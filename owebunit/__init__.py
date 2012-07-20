@@ -35,8 +35,18 @@ class Session(object):
     
     def assert_equal(self, expected, actual):
         assert expected == actual
+    
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, type, value, traceback):
+        pass
 
 class WebTestCase(unittest.TestCase):
+    def session(self):
+        session = Session()
+        return session
+    
     def get(self, url):
         self.session = Session()
         self.session.get(url)

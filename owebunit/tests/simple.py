@@ -33,6 +33,11 @@ class Case(owebunit.WebTestCase):
     def test_simple(self):
         self.get('http://127.0.0.1:8041')
         self.assert_code(200)
+    
+    def test_session(self):
+        with self.session() as s:
+            s.get('http://127.0.0.1:8041')
+            s.assert_code(200)
 
 if __name__ == '__main__':
     import unittest
