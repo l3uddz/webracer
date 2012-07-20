@@ -2,19 +2,20 @@ import BaseHTTPServer
 import threading
 import time
 import owebunit
+import bottle
 
-class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.wfile.write("HTTP/1.0 200 OK\n")
-        self.wfile.write("Content-Type: text/plain\n")
-        self.wfile.write("\n")
-        self.wfile.write("Response text")
+app = bottle.Bottle()
+
+@app.route('/ok')
+def ok():
+    return 'ok'
+
+@app.route('/internal_server_error')
+def internal_error():
+    bottle.abort(500, 'internal server error')
 
 def run_server():
-    server_address = ('', 8041)
-    httpd = BaseHTTPServer.HTTPServer(server_address, Handler)
-    while True:
-        httpd.handle_request()
+    app.run(host='localhost', port=8041)
 
 class ServerThread(threading.Thread):
     def run(self):
@@ -31,12 +32,12 @@ time.sleep(0.1)
 
 class Case(owebunit.WebTestCase):
     def test_simple(self):
-        self.get('http://127.0.0.1:8041')
+        self.get('http://127.0.0.1:8041/ok')
         self.assert_code(200)
     
     def test_session(self):
         with self.session() as s:
-            s.get('http://127.0.0.1:8041')
+            s.get('http://127.0.0.1:8041/ok')
             s.assert_code(200)
 
 if __name__ == '__main__':
