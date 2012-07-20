@@ -39,6 +39,16 @@ class Case(owebunit.WebTestCase):
         with self.session() as s:
             s.get('http://127.0.0.1:8041/ok')
             s.assert_code(200)
+    
+    def test_multiple_sessions(self):
+        one = self.session()
+        one.get('http://127.0.0.1:8041/ok')
+        
+        two = self.session()
+        two.get('http://127.0.0.1:8041/internal_server_error')
+        
+        one.assert_code(200)
+        two.assert_code(500)
 
 if __name__ == '__main__':
     import unittest
