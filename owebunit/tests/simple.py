@@ -1,4 +1,3 @@
-import BaseHTTPServer
 import threading
 import time
 import owebunit
