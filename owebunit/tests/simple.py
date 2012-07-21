@@ -58,6 +58,7 @@ class Case(owebunit.WebTestCase):
         self.assert_code(200)
         
         self.assert_response_cookie('visited')
+        self.assert_response_cookie('visited', value='yes')
 
 if __name__ == '__main__':
     import unittest

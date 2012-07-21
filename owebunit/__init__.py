@@ -55,11 +55,15 @@ class Session(object):
     def assert_equal(self, expected, actual):
         assert expected == actual
     
-    def assert_response_cookie(self, name):
+    def assert_response_cookie(self, name, **kwargs):
         '''Asserts that the response (as opposed to the session/cookie jar)
         contains the specified cookie.'''
         
         assert self.response.cookie_dict.has_key(name)
+        if kwargs:
+            cookie = self.response.cookie_dict[name]
+            if kwargs.has_key('value'):
+                self.assert_equal(kwargs['value'], cookie.value)
     
     def __enter__(self):
         return self
@@ -79,5 +83,5 @@ class WebTestCase(unittest.TestCase):
     def assert_code(self, code):
         self.session.assert_code(code)
     
-    def assert_response_cookie(self, name):
-        self.session.assert_response_cookie(name)
+    def assert_response_cookie(self, name, **kwargs):
+        self.session.assert_response_cookie(name, **kwargs)
