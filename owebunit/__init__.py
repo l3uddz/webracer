@@ -1,6 +1,7 @@
 import unittest
 import httplib
 import urlparse
+import ocookie.httplibadapter
 
 class Response(object):
     def __init__(self, httplib_response):
@@ -9,6 +10,24 @@ class Response(object):
     @property
     def code(self):
         return self.httplib_response.status
+    
+    @property
+    def cookie_list(self):
+        try:
+            return self._cookie_list
+        except AttributeError:
+            self._cookie_list = ocookie.httplibadapter.parse_cookies(
+                self.httplib_response.getheaders()
+            )
+            return self._cookie_list
+    
+    @property
+    def cookie_dict(self):
+        try:
+            return self._cookie_dict
+        except AttributeError:
+            self._cookie_dict = ocookie.cookie_list_to_dict(self.cookie_list)
+            return self._cookie_dict
 
 def uri(self):
     uri = self.path or '/'
@@ -36,6 +55,12 @@ class Session(object):
     def assert_equal(self, expected, actual):
         assert expected == actual
     
+    def assert_response_cookie(self, name):
+        '''Asserts that the response (as opposed to the session/cookie jar)
+        contains the specified cookie.'''
+        
+        assert self.response.cookie_dict.has_key(name)
+    
     def __enter__(self):
         return self
     
@@ -53,3 +78,6 @@ class WebTestCase(unittest.TestCase):
     
     def assert_code(self, code):
         self.session.assert_code(code)
+    
+    def assert_response_cookie(self, name):
+        self.session.assert_response_cookie(name)

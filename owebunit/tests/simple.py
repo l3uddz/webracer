@@ -13,6 +13,10 @@ def ok():
 def internal_error():
     bottle.abort(500, 'internal server error')
 
+@app.route('/set_cookie')
+def set_cookie():
+    bottle.response.set_cookie('visited', 'yes')
+
 def run_server():
     app.run(host='localhost', port=8041)
 
@@ -48,6 +52,12 @@ class Case(owebunit.WebTestCase):
         
         one.assert_code(200)
         two.assert_code(500)
+    
+    def test_cookie(self):
+        self.get('http://127.0.0.1:8041/set_cookie')
+        self.assert_code(200)
+        
+        self.assert_response_cookie('visited')
 
 if __name__ == '__main__':
     import unittest
