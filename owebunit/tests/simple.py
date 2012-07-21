@@ -65,6 +65,17 @@ class SimpleTestCase(owebunit.WebTestCase):
         
         with self.assert_raises(AssertionError):
             self.assert_response_cookie('visited', value='no')
+    
+    def test_implicit_session(self):
+        self.get('http://127.0.0.1:8041/set_cookie')
+        self.assert_code(200)
+        self.assert_response_cookie('visited')
+        self.assert_session_cookie('visited')
+        
+        self.get('http://127.0.0.1:8041/ok')
+        self.assert_code(200)
+        self.assert_not_response_cookie('visited')
+        self.assert_session_cookie('visited')
 
 if __name__ == '__main__':
     import unittest

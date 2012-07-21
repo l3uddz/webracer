@@ -58,11 +58,16 @@ class AssertRaisesContextManager(object):
         return True
 
 class Session(object):
+    def __init__(self):
+        self._cookie_jar = ocookie.CookieJar()
+    
     def get(self, url):
         parsed_url = parse_url(url)
         self.connection = httplib.HTTPConnection(*parsed_url.netloc.split(':'))
         self.connection.request('GET', parsed_url.uri)
         self.response = Response(self.connection.getresponse())
+        for cookie in self.response.cookie_list:
+            self._cookie_jar.add(cookie)
     
     def assert_code(self, code):
         self.assert_equal(code, self.response.code)
@@ -86,6 +91,9 @@ class Session(object):
         
         assert name not in self.response.cookie_dict
     
+    def assert_session_cookie(self, name, **kwargs):
+        assert name in self._cookie_jar
+    
     def __enter__(self):
         return self
     
@@ -93,13 +101,16 @@ class Session(object):
         pass
 
 class WebTestCase(unittest.TestCase):
+    def setUp(self):
+        super(WebTestCase, self).setUp()
+        self._session = Session()
+    
     def session(self):
         session = Session()
         return session
     
     def get(self, url):
-        self.session = Session()
-        self.session.get(url)
+        self._session.get(url)
     
     def assert_raises(self, expected, *args):
         if args:
@@ -108,10 +119,16 @@ class WebTestCase(unittest.TestCase):
             return AssertRaisesContextManager(expected)
     
     def assert_code(self, code):
-        self.session.assert_code(code)
+        self._session.assert_code(code)
     
     def assert_response_cookie(self, name, **kwargs):
-        self.session.assert_response_cookie(name, **kwargs)
+        self._session.assert_response_cookie(name, **kwargs)
     
     def assert_not_response_cookie(self, name):
-        self.session.assert_not_response_cookie(name)
+        self._session.assert_not_response_cookie(name)
+    
+    def assert_session_cookie(self, name, **kwargs):
+        self._session.assert_session_cookie(name, **kwargs)
+    
+    def assert_not_session_cookie(self, name):
+        self._session.assert_not_session_cookie(name)
