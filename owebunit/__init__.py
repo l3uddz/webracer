@@ -42,6 +42,21 @@ def parse_url(url):
     parsed_url.uri = uri(parsed_url)
     return parsed_url
 
+class AssertRaisesContextManager(object):
+    def __init__(self, expected):
+        self.expected = expected
+    
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, type, value, traceback):
+        if type is None:
+            assert False
+        if type != self.expected:
+            assert False
+        # silence exception
+        return True
+
 class Session(object):
     def get(self, url):
         parsed_url = parse_url(url)
@@ -79,6 +94,12 @@ class WebTestCase(unittest.TestCase):
     def get(self, url):
         self.session = Session()
         self.session.get(url)
+    
+    def assert_raises(self, expected, *args):
+        if args:
+            return self.assertRaises(expected, *args)
+        else:
+            return AssertRaisesContextManager(expected)
     
     def assert_code(self, code):
         self.session.assert_code(code)
