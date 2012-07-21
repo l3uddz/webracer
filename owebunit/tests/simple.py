@@ -33,7 +33,7 @@ start_server()
 
 time.sleep(0.1)
 
-class Case(owebunit.WebTestCase):
+class SimpleTestCase(owebunit.WebTestCase):
     def test_simple(self):
         self.get('http://127.0.0.1:8041/ok')
         self.assert_code(200)
@@ -59,6 +59,9 @@ class Case(owebunit.WebTestCase):
         
         self.assert_response_cookie('visited')
         self.assert_response_cookie('visited', value='yes')
+        
+        # nonexistent cookie
+        self.assert_not_response_cookie('nonexistent_cookie')
         
         with self.assert_raises(AssertionError):
             self.assert_response_cookie('visited', value='no')

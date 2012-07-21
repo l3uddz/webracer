@@ -74,11 +74,17 @@ class Session(object):
         '''Asserts that the response (as opposed to the session/cookie jar)
         contains the specified cookie.'''
         
-        assert self.response.cookie_dict.has_key(name)
+        assert name in self.response.cookie_dict
         if kwargs:
             cookie = self.response.cookie_dict[name]
             if kwargs.has_key('value'):
                 self.assert_equal(kwargs['value'], cookie.value)
+    
+    def assert_not_response_cookie(self, name):
+        '''Asserts that a cookie with the specified name was not set
+        in the response.'''
+        
+        assert name not in self.response.cookie_dict
     
     def __enter__(self):
         return self
@@ -106,3 +112,6 @@ class WebTestCase(unittest.TestCase):
     
     def assert_response_cookie(self, name, **kwargs):
         self.session.assert_response_cookie(name, **kwargs)
+    
+    def assert_not_response_cookie(self, name):
+        self.session.assert_not_response_cookie(name)
