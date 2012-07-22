@@ -12,6 +12,14 @@ class Response(object):
         return self.httplib_response.status
     
     @property
+    def body(self):
+        try:
+            return self._body
+        except AttributeError:
+            self._body = self.httplib_response.read()
+            return self._body
+    
+    @property
     def cookie_list(self):
         try:
             return self._cookie_list
@@ -61,13 +69,22 @@ class Session(object):
     def __init__(self):
         self._cookie_jar = ocookie.CookieJar()
     
-    def get(self, url):
+    def request(self, method, url, body=None, headers=None):
         parsed_url = parse_url(url)
+        headers = self._merge_headers(headers)
         self.connection = httplib.HTTPConnection(*parsed_url.netloc.split(':'))
-        self.connection.request('GET', parsed_url.uri)
+        kwargs = {}
+        if body is not None:
+            kwargs['body'] = body
+        if headers is not None:
+            kwargs['headers'] = headers
+        self.connection.request(method.upper(), parsed_url.uri, **kwargs)
         self.response = Response(self.connection.getresponse())
         for cookie in self.response.cookie_list:
             self._cookie_jar.add(cookie)
+    
+    def get(self, url, body=None, headers=None):
+        self.request('get', url, body, headers)
     
     def assert_code(self, code):
         self.assert_equal(code, self.response.code)
@@ -102,6 +119,45 @@ class Session(object):
     
     def __exit__(self, type, value, traceback):
         pass
+    
+    def _merge_headers(self, user_headers):
+        if isinstance(user_headers, list) or isinstance(user_headers, tuple):
+            # convert to a dictionary for httplib
+            map = {}
+            for key, value in user_headers:
+                if key in map:
+                    raise ValueError, 'Duplicate headers are not supported by httplib'
+                map[key] = value
+            user_headers = map
+        
+        if self._cookie_jar:
+            if user_headers is None:
+                user_headers = {}
+            if 'cookie' in user_headers:
+                value = self._merge_cookie_header_values(user_headers['cookie'])
+            else:
+                value = self._cookie_jar.build_cookie_header()
+        else:
+            value = None
+        
+        if value:
+            if user_headers:
+                headers = dict(user_headers)
+            else:
+                headers = {}
+            headers['cookie'] = value
+        else:
+            headers = user_headers
+        return headers
+    
+    def _merge_cookie_header_values(self, user_header_value):
+        user_cookie_dict = ocookie.CookieParser.parse_cookie_value(user_header_value)
+        cookie_dict = ocookie.CookieDict()
+        for cookie in self._cookie_jar:
+            cookie_dict[cookie.name] = cookie
+        for cookie in user_cookie_dict:
+            cookie_dict[cookie.name] = cookie
+        return cookie_dict.cookie_header_value()
 
 class WebTestCase(unittest.TestCase):
     def setUp(self):
@@ -111,6 +167,10 @@ class WebTestCase(unittest.TestCase):
     def session(self):
         session = Session()
         return session
+    
+    @property
+    def response(self):
+        return self._session.response
     
     def get(self, url):
         if hasattr(self, '_no_session') and self._no_session:

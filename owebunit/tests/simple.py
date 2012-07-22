@@ -17,6 +17,10 @@ def internal_error():
 def set_cookie():
     bottle.response.set_cookie('visited', 'yes')
 
+@app.route('/read_cookie')
+def read_cookie():
+    return bottle.request.get_cookie('visited')
+
 def run_server():
     app.run(host='localhost', port=8041)
 
@@ -72,8 +76,9 @@ class SimpleTestCase(owebunit.WebTestCase):
         self.assert_response_cookie('visited')
         self.assert_session_cookie('visited')
         
-        self.get('http://127.0.0.1:8041/ok')
+        self.get('http://127.0.0.1:8041/read_cookie')
         self.assert_code(200)
+        self.assertEqual('yes', self.response.body)
         self.assert_not_response_cookie('visited')
         # session cookie is carried over
         self.assert_session_cookie('visited')
@@ -87,8 +92,9 @@ class NoSessionTestCase(owebunit.WebTestCase):
         self.assert_response_cookie('visited')
         self.assert_session_cookie('visited')
         
-        self.get('http://127.0.0.1:8041/ok')
+        self.get('http://127.0.0.1:8041/read_cookie')
         self.assert_code(200)
+        self.assertEqual('', self.response.body)
         self.assert_not_response_cookie('visited')
         # session cookie is not carried over
         self.assert_not_session_cookie('visited')
