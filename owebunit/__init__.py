@@ -94,6 +94,9 @@ class Session(object):
     def assert_session_cookie(self, name, **kwargs):
         assert name in self._cookie_jar
     
+    def assert_not_session_cookie(self, name, **kwargs):
+        assert name not in self._cookie_jar
+    
     def __enter__(self):
         return self
     
@@ -110,6 +113,8 @@ class WebTestCase(unittest.TestCase):
         return session
     
     def get(self, url):
+        if hasattr(self, '_no_session') and self._no_session:
+            self._session = Session()
         self._session.get(url)
     
     def assert_raises(self, expected, *args):
