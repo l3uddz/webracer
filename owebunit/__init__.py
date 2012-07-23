@@ -83,6 +83,7 @@ class Session(object):
         for cookie in self.response.cookie_list:
             self._cookie_jar.add(cookie)
     
+    # note: cherrypy webtest has a protocol argument
     def get(self, url, body=None, headers=None):
         self.request('get', url, body, headers)
     
@@ -172,10 +173,15 @@ class WebTestCase(unittest.TestCase):
     def response(self):
         return self._session.response
     
-    def get(self, url):
+    def request(self, method, url, body=None, headers=None):
         if hasattr(self, '_no_session') and self._no_session:
             self._session = Session()
-        self._session.get(url)
+        return self._session.request(method, url, body=body, headers=headers)
+    
+    def get(self, url, body=None, headers=None):
+        if hasattr(self, '_no_session') and self._no_session:
+            self._session = Session()
+        self._session.get(url, body=body, headers=headers)
     
     def assert_raises(self, expected, *args):
         if args:
