@@ -81,6 +81,14 @@ class Session(object):
         kwargs = {}
         if body is not None:
             kwargs['body'] = body
+        
+        # XXX cherrypy waits for keep-alives to expire, work around that
+        if headers is None:
+            headers = {}
+        else:
+            headers = dict(headers)
+        headers['connection'] = 'close'
+        
         if headers is not None:
             kwargs['headers'] = headers
         self.connection.request(method.upper(), parsed_url.uri, **kwargs)
