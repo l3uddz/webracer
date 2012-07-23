@@ -66,13 +66,18 @@ class AssertRaisesContextManager(object):
         return True
 
 class Session(object):
-    def __init__(self):
+    def __init__(self, default_netloc=None):
         self._cookie_jar = ocookie.CookieJar()
+        if default_netloc:
+            self._default_host, self._default_port = default_netloc.split(':')
+        else:
+            self._default_host, self._default_port = None, None
     
     def request(self, method, url, body=None, headers=None):
         parsed_url = parse_url(url)
         headers = self._merge_headers(headers)
-        self.connection = httplib.HTTPConnection(*parsed_url.netloc.split(':'))
+        host, port = self._netloc_to_host_port(parsed_url.netloc)
+        self.connection = httplib.HTTPConnection(host, port)
         kwargs = {}
         if body is not None:
             kwargs['body'] = body
@@ -82,6 +87,13 @@ class Session(object):
         self.response = Response(self.connection.getresponse())
         for cookie in self.response.cookie_list:
             self._cookie_jar.add(cookie)
+    
+    def _netloc_to_host_port(self, netloc):
+        if netloc:
+            return netloc.split(':')
+        else:
+            # url contained path only
+            return (self._default_host, self._default_port)
     
     # note: cherrypy webtest has a protocol argument
     def get(self, url, body=None, headers=None):
@@ -163,10 +175,16 @@ class Session(object):
 class WebTestCase(unittest.TestCase):
     def setUp(self):
         super(WebTestCase, self).setUp()
-        self._session = Session()
+        self._session = self._create_session()
+    
+    def _create_session(self):
+        kwargs = {}
+        if hasattr(self.__class__, 'DEFAULT_NETLOC'):
+            kwargs['default_netloc'] = self.__class__.DEFAULT_NETLOC
+        return Session(**kwargs)
     
     def session(self):
-        session = Session()
+        session = self._create_session()
         return session
     
     @property
@@ -175,12 +193,12 @@ class WebTestCase(unittest.TestCase):
     
     def request(self, method, url, body=None, headers=None):
         if hasattr(self, '_no_session') and self._no_session:
-            self._session = Session()
+            self._session = self._create_session()
         return self._session.request(method, url, body=body, headers=headers)
     
     def get(self, url, body=None, headers=None):
         if hasattr(self, '_no_session') and self._no_session:
-            self._session = Session()
+            self._session = self._create_session()
         self._session.get(url, body=body, headers=headers)
     
     def assert_raises(self, expected, *args):
