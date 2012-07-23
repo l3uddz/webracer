@@ -3,6 +3,33 @@ import httplib
 import urlparse
 import ocookie.httplibadapter
 
+class HeadersDict(dict):
+    '''Dictionary type for headers. Performs case folding of header names.
+    '''
+    
+    def __init__(self, map=None):
+        super(HeadersDict, self).__init__()
+        
+        if map:
+            for key in map:
+                self[key.lower()] = map[key]
+    
+    def __delitem__(self, key):
+        super(HeadersDict, self).__delitem__(key.lower())
+    
+    def __getitem__(self, key):
+        return super(HeadersDict, self).__getitem__(key.lower())
+    
+    def __setitem__(self, key, value):
+        super(HeadersDict, self).__setitem__(key.lower(), value)
+    
+    def __contains__(self, key):
+        return super(HeadersDict, self).__contains__(key.lower())
+    
+    def update(self, other):
+        for key in other:
+            self[key.lower()] = other[key]
+
 class Response(object):
     def __init__(self, httplib_response):
         self.httplib_response = httplib_response
@@ -86,7 +113,7 @@ class Session(object):
         if headers is None:
             headers = {}
         else:
-            headers = dict(headers)
+            headers = HeadersDict(headers)
         headers['connection'] = 'close'
         
         if headers is not None:
@@ -163,7 +190,7 @@ class Session(object):
         
         if value:
             if user_headers:
-                headers = dict(user_headers)
+                headers = HeadersDict(user_headers)
             else:
                 headers = {}
             headers['cookie'] = value
