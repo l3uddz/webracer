@@ -40,12 +40,12 @@ time.sleep(0.1)
 class SimpleTestCase(owebunit.WebTestCase):
     def test_simple(self):
         self.get('http://127.0.0.1:8041/ok')
-        self.assert_code(200)
+        self.assert_status(200)
     
     def test_session(self):
         with self.session() as s:
             s.get('http://127.0.0.1:8041/ok')
-            s.assert_code(200)
+            s.assert_status(200)
     
     def test_multiple_sessions(self):
         one = self.session()
@@ -54,12 +54,12 @@ class SimpleTestCase(owebunit.WebTestCase):
         two = self.session()
         two.get('http://127.0.0.1:8041/internal_server_error')
         
-        one.assert_code(200)
-        two.assert_code(500)
+        one.assert_status(200)
+        two.assert_status(500)
     
     def test_cookie(self):
         self.get('http://127.0.0.1:8041/set_cookie')
-        self.assert_code(200)
+        self.assert_status(200)
         
         self.assert_response_cookie('visited')
         self.assert_response_cookie('visited', value='yes')
@@ -72,12 +72,12 @@ class SimpleTestCase(owebunit.WebTestCase):
     
     def test_implicit_session(self):
         self.get('http://127.0.0.1:8041/set_cookie')
-        self.assert_code(200)
+        self.assert_status(200)
         self.assert_response_cookie('visited')
         self.assert_session_cookie('visited')
         
         self.get('http://127.0.0.1:8041/read_cookie')
-        self.assert_code(200)
+        self.assert_status(200)
         self.assertEqual('yes', self.response.body)
         self.assert_not_response_cookie('visited')
         # session cookie is carried over
@@ -88,12 +88,12 @@ class NoSessionTestCase(owebunit.WebTestCase):
     
     def test_implicit_session(self):
         self.get('http://127.0.0.1:8041/set_cookie')
-        self.assert_code(200)
+        self.assert_status(200)
         self.assert_response_cookie('visited')
         self.assert_session_cookie('visited')
         
         self.get('http://127.0.0.1:8041/read_cookie')
-        self.assert_code(200)
+        self.assert_status(200)
         self.assertEqual('', self.response.body)
         self.assert_not_response_cookie('visited')
         # session cookie is not carried over

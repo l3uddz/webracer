@@ -99,7 +99,7 @@ class Session(object):
     def get(self, url, body=None, headers=None):
         self.request('get', url, body, headers)
     
-    def assert_code(self, code):
+    def assert_status(self, code):
         self.assert_equal(code, self.response.code)
     
     def assert_equal(self, expected, actual):
@@ -207,8 +207,8 @@ class WebTestCase(unittest.TestCase):
         else:
             return AssertRaisesContextManager(expected)
     
-    def assert_code(self, code):
-        self._session.assert_code(code)
+    def assert_status(self, code):
+        self._session.assert_status(code)
     
     def assert_response_cookie(self, name, **kwargs):
         self._session.assert_response_cookie(name, **kwargs)
