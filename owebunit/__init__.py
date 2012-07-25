@@ -47,6 +47,15 @@ class Response(object):
             return self._body
     
     @property
+    def etree(self):
+        '''Returns an ElementTree built from response body.'''
+        
+        import xml.etree.ElementTree
+        
+        root = xml.etree.ElementTree.ElementTree(self.body)
+        return root
+    
+    @property
     def cookie_list(self):
         try:
             return self._cookie_list
