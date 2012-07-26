@@ -149,6 +149,12 @@ class Session(object):
         if body is not None:
             if isinstance(body, dict):
                 body = urlencode_utf8(body)
+            #if headers is None:
+                #headers = headers
+            #else:
+                #headers = HeadersDict(headers)
+            #if 'content-type' not in headers:
+                #headers['content-type'] = 'application/x-www-form-urlencoded'
             kwargs['body'] = body
         
         # XXX cherrypy waits for keep-alives to expire, work around that
@@ -160,7 +166,7 @@ class Session(object):
         
         if headers is not None:
             kwargs['headers'] = headers
-        self.connection.request(method.upper(), parsed_url.uri, **kwargs)
+        self.connection.request(method.upper(), parsed_url.uri, kwargs.get('body'), kwargs.get('headers'))
         self.response = Response(self.connection.getresponse())
         for cookie in self.response.cookie_list:
             self._cookie_jar.add(cookie)

@@ -21,6 +21,10 @@ def set_cookie():
 def read_cookie():
     return bottle.request.get_cookie('visited')
 
+@app.route('/param', method='POST')
+def param():
+    return bottle.request.forms.p
+
 def run_server():
     app.run(host='localhost', port=8041)
 
@@ -82,6 +86,16 @@ class SimpleTestCase(owebunit.WebTestCase):
         self.assert_not_response_cookie('visited')
         # session cookie is carried over
         self.assert_session_cookie('visited')
+    
+    def test_param_string(self):
+        self.post('http://127.0.0.1:8041/param', body='p=value')
+        self.assert_status(200)
+        self.assertEqual('value', self.response.body)
+    
+    def test_param_dict(self):
+        self.post('http://127.0.0.1:8041/param', body=dict(p='value'))
+        self.assert_status(200)
+        self.assertEqual('value', self.response.body)
 
 class NoSessionTestCase(owebunit.WebTestCase):
     _no_session = True
