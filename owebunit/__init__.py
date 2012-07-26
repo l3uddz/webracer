@@ -160,7 +160,10 @@ class Session(object):
     
     # note: cherrypy webtest has a protocol argument
     def get(self, url, body=None, headers=None):
-        self.request('get', url, body, headers)
+        return self.request('get', url, body=body, headers=headers)
+    
+    def post(self, url, body=None, headers=None):
+        return self.request('post', url, body=body, headers=headers)
     
     def assert_status(self, code):
         self.assert_equal(code, self.response.code)
@@ -260,9 +263,10 @@ class WebTestCase(unittest.TestCase):
         return self._session.request(method, url, body=body, headers=headers)
     
     def get(self, url, body=None, headers=None):
-        if hasattr(self, '_no_session') and self._no_session:
-            self._session = self._create_session()
-        self._session.get(url, body=body, headers=headers)
+        return self.request('get', url, body=body, headers=headers)
+    
+    def post(self, url, body=None, headers=None):
+        return self.request('post', url, body=body, headers=headers)
     
     def assert_raises(self, expected, *args):
         if args:
