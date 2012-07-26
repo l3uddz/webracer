@@ -56,6 +56,25 @@ class Response(object):
         return root
     
     @property
+    def lxml_etree(self):
+        '''Returns an lxml.etree built from response body, treating
+        the latter as XML.'''
+        
+        import lxml.etree
+        
+        doc = lxml.etree.XML(response.body)
+    
+    @property
+    def lxml_etree_html(self):
+        '''Returns an lxml.etree built from response body, treating
+        the latter as HTML.'''
+        
+        import lxml.etree
+        
+        doc = lxml.etree.HTML(self.body)
+        return doc
+    
+    @property
     def cookie_list(self):
         try:
             return self._cookie_list
