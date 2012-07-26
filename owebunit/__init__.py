@@ -149,12 +149,12 @@ class Session(object):
         if body is not None:
             if isinstance(body, dict):
                 body = urlencode_utf8(body)
-            #if headers is None:
-                #headers = headers
-            #else:
-                #headers = HeadersDict(headers)
-            #if 'content-type' not in headers:
-                #headers['content-type'] = 'application/x-www-form-urlencoded'
+            if headers is None:
+                headers = headers
+            else:
+                headers = HeadersDict(headers)
+            if 'content-type' not in headers:
+                headers['content-type'] = 'application/x-www-form-urlencoded'
             kwargs['body'] = body
         
         # XXX cherrypy waits for keep-alives to expire, work around that
