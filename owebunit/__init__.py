@@ -1,5 +1,6 @@
 import unittest
 import httplib
+import urllib
 import urlparse
 import ocookie.httplibadapter
 
@@ -105,6 +106,17 @@ def parse_url(url):
     parsed_url.uri = uri(parsed_url)
     return parsed_url
 
+def urlencode_utf8(params):
+    encoded = {}
+    for key in params:
+        value = params[key]
+        if isinstance(value, unicode):
+            encoded[key] = value.encode('utf-8')
+        else:
+            encoded[key] = value
+    encoded = urllib.urlencode(encoded)
+    return encoded
+
 class AssertRaisesContextManager(object):
     def __init__(self, expected):
         self.expected = expected
@@ -135,6 +147,8 @@ class Session(object):
         self.connection = httplib.HTTPConnection(host, port)
         kwargs = {}
         if body is not None:
+            if isinstance(body, dict):
+                body = urlencode_utf8(body)
             kwargs['body'] = body
         
         # XXX cherrypy waits for keep-alives to expire, work around that
