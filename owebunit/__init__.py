@@ -169,7 +169,7 @@ class Session(object):
         self.assert_equal(code, self.response.code)
     
     def assert_equal(self, expected, actual):
-        assert expected == actual
+        assert expected == actual, '%s expected but was %s' % (expected, actual)
     
     def assert_response_cookie(self, name, **kwargs):
         '''Asserts that the response (as opposed to the session/cookie jar)
