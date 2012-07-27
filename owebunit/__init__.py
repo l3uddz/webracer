@@ -140,7 +140,7 @@ class Session(object):
         else:
             self._default_host, self._default_port = None, None
     
-    def request(self, method, url, body=None, headers=None):
+    def request(self, method, url, body=None, query=None, headers=None):
         parsed_url = parse_url(url)
         headers = self._merge_headers(headers)
         host, port = self._netloc_to_host_port(parsed_url.netloc)
@@ -155,7 +155,6 @@ class Session(object):
                 headers = HeadersDict(headers)
             if 'content-type' not in headers:
                 headers['content-type'] = 'application/x-www-form-urlencoded'
-            kwargs['body'] = body
         
         # XXX cherrypy waits for keep-alives to expire, work around that
         if headers is None:
@@ -164,9 +163,18 @@ class Session(object):
             headers = HeadersDict(headers)
         headers['connection'] = 'close'
         
-        if headers is not None:
-            kwargs['headers'] = headers
-        self.connection.request(method.upper(), parsed_url.uri, kwargs.get('body'), kwargs.get('headers'))
+        uri = parsed_url.uri
+        if query is not None:
+            if isinstance(query, dict):
+                encoded_query = urlencode_utf8(query)
+            elif isinstance(query, basestring):
+                encoded_query = query
+            else:
+                raise ValueError, 'Query string is neither a string nor a dict'
+            # XXX handle url also having a query
+            uri += '?' + encoded_query
+        
+        self.connection.request(method.upper(), uri, body, headers)
         self.response = Response(self.connection.getresponse())
         for cookie in self.response.cookie_list:
             self._cookie_jar.add(cookie)
@@ -179,11 +187,11 @@ class Session(object):
             return (self._default_host, self._default_port)
     
     # note: cherrypy webtest has a protocol argument
-    def get(self, url, body=None, headers=None):
-        return self.request('get', url, body=body, headers=headers)
+    def get(self, url, **kwargs):
+        return self.request('get', url, **kwargs)
     
-    def post(self, url, body=None, headers=None):
-        return self.request('post', url, body=body, headers=headers)
+    def post(self, url, **kwargs):
+        return self.request('post', url, **kwargs)
     
     def assert_status(self, code):
         self.assert_equal(code, self.response.code)
@@ -277,16 +285,16 @@ class WebTestCase(unittest.TestCase):
     def response(self):
         return self._session.response
     
-    def request(self, method, url, body=None, headers=None):
+    def request(self, method, url, **kwargs):
         if hasattr(self, '_no_session') and self._no_session:
             self._session = self._create_session()
-        return self._session.request(method, url, body=body, headers=headers)
+        return self._session.request(method, url, **kwargs)
     
-    def get(self, url, body=None, headers=None):
-        return self.request('get', url, body=body, headers=headers)
+    def get(self, url, **kwargs):
+        return self.request('get', url, **kwargs)
     
-    def post(self, url, body=None, headers=None):
-        return self.request('post', url, body=body, headers=headers)
+    def post(self, url, **kwargs):
+        return self.request('post', url, **kwargs)
     
     def assert_raises(self, expected, *args):
         if args:
