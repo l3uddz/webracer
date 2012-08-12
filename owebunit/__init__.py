@@ -205,7 +205,10 @@ class Session(object):
         return self.request('post', url, **kwargs)
     
     def assert_status(self, code):
-        self.assert_equal(code, self.response.code)
+        if self.response.code != code:
+            if len(self.response.body) > 0:
+                print self.response.body
+            assert False, 'Response status %s expected but was %s' % (code, self.response.code)
     
     def assert_equal(self, expected, actual):
         assert expected == actual, '%s expected but was %s' % (expected, actual)
