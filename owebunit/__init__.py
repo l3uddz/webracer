@@ -211,8 +211,9 @@ class Session(object):
     
     def assert_status(self, code):
         if self.response.code != code:
-            if len(self.response.body) > 0:
-                print self.response.body
+            if self.config.save_failed_responses:
+                if len(self.response.body) > 0:
+                    print self.response.body
             assert False, 'Response status %s expected but was %s' % (code, self.response.code)
     
     def assert_equal(self, expected, actual):
