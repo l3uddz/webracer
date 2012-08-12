@@ -106,16 +106,27 @@ def parse_url(url):
     parsed_url.uri = uri(parsed_url)
     return parsed_url
 
+def _urlencode_value(value):
+    if isinstance(value, unicode):
+        encoded = value.encode('utf-8')
+    else:
+        encoded = str(value)
+    return urllib.quote(encoded)
+
 def urlencode_utf8(params):
-    encoded = {}
+    encoded = []
     for key in params:
         value = params[key]
-        if isinstance(value, unicode):
-            encoded[key] = value.encode('utf-8')
+        if isinstance(value, list) or isinstance(value, tuple):
+            prefix = key + '[]='
+            values = value
+            for value in values:
+                value = _urlencode_value(value)
+                encoded.append(prefix + value)
         else:
-            encoded[key] = value
-    encoded = urllib.urlencode(encoded)
-    return encoded
+            value = _urlencode_value(value)
+            encoded.append(key + '=' + value)
+    return '&'.join(encoded)
 
 class AssertRaisesContextManager(object):
     def __init__(self, expected):
