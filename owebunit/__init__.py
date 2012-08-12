@@ -1,5 +1,7 @@
-import unittest
 import httplib
+import os.path
+import time as _time
+import unittest
 import urllib
 import urlparse
 import ocookie.httplibadapter
@@ -211,10 +213,16 @@ class Session(object):
     
     def assert_status(self, code):
         if self.response.code != code:
+            msg = 'Response status %s expected but was %s' % (code, self.response.code)
             if self.config.save_failed_responses:
                 if len(self.response.body) > 0:
-                    print self.response.body
-            assert False, 'Response status %s expected but was %s' % (code, self.response.code)
+                    if self.config.save_dir is not None:
+                        basename = 'response_%f' % _time.time()
+                        with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
+                            f.write(self.response.body)
+                    else:
+                        msg += "\nCould not save response body - save_dir is None"
+            assert False, msg
     
     def assert_equal(self, expected, actual):
         assert expected == actual, '%s expected but was %s' % (expected, actual)
