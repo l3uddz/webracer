@@ -4,6 +4,10 @@ import urllib
 import urlparse
 import ocookie.httplibadapter
 
+class Config(object):
+    save_failed_responses = False
+    save_dir = None
+
 class HeadersDict(dict):
     '''Dictionary type for headers. Performs case folding of header names.
     '''
@@ -144,7 +148,8 @@ class AssertRaisesContextManager(object):
         return True
 
 class Session(object):
-    def __init__(self, default_netloc=None):
+    def __init__(self, config, default_netloc=None):
+        self.config = config
         self._cookie_jar = ocookie.CookieJar()
         if default_netloc:
             self._default_host, self._default_port = default_netloc.split(':')
@@ -281,6 +286,8 @@ class Session(object):
         return cookie_dict.cookie_header_value()
 
 class WebTestCase(unittest.TestCase):
+    config = Config()
+    
     def setUp(self):
         super(WebTestCase, self).setUp()
         self._session = self._create_session()
@@ -289,6 +296,7 @@ class WebTestCase(unittest.TestCase):
         kwargs = {}
         if hasattr(self.__class__, 'DEFAULT_NETLOC'):
             kwargs['default_netloc'] = self.__class__.DEFAULT_NETLOC
+        kwargs['config'] = self.config
         return Session(**kwargs)
     
     def session(self):
