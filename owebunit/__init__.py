@@ -150,8 +150,9 @@ class AssertRaisesContextManager(object):
         return True
 
 class Session(object):
-    def __init__(self, config, default_netloc=None):
+    def __init__(self, config, test_case, default_netloc=None):
         self.config = config
+        self.test_case = test_case
         self._cookie_jar = ocookie.CookieJar()
         if default_netloc:
             self._default_host, self._default_port = default_netloc.split(':')
@@ -214,6 +215,10 @@ class Session(object):
     def assert_status(self, code):
         if self.response.code != code:
             msg = 'Response status %s expected but was %s' % (code, self.response.code)
+            if self.response.code == 500:
+                extra = self.test_case.get_500_extra_message()
+                if extra:
+                    msg += "\n" + extra
             if self.config.save_failed_responses:
                 if len(self.response.body) > 0:
                     if self.config.save_dir is not None:
@@ -306,6 +311,7 @@ class WebTestCase(unittest.TestCase):
         if hasattr(self.__class__, 'DEFAULT_NETLOC'):
             kwargs['default_netloc'] = self.__class__.DEFAULT_NETLOC
         kwargs['config'] = self.config
+        kwargs['test_case'] = self
         return Session(**kwargs)
     
     def session(self):
@@ -347,3 +353,6 @@ class WebTestCase(unittest.TestCase):
     
     def assert_not_session_cookie(self, name):
         self._session.assert_not_session_cookie(name)
+    
+    def get_500_extra_message(self):
+        return None
