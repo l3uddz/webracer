@@ -356,3 +356,7 @@ class WebTestCase(unittest.TestCase):
     
     def get_500_extra_message(self):
         return None
+    
+    @property
+    def cookie_dict(self):
+        return self._session.cookie_dict
