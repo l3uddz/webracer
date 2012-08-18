@@ -69,7 +69,7 @@ class Response(object):
         
         import lxml.etree
         
-        doc = lxml.etree.XML(response.body)
+        doc = lxml.etree.XML(self.body)
     
     @property
     def lxml_etree_html(self):
