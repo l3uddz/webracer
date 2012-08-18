@@ -98,6 +98,18 @@ class Response(object):
         except AttributeError:
             self._cookie_dict = ocookie.cookie_list_to_dict(self.cookie_list)
             return self._cookie_dict
+    
+    @property
+    def header_list(self):
+        return self.httplib_response.getheaders()
+    
+    @property
+    def header_dict(self):
+        header_list = self.header_list
+        map = {}
+        for key, value in header_list:
+            map[key] = value
+        return map
 
 def uri(self):
     uri = self.path or '/'
@@ -360,3 +372,11 @@ class WebTestCase(unittest.TestCase):
     @property
     def cookie_dict(self):
         return self._session.cookie_dict
+    
+    @property
+    def header_list(self):
+        return self._session.header_list
+    
+    @property
+    def header_dict(self):
+        return self._session.header_dict
