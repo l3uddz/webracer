@@ -310,6 +310,9 @@ class Session(object):
         for cookie in user_cookie_dict:
             cookie_dict[cookie.name] = cookie
         return cookie_dict.cookie_header_value()
+    
+    def clear_cookie_jar(self):
+        self._cookie_jar = ocookie.CookieJar()
 
 class WebTestCase(unittest.TestCase):
     config = Config()
