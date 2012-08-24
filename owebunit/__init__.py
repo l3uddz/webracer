@@ -110,6 +110,14 @@ class Response(object):
         for key, value in header_list:
             map[key] = value
         return map
+    
+    @property
+    def location(self):
+        headers = self.header_dict
+        if 'location' in headers:
+            return headers['location']
+        else:
+            raise ValueError, 'There is no location header in this response'
 
 def uri(self):
     uri = self.path or '/'
