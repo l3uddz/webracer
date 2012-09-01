@@ -1,5 +1,6 @@
 import httplib
 import os.path
+import re
 import time as _time
 import unittest
 import urllib
@@ -118,6 +119,16 @@ class Response(object):
             return headers['location']
         else:
             raise ValueError, 'There is no location header in this response'
+    
+    @property
+    def location_uri(self):
+        '''Location with the host/port stripped, for ease of asserting.'''
+        
+        location = self.location
+        # XXX could do this via parseurl
+        location = re.sub(r'^\w+://[^/]+', '', location)
+        location = re.sub(r'^//[^/]+', '', location)
+        return location
 
 def uri(self):
     uri = self.path or '/'
