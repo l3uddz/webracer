@@ -29,6 +29,10 @@ def get_param():
 def param():
     return bottle.request.forms.p
 
+@app.route('/get_content_length', method='POST')
+def get_content_length():
+    return bottle.request.headers.get('content-length')
+
 def run_server():
     app.run(host='localhost', port=8041)
 
@@ -115,6 +119,21 @@ class SimpleTestCase(owebunit.WebTestCase):
         self.post('http://127.0.0.1:8041/param')
         self.assert_status(200)
         self.assertEqual('', self.response.body)
+        
+        # content-length should be set to zero for cherrypy
+        self.post('http://127.0.0.1:8041/get_content_length')
+        self.assert_status(200)
+        self.assertEqual('0', self.response.body)
+    
+    def test_post_with_empty_params(self):
+        self.post('http://127.0.0.1:8041/param', body={})
+        self.assert_status(200)
+        self.assertEqual('', self.response.body)
+        
+        # content-length should be set to zero for cherrypy
+        self.post('http://127.0.0.1:8041/get_content_length', body={})
+        self.assert_status(200)
+        self.assertEqual('0', self.response.body)
 
 class NoSessionTestCase(owebunit.WebTestCase):
     _no_session = True

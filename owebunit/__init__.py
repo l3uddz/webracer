@@ -196,15 +196,24 @@ class Session(object):
         host, port = self._netloc_to_host_port(parsed_url.netloc)
         self.connection = httplib.HTTPConnection(host, port)
         kwargs = {}
+        if headers is None:
+            headers = headers
+        else:
+            headers = HeadersDict(headers)
         if body is not None:
             if isinstance(body, dict):
                 body = urlencode_utf8(body)
-            if headers is None:
-                headers = headers
-            else:
-                headers = HeadersDict(headers)
             if 'content-type' not in headers:
                 headers['content-type'] = 'application/x-www-form-urlencoded'
+            # cherrypy refuses to process x-www-form-urlencoded without
+            # a content length
+            if len(body) == 0:
+                headers['content-length'] = 0
+        else:
+            # apparently content type is set to x-www-form-urlencoded
+            # even when there is no body specified, which proceeds
+            # to break cherrypy per above
+            headers['content-length'] = 0
         
         # XXX cherrypy waits for keep-alives to expire, work around that
         if headers is None:
