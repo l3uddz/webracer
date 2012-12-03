@@ -83,6 +83,14 @@ class Response(object):
         return doc
     
     @property
+    def json(self):
+        '''Returns response body parsed as JSON.'''
+        
+        import json
+        
+        return json.loads(self.body)
+    
+    @property
     def cookie_list(self):
         try:
             return self._cookie_list

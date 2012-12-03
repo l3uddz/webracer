@@ -33,6 +33,14 @@ def param():
 def get_content_length():
     return bottle.request.headers.get('content-length')
 
+@app.route('/json/empty')
+def get_json_empty():
+    return '{}'
+
+@app.route('/json/hash')
+def get_json_empty():
+    return '{"a": "b"}'
+
 def run_server():
     app.run(host='localhost', port=8041)
 
@@ -134,6 +142,16 @@ class SimpleTestCase(owebunit.WebTestCase):
         self.post('http://127.0.0.1:8041/get_content_length', body={})
         self.assert_status(200)
         self.assertEqual('0', self.response.body)
+    
+    def test_json_parsing_empty(self):
+        self.get('http://127.0.0.1:8041/json/empty')
+        self.assert_status(200)
+        self.assertEqual({}, self.response.json)
+    
+    def test_json_parsing_hash(self):
+        self.get('http://127.0.0.1:8041/json/hash')
+        self.assert_status(200)
+        self.assertEqual({'a': 'b'}, self.response.json)
 
 class NoSessionTestCase(owebunit.WebTestCase):
     _no_session = True
