@@ -10,6 +10,28 @@ import urllib
 import urlparse
 import ocookie.httplibadapter
 
+def is_mapping(value):
+    '''Returns True if value is of a mapping type such as a dictionary,
+    and False otherwise.
+    '''
+    
+    # http://stackoverflow.com/questions/3854470/how-to-distinguish-between-a-sequence-and-a-mapping
+    return hasattr(value, 'keys')
+
+def is_container(value):
+    '''Returns True if value is of a container type such as a list, tuple
+    or a dictionary, but not a string, and False otherwise.
+    '''
+    
+    # sequence or mapping, but not a string as strings are mappings
+    return hasattr(value, '__getitem__') and not isinstance(value, basestring)
+
+def is_string(value):
+    '''Returns True if value is a string, and False otherwise.
+    '''
+    
+    return isinstance(value, basestring)
+
 def immutable(func):
     @functools.wraps(func)
     def decorated(self):
@@ -207,9 +229,8 @@ def _urlencode_value(value):
 
 def urlencode_utf8(params):
     encoded = []
-    if hasattr(params, 'keys'):
+    if is_mapping(params):
         # assume a dictionary type
-        # http://stackoverflow.com/questions/3854470/how-to-distinguish-between-a-sequence-and-a-mapping
         for key in params:
             value = params[key]
             if isinstance(value, list) or isinstance(value, tuple):
@@ -265,8 +286,7 @@ class Session(object):
         else:
             headers = HeadersDict(headers)
         if body is not None:
-            # sequence or mapping, but not a string as strings are mappings
-            if hasattr(body, '__getitem__') and not isinstance(body, basestring):
+            if is_container(body):
                 body = urlencode_utf8(body)
             if 'content-type' not in headers:
                 headers['content-type'] = 'application/x-www-form-urlencoded'
@@ -289,7 +309,7 @@ class Session(object):
         
         uri = parsed_url.uri
         if query is not None:
-            if isinstance(query, basestring):
+            if is_string(query):
                 encoded_query = query
             elif hasattr(query, '__getitem__'):
                 # sequence or mapping
