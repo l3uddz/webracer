@@ -207,17 +207,25 @@ def _urlencode_value(value):
 
 def urlencode_utf8(params):
     encoded = []
-    for key in params:
-        value = params[key]
-        if isinstance(value, list) or isinstance(value, tuple):
-            prefix = key + '[]='
-            values = value
-            for value in values:
+    if hasattr(params, 'keys'):
+        # assume a dictionary type
+        # http://stackoverflow.com/questions/3854470/how-to-distinguish-between-a-sequence-and-a-mapping
+        for key in params:
+            value = params[key]
+            if isinstance(value, list) or isinstance(value, tuple):
+                prefix = key + '[]='
+                values = value
+                for value in values:
+                    value = _urlencode_value(value)
+                    encoded.append(prefix + value)
+            else:
                 value = _urlencode_value(value)
-                encoded.append(prefix + value)
-        else:
-            value = _urlencode_value(value)
-            encoded.append(key + '=' + value)
+                encoded.append(key + '=' + value)
+    else:
+        # assume a list of pairs
+        # http://docs.python.org/2/library/urllib.html#urllib.urlencode
+        for pair in params:
+            encoded.append(pair[0] + '=' + _urlencode_value(pair[1]))
     return '&'.join(encoded)
 
 class AssertRaisesContextManager(object):
