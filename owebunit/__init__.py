@@ -419,7 +419,10 @@ class Session(object):
         return url
 
 class WebTestCase(unittest.TestCase):
-    config = Config()
+    def __init__(self, *args, **kwargs):
+        super(WebTestCase, self).__init__(*args, **kwargs)
+        # XXX does not inherit
+        self.config = getattr(self.__class__, '_config', None) or Config()
     
     def setUp(self):
         super(WebTestCase, self).setUp()
@@ -503,7 +506,9 @@ def config(**kwargs):
     '''Class decorator for setting configuration on test cases.'''
     
     def decorator(cls):
+        config = getattr(cls, '_config', None) or Config()
         for name in kwargs:
-            setattr(cls.config, name, kwargs[name])
+            setattr(config, name, kwargs[name])
+        cls._config = config
         return cls
     return decorator
