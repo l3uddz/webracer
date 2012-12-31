@@ -265,7 +265,8 @@ class Session(object):
         else:
             headers = HeadersDict(headers)
         if body is not None:
-            if isinstance(body, dict):
+            # sequence or mapping, but not a string as strings are mappings
+            if hasattr(body, '__getitem__') and not isinstance(body, basestring):
                 body = urlencode_utf8(body)
             if 'content-type' not in headers:
                 headers['content-type'] = 'application/x-www-form-urlencoded'
@@ -288,12 +289,13 @@ class Session(object):
         
         uri = parsed_url.uri
         if query is not None:
-            if isinstance(query, dict):
-                encoded_query = urlencode_utf8(query)
-            elif isinstance(query, basestring):
+            if isinstance(query, basestring):
                 encoded_query = query
+            elif hasattr(query, '__getitem__'):
+                # sequence or mapping
+                encoded_query = urlencode_utf8(query)
             else:
-                raise ValueError, 'Query string is neither a string nor a dict'
+                raise ValueError, 'Query string is neither a string, a sequence nor a dict'
             # XXX handle url also having a query
             uri += '?' + encoded_query
         

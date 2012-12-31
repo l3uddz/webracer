@@ -115,6 +115,11 @@ class KitchenSinkTestCase(owebunit.WebTestCase):
         self.assert_status(200)
         self.assertEqual('value', self.response.body)
     
+    def test_param_tuple(self):
+        self.post('http://127.0.0.1:8041/param', body=(('p', 'value'),))
+        self.assert_status(200)
+        self.assertEqual('value', self.response.body)
+    
     def test_post_without_params(self):
         self.post('http://127.0.0.1:8041/param')
         self.assert_status(200)
