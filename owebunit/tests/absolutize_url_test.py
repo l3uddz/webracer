@@ -25,6 +25,14 @@ class AbsolutizeUrlTestCase(unittest.TestCase):
         expected = 'http://host:8080/path'
         self._perform(config, url, expected)
     
+    def test_with_host_as_url(self):
+        config = owebunit.Config()
+        config.host = 'http://host'
+        config.port = config.protocol = None
+        url = '/path'
+        expected = 'http://host/path'
+        self._perform(config, url, expected)
+    
     def test_with_host_and_port_as_url(self):
         config = owebunit.Config()
         config.host = 'http://host:8080'
