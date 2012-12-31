@@ -586,3 +586,21 @@ class Form(object):
         else:
             method = 'get'
         return method
+    
+    @property
+    def params_list(self):
+        '''Returns a list of parameters that the form will submit.
+        
+        Return value is a list of (name, value) pairs. Multiple pairs
+        may have the same name.
+        
+        Note: does not include parameters in form's action.
+        
+        Form elements that do not have name or value attributes are ignored.
+        '''
+        
+        params = []
+        for element in self._form_tag.xpath('.//*[self::input or self::button or self::textarea or self::select]'):
+            if 'name' in element.attrib and 'value' in element.attrib:
+                params.append((element.attrib['name'], element.attrib['value']))
+        return params

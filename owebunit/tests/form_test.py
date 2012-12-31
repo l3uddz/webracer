@@ -40,7 +40,7 @@ utils.start_bottle_server(app, 8043)
 
 @owebunit.config(host='localhost', port=8043)
 class FormTestCase(owebunit.WebTestCase):
-    def test_form_parsing(self):
+    def test_with_specified_attributes(self):
         self.get('/one-form')
         self.assert_status(200)
         forms = self.response.forms
@@ -52,7 +52,7 @@ class FormTestCase(owebunit.WebTestCase):
         self.assertEqual('post', form.method)
         self.assertEqual('post', form.computed_method)
     
-    def test_no_attribute_form_parsing(self):
+    def test_without_specified_attributes(self):
         self.get('/no-attribute-form')
         self.assert_status(200)
         forms = self.response.forms
@@ -63,6 +63,19 @@ class FormTestCase(owebunit.WebTestCase):
         self.assertEqual('http://localhost:8043/no-attribute-form', form.computed_action)
         self.assertIs(form.method, None)
         self.assertEqual('get', form.computed_method)
+    
+    def test_params(self):
+        self.get('/no-attribute-form')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        params = form.params_list
+        if isinstance(params, list):
+            params = tuple(params)
+        expected = (('textf', 'textv'),)
+        self.assertEqual(expected, params)
 
 if __name__ == '__main__':
     import unittest
