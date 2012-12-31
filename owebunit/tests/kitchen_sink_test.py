@@ -49,7 +49,7 @@ def get_json_empty():
 
 utils.start_bottle_server(app, 8041)
 
-class SimpleTestCase(owebunit.WebTestCase):
+class KitchenSinkTestCase(owebunit.WebTestCase):
     def test_simple(self):
         self.get('http://127.0.0.1:8041/ok')
         self.assert_status(200)
