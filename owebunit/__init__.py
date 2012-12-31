@@ -1,5 +1,6 @@
 # Note: responses are assumed to be immutable.
 
+import functools
 import httplib
 import os.path
 import re
@@ -8,6 +9,20 @@ import unittest
 import urllib
 import urlparse
 import ocookie.httplibadapter
+
+def immutable(func):
+    @functools.wraps(func)
+    def decorated(self):
+        if not getattr(self, '_cache', None):
+            self._cache = {}
+        name = func.__name__
+        if name not in self._cache:
+            value = func(self)
+            self._cache[name] = value
+        else:
+            value = self._cache[name]
+        return value
+    return decorated
 
 class Config(object):
     # Host, port and protocol to use when only path is requested.
@@ -538,6 +553,7 @@ class Form(object):
         return self._form_tag.attrib.get('action')
     
     @property
+    @immutable
     def computed_action(self):
         '''The url that the form should submit to.
         
@@ -555,6 +571,7 @@ class Form(object):
         return self._form_tag.attrib.get('method')
     
     @property
+    @immutable
     def computed_method(self):
         '''The method that should be used to submit the form.
         
