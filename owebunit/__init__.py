@@ -8,6 +8,15 @@ import urlparse
 import ocookie.httplibadapter
 
 class Config(object):
+    # Host, port and protocol to use when only path is requested.
+    # Host may contain port and protocol via host:port or
+    # protocol://host or protocol://host:port syntax.
+    host = None
+    port = None
+    protocol = None
+    
+    # If True, failed responses will be saved in a directory specified by
+    # save_dir.
     save_failed_responses = False
     save_dir = None
 
@@ -199,6 +208,7 @@ class Session(object):
             self._default_host, self._default_port = None, None
     
     def request(self, method, url, body=None, query=None, headers=None):
+        url = self._absolutize_url(url)
         parsed_url = parse_url(url)
         headers = self._merge_headers(headers)
         host, port = self._netloc_to_host_port(parsed_url.netloc)
@@ -349,6 +359,42 @@ class Session(object):
     
     def clear_cookie_jar(self):
         self._cookie_jar = ocookie.CookieJar()
+    
+    def _absolutize_url(self, url):
+        if url.startswith('/'):
+            # convert to absolute url
+            if self.config.host is None:
+                raise ValueError, 'Url is only a path and host is not specified in configuration: %s' % url
+            match = re.match(r'((\w+)://)?([^:]+)(:(\d+))?$', self.config.host)
+            if not match:
+                raise ValueError, 'Default host is malformed: %s' % self.config.host
+            if self.config.protocol is not None:
+                protocol = self.config.protocol
+            elif match.group(1):
+                protocol = match.group(2)
+            else:
+                protocol = None
+            host = match.group(3)
+            if self.config.port is not None:
+                port = self.config.port
+            elif match.group(4):
+                port = match.group(5)
+            else:
+                port = None
+            
+            if protocol is None:
+                if port == 443:
+                    protocol = 'https'
+                else:
+                    protocol = 'http'
+            prefix = '%s://%s' % (protocol, host)
+            if port is not None:
+                prefix += ':%s' % port
+            # prefix has no trailing slash, url has a leading slash
+            url = prefix + url
+        elif not re.match(r'\w+://', url):
+            raise ValueError, 'Url must either be an absolute url or an absolute path: %s' % url
+        return url
 
 class WebTestCase(unittest.TestCase):
     config = Config()

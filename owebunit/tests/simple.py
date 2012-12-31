@@ -168,6 +168,15 @@ class NoSessionTestCase(owebunit.WebTestCase):
         # session cookie is not carried over
         self.assert_not_session_cookie('visited')
 
+class DefaultHostUrlTestCase(owebunit.WebTestCase):
+    def __init__(self, *args, **kwargs):
+        super(DefaultHostUrlTestCase, self).__init__(*args, **kwargs)
+        self.config.host = 'http://127.0.0.1:8041'
+    
+    def test_simple(self):
+        self.get('/ok')
+        self.assert_status(200)
+
 if __name__ == '__main__':
     import unittest
     unittest.main()
