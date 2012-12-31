@@ -80,7 +80,10 @@ class Response(object):
         is used (text/html content type) or XML (everything else).
         '''
         
-        print 
+        if self.header_dict['content-type'].lower().find('text/html') >= 0:
+            return self.lxml_etree_html
+        else:
+            return self.lxml_etree_xml
     
     @property
     def lxml_etree_xml(self):
@@ -90,6 +93,7 @@ class Response(object):
         import lxml.etree
         
         doc = lxml.etree.XML(self.body)
+        return doc
     
     @property
     def lxml_etree_html(self):

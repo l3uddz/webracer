@@ -1,3 +1,4 @@
+import lxml.etree
 import owebunit
 import bottle
 from owebunit.tests import utils
@@ -22,21 +23,25 @@ class LxmlTestCase(owebunit.WebTestCase):
         self.get('/xml')
         self.assert_status(200)
         doc = self.response.lxml_etree_xml
+        self.assertIsInstance(doc, lxml.etree._Element)
     
     def test_parse_html(self):
         self.get('/html')
         self.assert_status(200)
         doc = self.response.lxml_etree_html
+        self.assertIsInstance(doc, lxml.etree._Element)
     
     def test_parse_auto_xml(self):
         self.get('/xml')
         self.assert_status(200)
         doc = self.response.lxml_etree
+        self.assertIsInstance(doc, lxml.etree._Element)
     
     def test_parse_auto_html(self):
         self.get('/html')
         self.assert_status(200)
         doc = self.response.lxml_etree
+        self.assertIsInstance(doc, lxml.etree._Element)
 
 if __name__ == '__main__':
     import unittest
