@@ -2,3 +2,4 @@
  - Cookie jar
  - "No session" session
  - Use setUpClass/tearDownClass for starting and stopping bottle servers
+ - Generic memoization for attributes on response, forms, etc.

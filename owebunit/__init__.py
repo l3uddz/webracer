@@ -1,3 +1,5 @@
+# Note: responses are assumed to be immutable.
+
 import httplib
 import os.path
 import re
@@ -163,10 +165,10 @@ class Response(object):
     
     @property
     def forms(self):
-        # XXX optimize
-        doc = self.lxml_etree
-        forms = [Form(form_tag, self) for form_tag in doc.xpath('//form')]
-        return forms
+        if getattr(self, '_forms', None) is None:
+            doc = self.lxml_etree
+            self._forms = [Form(form_tag, self) for form_tag in doc.xpath('//form')]
+        return self._forms
 
 def uri(self):
     uri = self.path or '/'
