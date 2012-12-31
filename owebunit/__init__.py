@@ -160,6 +160,13 @@ class Response(object):
         location = re.sub(r'^\w+://[^/]+', '', location)
         location = re.sub(r'^//[^/]+', '', location)
         return location
+    
+    @property
+    def forms(self):
+        # XXX optimize
+        doc = self.lxml_etree
+        forms = [Form(form_tag) for form_tag in doc.xpath('//form')]
+        return forms
 
 def uri(self):
     uri = self.path or '/'
@@ -516,3 +523,15 @@ def config(**kwargs):
         cls._config = config
         return cls
     return decorator
+
+class Form(object):
+    def __init__(self, form_tag):
+        self._form_tag = form_tag
+    
+    @property
+    def action(self):
+        return self._form_tag.attrib.get('action')
+    
+    @property
+    def method(self):
+        return self._form_tag.attrib.get('method')
