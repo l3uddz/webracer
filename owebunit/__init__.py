@@ -210,10 +210,10 @@ class Session(object):
     def request(self, method, url, body=None, query=None, headers=None):
         url = self._absolutize_url(url)
         parsed_url = parse_url(url)
-        headers = self._merge_headers(headers)
         host, port = self._netloc_to_host_port(parsed_url.netloc)
         self.connection = httplib.HTTPConnection(host, port)
         kwargs = {}
+        headers = self._merge_headers(headers)
         if headers is None:
             headers = headers
         else:
@@ -258,7 +258,11 @@ class Session(object):
     
     def _netloc_to_host_port(self, netloc):
         if netloc:
-            return netloc.split(':')
+            if ':' in netloc:
+                host, port = netloc.split(':')
+                return (host, int(port))
+            else:
+                return (netloc, self._default_port)
         else:
             # url contained path only
             return (self._default_host, self._default_port)

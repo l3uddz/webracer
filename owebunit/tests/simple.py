@@ -177,6 +177,11 @@ class DefaultHostUrlTestCase(owebunit.WebTestCase):
         self.get('/ok')
         self.assert_status(200)
 
+class MockedServerTestCase(owebunit.WebTestCase):
+    def test_portless_url(self):
+        self.get('http://server/path')
+        self.assert_status(200)
+
 if __name__ == '__main__':
     import unittest
     unittest.main()
