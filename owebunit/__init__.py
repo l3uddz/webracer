@@ -566,15 +566,9 @@ class Form(object):
     @immutable
     def computed_action(self):
         '''The url that the form should submit to.
-        
-        If action is specified by the form, it is returned.
-        Otherwise the URL of the page on which the form was found is returned.
         '''
         
-        action = self.action
-        if not action:
-            action = self._response.request_url
-        return action
+        return urlparse.urljoin(self._response.request_url, self.action)
     
     @property
     def method(self):

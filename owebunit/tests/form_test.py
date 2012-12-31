@@ -20,6 +20,22 @@ def one_form():
 </html>
 '''
 
+@app.route('/subdir/relative_action_form')
+def relative_action_form():
+    return '''
+<!doctype html>
+<html>
+<head></head>
+<body>
+    <form action='in_subdir' method='post'>
+        <input type='text' name='textf' value='textv' />
+        <input type='submit' value='Go' />
+        <button name='foo' />
+    </form>
+</body>
+</html>
+'''
+
 @app.route('/no-attribute-form')
 def no_attribute_form():
     return '''
@@ -84,7 +100,8 @@ class FormTestCase(owebunit.WebTestCase):
         
         form = forms[0]
         self.assertEqual('/there', form.action)
-        self.assertEqual('/there', form.computed_action)
+        # always a full url
+        self.assertEqual('http://localhost:8043/there', form.computed_action)
         self.assertEqual('post', form.method)
         self.assertEqual('post', form.computed_method)
     
@@ -99,6 +116,16 @@ class FormTestCase(owebunit.WebTestCase):
         self.assertEqual('http://localhost:8043/no-attribute-form', form.computed_action)
         self.assertIs(form.method, None)
         self.assertEqual('get', form.computed_method)
+    
+    def test_computed_action_relative(self):
+        self.get('/subdir/relative_action_form')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        self.assertEqual('in_subdir', form.action)
+        self.assertEqual('http://localhost:8043/subdir/in_subdir', form.computed_action)
     
     def test_params(self):
         self.get('/no-attribute-form')
