@@ -74,6 +74,16 @@ class Response(object):
     
     @property
     def lxml_etree(self):
+        '''Returns an lxml.etree built from response body.
+        
+        Depending on content type of the response, either HTML parsing
+        is used (text/html content type) or XML (everything else).
+        '''
+        
+        print 
+    
+    @property
+    def lxml_etree_xml(self):
         '''Returns an lxml.etree built from response body, treating
         the latter as XML.'''
         
@@ -488,3 +498,12 @@ def no_session(cls):
     
     cls._no_session = True
     return cls
+
+def config(**kwargs):
+    '''Class decorator for setting configuration on test cases.'''
+    
+    def decorator(cls):
+        for name in kwargs:
+            setattr(cls.config, name, kwargs[name])
+        return cls
+    return decorator
