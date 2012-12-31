@@ -69,7 +69,7 @@ class Response(object):
         
         import xml.etree.ElementTree
         
-        root = xml.etree.ElementTree.ElementTree(self.body)
+        root = xml.etree.ElementTree.fromstring(self.body)
         return root
     
     @property
