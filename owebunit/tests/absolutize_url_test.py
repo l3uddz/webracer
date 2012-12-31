@@ -33,6 +33,15 @@ class AbsolutizeUrlTestCase(unittest.TestCase):
         expected = 'http://host:8080/path'
         self._perform(config, url, expected)
     
+    def test_with_port_only(self):
+        config = owebunit.Config()
+        config.host = None
+        config.port = 8080
+        config.protocol = None
+        url = '/path'
+        expected = 'http://host:8080/path'
+        self.assertRaises(ValueError, self._perform, config, url, expected)
+    
     def _perform(self, config, url, expected):
         session = owebunit.Session(config, None)
         absolutized = session._absolutize_url(url)
