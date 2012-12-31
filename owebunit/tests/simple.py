@@ -2,6 +2,7 @@ import threading
 import time
 import owebunit
 import bottle
+import mock
 
 app = bottle.Bottle()
 
@@ -185,8 +186,20 @@ class DefaultHostUrlTestCase(owebunit.WebTestCase):
         self.get('/ok')
         self.assert_status(200)
 
+def mock_http_connection_returning_200():
+    response = mock.MagicMock(status=200)
+    mock_cls = mock.MagicMock()
+    mock_cls.getresponse = mock.MagicMock(return_value=response)
+    mock_http_connection = mock.MagicMock()
+    mock_http_connection.return_value = mock_cls
+    return mock_http_connection
+
 class MockedServerTestCase(owebunit.WebTestCase):
+    @mock.patch('httplib.HTTPConnection', mock_http_connection_returning_200())
     def test_portless_url(self):
+        '''Check that our logic for issuing requests does not have any
+        local problems'''
+        
         self.get('http://server/path')
         self.assert_status(200)
 
