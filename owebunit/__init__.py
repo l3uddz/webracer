@@ -275,7 +275,11 @@ class Session(object):
         return self.request('post', url, **kwargs)
     
     def assert_status(self, code):
-        if self.response.code != code:
+        if code == 'redirect':
+            ok = self.response.code in (301, 302, 303)
+        else:
+            ok = self.response.code == code
+        if not ok:
             msg = 'Response status %s expected but was %s' % (code, self.response.code)
             if self.response.code == 500:
                 extra = self.test_case.get_500_extra_message()
@@ -290,6 +294,10 @@ class Session(object):
                     else:
                         msg += "\nCould not save response body - save_dir is None"
             assert False, msg
+    
+    def assert_redirected_to_uri(self, target):
+        self.assert_status('redirect')
+        self.assert_equal(target, self.response.location_uri)
     
     def assert_equal(self, expected, actual):
         assert expected == actual, '%s expected but was %s' % (expected, actual)
@@ -442,6 +450,9 @@ class WebTestCase(unittest.TestCase):
     
     def assert_status(self, code):
         self._session.assert_status(code)
+    
+    def assert_redirected_to_uri(self, target):
+        self._session.assert_redirected_to_uri(target)
     
     def assert_response_cookie(self, name, **kwargs):
         self._session.assert_response_cookie(name, **kwargs)

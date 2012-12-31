@@ -13,6 +13,10 @@ def ok():
 def internal_error():
     bottle.abort(500, 'internal server error')
 
+@app.route('/redirect')
+def redirect():
+    bottle.redirect('/found', 302)
+
 @app.route('/set_cookie')
 def set_cookie():
     bottle.response.set_cookie('visited', 'yes')
@@ -152,6 +156,10 @@ class SimpleTestCase(owebunit.WebTestCase):
         self.get('http://127.0.0.1:8041/json/hash')
         self.assert_status(200)
         self.assertEqual({'a': 'b'}, self.response.json)
+    
+    def test_redirect_assertion(self):
+        self.get('http://127.0.0.1:8041/redirect')
+        self.assert_redirected_to_uri('/found')
 
 @owebunit.no_session
 class NoSessionTestCase(owebunit.WebTestCase):
