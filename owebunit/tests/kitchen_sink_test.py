@@ -23,6 +23,12 @@ def redirect():
 def set_cookie():
     bottle.response.set_cookie('visited', 'yes')
 
+@app.route('/set_multiple_cookies')
+def set_multiple_cookies():
+    bottle.response.set_cookie('foo_a', 'a_value', expires=1)
+    bottle.response.set_cookie('foo_b', 'b_value', httponly=True)
+    bottle.response.set_cookie('foo_c', 'c_value', secure=True)
+
 @app.route('/read_cookie')
 def read_cookie():
     return bottle.request.get_cookie('visited')
@@ -81,6 +87,17 @@ class KitchenSinkTestCase(owebunit.WebTestCase):
         
         with self.assert_raises(AssertionError):
             self.assert_response_cookie('visited', value='no')
+    
+    def test_multiple_cookies(self):
+        self.get('http://127.0.0.1:8041/set_multiple_cookies')
+        self.assert_status(200)
+        
+        self.assert_response_cookie('foo_a')
+        self.assert_response_cookie('foo_a', value='a_value')
+        self.assert_response_cookie('foo_b')
+        self.assert_response_cookie('foo_b', value='b_value')
+        self.assert_response_cookie('foo_c')
+        self.assert_response_cookie('foo_c', value='c_value')
     
     def test_implicit_session(self):
         self.get('http://127.0.0.1:8041/set_cookie')

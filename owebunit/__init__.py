@@ -135,8 +135,8 @@ class Response(object):
         try:
             return self._cookie_list
         except AttributeError:
-            self._cookie_list = ocookie.httplibadapter.parse_cookies(
-                self.httplib_response.getheaders()
+            self._cookie_list = ocookie.httplibadapter.parse_response_cookies(
+                self.httplib_response
             )
             return self._cookie_list
     
