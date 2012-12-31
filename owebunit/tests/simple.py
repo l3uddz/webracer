@@ -3,6 +3,7 @@ import time
 import owebunit
 import bottle
 import mock
+from owebunit.tests import utils
 
 app = bottle.Bottle()
 
@@ -46,21 +47,7 @@ def get_json_empty():
 def get_json_empty():
     return '{"a": "b"}'
 
-def run_server():
-    app.run(host='localhost', port=8041)
-
-class ServerThread(threading.Thread):
-    def run(self):
-        run_server()
-
-def start_server():
-    server_thread = ServerThread()
-    server_thread.daemon = True
-    server_thread.start()
-
-start_server()
-
-time.sleep(0.1)
+utils.start_bottle_server(app, 8041)
 
 class SimpleTestCase(owebunit.WebTestCase):
     def test_simple(self):
