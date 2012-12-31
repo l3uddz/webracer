@@ -601,6 +601,37 @@ class Form(object):
         
         params = []
         for element in self._form_tag.xpath('.//*[self::input or self::button or self::textarea or self::select]'):
-            if 'name' in element.attrib and 'value' in element.attrib:
-                params.append((element.attrib['name'], element.attrib['value']))
+            if 'name' not in element.attrib:
+                continue
+            if element.tag == 'select':
+                options = element.xpath('.//option')
+                # try to find a selected option;
+                # use the last selected option if more than one is selected
+                value = None
+                for option in options:
+                    # browsers differ on which values for selected attribute
+                    # constitute the selection being active.
+                    # consider presence of the attribute as the indicator
+                    # that the option is selected.
+                    # http://stackoverflow.com/questions/1033944/what-values-can-appear-in-the-selected-attribute-of-the-option-tag
+                    if 'selected' in option.attrib:
+                        # if the selected element has no value,
+                        # clear the selected value.
+                        # if there are multiple selected options,
+                        # this may result in not having a value for the select
+                        # despite some (earlier) selected options having values.
+                        # XXX handle multiple selection selects
+                        value = option.attrib.get('value')
+                if value is None:
+                    # get the first option as that will be selected
+                    # by the browser
+                    if len(options) > 0:
+                        option = options[0]
+                        # the first option may not have a value, in which case
+                        # we won't return a value as well
+                        value = option.attrib.get('value')
+            else:
+                value = element.attrib.get('value')
+            if value is not None:
+                params.append((element.attrib['name'], value))
         return params

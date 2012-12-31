@@ -36,6 +36,42 @@ def no_attribute_form():
 </html>
 '''
 
+@app.route('/form_with_select_not_selected')
+def form_with_select_not_selected():
+    return '''
+<!doctype html>
+<html>
+<head></head>
+<body>
+    <form>
+        <select name='selectf'>
+            <option value='first'>First</option>
+            <option value='second'>Second</option>
+            <option value='third'>Third</option>
+        </select>
+    </form>
+</body>
+</html>
+'''
+
+@app.route('/form_with_select_selected')
+def form_with_select_selected():
+    return '''
+<!doctype html>
+<html>
+<head></head>
+<body>
+    <form>
+        <select name='selectf'>
+            <option value='first'>First</option>
+            <option value='second' selected='selected'>Second</option>
+            <option value='third'>Third</option>
+        </select>
+    </form>
+</body>
+</html>
+'''
+
 utils.start_bottle_server(app, 8043)
 
 @owebunit.config(host='localhost', port=8043)
@@ -75,6 +111,32 @@ class FormTestCase(owebunit.WebTestCase):
         if isinstance(params, list):
             params = tuple(params)
         expected = (('textf', 'textv'),)
+        self.assertEqual(expected, params)
+    
+    def test_params_select_not_selected(self):
+        self.get('/form_with_select_not_selected')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        params = form.params_list
+        if isinstance(params, list):
+            params = tuple(params)
+        expected = (('selectf', 'first'),)
+        self.assertEqual(expected, params)
+    
+    def test_params_select_selected(self):
+        self.get('/form_with_select_selected')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        params = form.params_list
+        if isinstance(params, list):
+            params = tuple(params)
+        expected = (('selectf', 'second'),)
         self.assertEqual(expected, params)
 
 if __name__ == '__main__':
