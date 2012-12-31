@@ -666,3 +666,37 @@ class Form(object):
             if value is not None:
                 params.append((element.attrib['name'], value))
         return params
+
+def extend_params(target, extra):
+    '''Extends a target parameter list, which can be a sequence or a mapping,
+    with additional parameters which can also be a sequence or a mapping.
+    
+    The type of return value matches the type of target.
+    
+    No duplicate elimination is performed. Sequences can be added to sequences,
+    dictionaries can be added to sequences but sequences cannot be added to
+    dictionaries.
+    
+    Note: target is mutated unless it is a tuple, in which case a new list
+    is returned.
+    '''
+    
+    if is_mapping(target):
+        if is_mapping(extra):
+            target.update(extra)
+        else:
+            raise ValueError, "Mappings can only be extended with other mappings"
+    elif is_container(target):
+        # if target is a tuple we have to convert it to a list first
+        # as tuples are immutable
+        if type(target) == tuple:
+            target = list(target)
+        if is_mapping(extra):
+            target.extend(extra.items())
+        elif is_container(extra):
+            target.extend(extra)
+        else:
+            raise ValueError, 'Unsupported type for extra: %s' % type(extra)
+    else:
+        raise ValueError, 'Unsupported type for target: %s' % type(target)
+    return target
