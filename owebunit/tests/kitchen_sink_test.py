@@ -19,6 +19,10 @@ def internal_error():
 def redirect():
     bottle.redirect('/found', 302)
 
+@app.route('/redirect_to')
+def redirect():
+    bottle.redirect(bottle.request.query.target, 302)
+
 @app.route('/set_cookie')
 def set_cookie():
     bottle.response.set_cookie('visited', 'yes')
@@ -170,6 +174,13 @@ class KitchenSinkTestCase(owebunit.WebTestCase):
     def test_redirect_assertion(self):
         self.get('http://127.0.0.1:8041/redirect')
         self.assert_redirected_to_uri('/found')
+    
+    def test_follow_redirect(self):
+        self.get('http://127.0.0.1:8041/redirect_to', query=dict(target='/ok'))
+        self.assert_redirected_to_uri('/ok')
+        self.follow_redirect()
+        self.assert_status(200)
+        self.assertEqual('ok', self.response.body)
 
 @owebunit.no_session
 class NoSessionTestCase(owebunit.WebTestCase):

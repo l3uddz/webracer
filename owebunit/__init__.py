@@ -324,6 +324,10 @@ class Session(object):
     def post(self, url, **kwargs):
         return self.request('post', url, **kwargs)
     
+    def follow_redirect(self):
+        assert 'location' in self.response.header_dict
+        return self.get(self.response.location)
+    
     def assert_status(self, code):
         if code == 'redirect':
             ok = self.response.code in (301, 302, 303)
@@ -494,6 +498,9 @@ class WebTestCase(unittest.TestCase):
     
     def post(self, url, **kwargs):
         return self.request('post', url, **kwargs)
+    
+    def follow_redirect(self):
+        return self._session.follow_redirect()
     
     def assert_raises(self, expected, *args):
         if args:
