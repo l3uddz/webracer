@@ -165,7 +165,7 @@ class Response(object):
     def forms(self):
         # XXX optimize
         doc = self.lxml_etree
-        forms = [Form(form_tag) for form_tag in doc.xpath('//form')]
+        forms = [Form(form_tag, self) for form_tag in doc.xpath('//form')]
         return forms
 
 def uri(self):
@@ -274,6 +274,8 @@ class Session(object):
         
         self.connection.request(method.upper(), uri, body, headers)
         self.response = Response(self.connection.getresponse())
+        # XXX consider not writing attributes from here
+        self.response.request_url = url
         for cookie in self.response.cookie_list:
             self._cookie_jar.add(cookie)
     
@@ -525,13 +527,43 @@ def config(**kwargs):
     return decorator
 
 class Form(object):
-    def __init__(self, form_tag):
+    def __init__(self, form_tag, response):
         self._form_tag = form_tag
+        self._response = response
     
     @property
     def action(self):
         return self._form_tag.attrib.get('action')
     
     @property
+    def computed_action(self):
+        '''The url that the form should submit to.
+        
+        If action is specified by the form, it is returned.
+        Otherwise the URL of the page on which the form was found is returned.
+        '''
+        
+        action = self.action
+        if not action:
+            action = self._response.request_url
+        return action
+    
+    @property
     def method(self):
         return self._form_tag.attrib.get('method')
+    
+    @property
+    def computed_method(self):
+        '''The method that should be used to submit the form.
+        
+        If a method is given in the form, it is lowercased and returned.
+        
+        Otherwise, the default method of 'get' is returnd.
+        '''
+        
+        method = self.method
+        if method:
+            method = method.lower()
+        else:
+            method = 'get'
+        return method

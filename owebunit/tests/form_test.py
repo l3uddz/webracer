@@ -48,7 +48,9 @@ class FormTestCase(owebunit.WebTestCase):
         
         form = forms[0]
         self.assertEqual('/there', form.action)
+        self.assertEqual('/there', form.computed_action)
         self.assertEqual('post', form.method)
+        self.assertEqual('post', form.computed_method)
     
     def test_no_attribute_form_parsing(self):
         self.get('/no-attribute-form')
@@ -58,7 +60,9 @@ class FormTestCase(owebunit.WebTestCase):
         
         form = forms[0]
         self.assertIs(form.action, None)
+        self.assertEqual('http://localhost:8043/no-attribute-form', form.computed_action)
         self.assertIs(form.method, None)
+        self.assertEqual('get', form.computed_method)
 
 if __name__ == '__main__':
     import unittest
