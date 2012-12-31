@@ -153,9 +153,8 @@ class SimpleTestCase(owebunit.WebTestCase):
         self.assert_status(200)
         self.assertEqual({'a': 'b'}, self.response.json)
 
+@owebunit.no_session
 class NoSessionTestCase(owebunit.WebTestCase):
-    _no_session = True
-    
     def test_implicit_session(self):
         self.get('http://127.0.0.1:8041/set_cookie')
         self.assert_status(200)

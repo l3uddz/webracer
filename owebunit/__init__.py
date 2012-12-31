@@ -419,3 +419,11 @@ class WebTestCase(unittest.TestCase):
     @property
     def header_dict(self):
         return self._session.header_dict
+
+def no_session(cls):
+    '''Class decorator requesting that session management should not be
+    performed.
+    '''
+    
+    cls._no_session = True
+    return cls
