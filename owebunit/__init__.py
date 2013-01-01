@@ -441,7 +441,7 @@ class Session(object):
             if 'cookie' in user_headers:
                 value = self._merge_cookie_header_values(user_headers['cookie'])
             else:
-                value = self._cookie_jar.build_cookie_header()
+                value = self._cookie_jar.build_cookie_header_value()
         else:
             value = None
         
