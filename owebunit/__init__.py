@@ -633,6 +633,7 @@ class Form(object):
         '''
         
         params = []
+        submit_found = False
         for element in self._form_tag.xpath('.//*[self::input or self::button or self::textarea or self::select]'):
             if 'name' not in element.attrib:
                 continue
@@ -664,6 +665,11 @@ class Form(object):
                         # we won't return a value as well
                         value = option.attrib.get('value')
             else:
+                if element.tag == 'input' and element.attrib.get('type') == 'submit':
+                    # allow only one submit element to provide a value.
+                    if submit_found:
+                        continue
+                    submit_found = True
                 value = element.attrib.get('value')
             if value is not None:
                 params.append((element.attrib['name'], value))

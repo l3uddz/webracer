@@ -88,6 +88,21 @@ def form_with_select_selected():
 </html>
 '''
 
+@app.route('/form_with_two_submits')
+def form_with_two_submits():
+    return '''
+<!doctype html>
+<html>
+<head></head>
+<body>
+    <form action='/dump_params'>
+        <input type='submit' name='submit-first' value='first' />
+        <input type='submit' name='submit-second' value='second' />
+    </form>
+</body>
+</html>
+'''
+
 utils.start_bottle_server(app, 8043)
 
 @owebunit.config(host='localhost', port=8043)
@@ -165,6 +180,18 @@ class FormTestCase(owebunit.WebTestCase):
             params = tuple(params)
         expected = (('selectf', 'second'),)
         self.assertEqual(expected, params)
+    
+    def test_multiple_submits(self):
+        self.get('/form_with_two_submits')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        params = dict(form.params_list)
+        # first submit element should be returned by default
+        self.assertIn('submit-first', params)
+        self.assertNotIn('submit-second', params)
 
 if __name__ == '__main__':
     import unittest
