@@ -10,6 +10,9 @@ import urllib
 import urlparse
 import ocookie.httplibadapter
 
+class ConfigurationError(StandardError):
+    pass
+
 def is_mapping(value):
     '''Returns True if value is of a mapping type such as a dictionary,
     and False otherwise.
@@ -54,8 +57,12 @@ class Config(object):
     port = None
     protocol = None
     
-    # If True, failed responses will be saved in a directory specified by
+    # If True, all responses will be saved in a directory specified by
     # save_dir.
+    save_responses = False
+    # If True, responses whose statuses are unexpected will be saved
+    # in a directory specified by save_dir.
+    # assert_status must be called for check response status.
     save_failed_responses = False
     save_dir = None
 
@@ -325,6 +332,8 @@ class Session(object):
         self.response.request_url = url
         for cookie in self.response.cookie_list:
             self._cookie_jar.add(cookie)
+        if self.config.save_responses:
+            self._save_response()
     
     def _netloc_to_host_port(self, netloc):
         if netloc:
@@ -361,15 +370,21 @@ class Session(object):
                 extra = self.test_case.get_500_extra_message()
                 if extra:
                     msg += "\n" + extra
-            if self.config.save_failed_responses:
-                if len(self.response.body) > 0:
-                    if self.config.save_dir is not None:
-                        basename = 'response_%f' % _time.time()
-                        with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
-                            f.write(self.response.body)
-                    else:
-                        msg += "\nCould not save response body - save_dir is None"
+            if self.config.save_failed_responses and not self.config.save_responses:
+                try:
+                    self._save_response()
+                except e:
+                    msg += "\n" + str(e)
             assert False, msg
+    
+    def _save_response(self):
+        if len(self.response.body) > 0:
+            if self.config.save_dir is not None:
+                basename = 'response_%f' % _time.time()
+                with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
+                    f.write(self.response.body)
+            else:
+                raise ConfigurationError, 'Could not save response body - save_dir is None'
     
     def assert_redirected_to_uri(self, target):
         self.assert_status('redirect')
