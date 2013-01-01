@@ -1,5 +1,6 @@
 import owebunit
 import bottle
+import json
 from owebunit.tests import utils
 
 app = bottle.Bottle()
@@ -103,6 +104,10 @@ def form_with_two_submits():
 </html>
 '''
 
+@app.route('/dump_params')
+def dump_params():
+    return json.dumps(dict(bottle.request.forms))
+
 utils.start_bottle_server(app, 8043)
 
 @owebunit.config(host='localhost', port=8043)
@@ -197,6 +202,12 @@ class FormTestCase(owebunit.WebTestCase):
         params = form.params.submit('submit-second').dict
         self.assertNotIn('submit-first', params)
         self.assertIn('submit-second', params)
+        
+        # submit and verify, this is really unnecessary but
+        # I already wrote the target
+        self.get(form.computed_action, body=params)
+        self.assert_status(200)
+        self.assertEquals({'submit-second': 'second'}, self.response.json)
 
 if __name__ == '__main__':
     import unittest
