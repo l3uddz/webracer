@@ -132,6 +132,7 @@ class Response(object):
             return self.lxml_etree_xml
     
     @property
+    @immutable
     def lxml_etree_xml(self):
         '''Returns an lxml.etree built from response body, treating
         the latter as XML.'''
@@ -142,6 +143,7 @@ class Response(object):
         return doc
     
     @property
+    @immutable
     def lxml_etree_html(self):
         '''Returns an lxml.etree built from response body, treating
         the latter as HTML.'''
