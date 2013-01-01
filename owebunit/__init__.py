@@ -582,6 +582,23 @@ def config(**kwargs):
         return cls
     return decorator
 
+class FormParams(object):
+    def __init__(self, params):
+        self.params = params
+    
+    @property
+    def list(self):
+        filtered_params = []
+        submit_found = False
+        for tag, type, name, value in self.params:
+            if tag == 'input' and type == 'submit':
+                # allow only one submit element to provide a value.
+                if submit_found:
+                    continue
+                submit_found = True
+            filtered_params.append((name, value))
+        return filtered_params
+
 class Form(object):
     def __init__(self, form_tag, response):
         self._form_tag = form_tag
@@ -632,8 +649,11 @@ class Form(object):
         Form elements that do not have name or value attributes are ignored.
         '''
         
+        return self.params.list
+    
+    @property
+    def params(self):
         params = []
-        submit_found = False
         for element in self._form_tag.xpath('.//*[self::input or self::button or self::textarea or self::select]'):
             if 'name' not in element.attrib:
                 continue
@@ -665,15 +685,10 @@ class Form(object):
                         # we won't return a value as well
                         value = option.attrib.get('value')
             else:
-                if element.tag == 'input' and element.attrib.get('type') == 'submit':
-                    # allow only one submit element to provide a value.
-                    if submit_found:
-                        continue
-                    submit_found = True
                 value = element.attrib.get('value')
             if value is not None:
-                params.append((element.attrib['name'], value))
-        return params
+                params.append((element.tag, element.attrib.get('type'), element.attrib['name'], value))
+        return FormParams(params)
 
 def extend_params(target, extra):
     '''Extends a target parameter list, which can be a sequence or a mapping,
