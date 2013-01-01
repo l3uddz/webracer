@@ -383,6 +383,10 @@ class Session(object):
                 basename = 'response_%f' % _time.time()
                 with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
                     f.write(self.response.body)
+                last_path = os.path.join(self.config.save_dir, 'last')
+                if os.path.exists(last_path):
+                    os.unlink(last_path)
+                os.symlink(basename, last_path)
             else:
                 raise ConfigurationError, 'Could not save response body - save_dir is None'
     
