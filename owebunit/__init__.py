@@ -589,6 +589,16 @@ class FormParams(object):
     
     @property
     def list(self):
+        '''Returns a list of parameters that the form will submit.
+        
+        Return value is a list of (name, value) pairs. Multiple pairs
+        may have the same name.
+        
+        Note: does not include parameters in form's action.
+        
+        Form elements that do not have name or value attributes are ignored.
+        '''
+        
         filtered_params = []
         if 'submit_name' in self.options:
             submit_name = self.options['submit_name']
@@ -607,6 +617,21 @@ class FormParams(object):
                     submit_found = True
             filtered_params.append((name, value))
         return filtered_params
+    
+    @property
+    def dict(self):
+        '''Returns a dictionary of parameters that the form will submit.
+        
+        If there are multiple parameters with the same name, the last
+        parameter in document is used.
+        
+        Note: does not include parameters in form's action.
+        
+        Form elements that do not have name or value attributes are ignored.
+        '''
+        
+        # XXX optimize?
+        return dict(self.list)
     
     def submit(self, name):
         found = False
@@ -657,20 +682,6 @@ class Form(object):
         else:
             method = 'get'
         return method
-    
-    @property
-    def params_list(self):
-        '''Returns a list of parameters that the form will submit.
-        
-        Return value is a list of (name, value) pairs. Multiple pairs
-        may have the same name.
-        
-        Note: does not include parameters in form's action.
-        
-        Form elements that do not have name or value attributes are ignored.
-        '''
-        
-        return self.params.list
     
     @property
     def params(self):

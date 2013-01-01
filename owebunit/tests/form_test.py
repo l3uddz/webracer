@@ -149,7 +149,7 @@ class FormTestCase(owebunit.WebTestCase):
         self.assertEquals(1, len(forms))
         
         form = forms[0]
-        params = form.params_list
+        params = form.params.list
         if isinstance(params, list):
             params = tuple(params)
         expected = (('textf', 'textv'),)
@@ -162,7 +162,7 @@ class FormTestCase(owebunit.WebTestCase):
         self.assertEquals(1, len(forms))
         
         form = forms[0]
-        params = form.params_list
+        params = form.params.list
         if isinstance(params, list):
             params = tuple(params)
         expected = (('selectf', 'first'),)
@@ -175,7 +175,7 @@ class FormTestCase(owebunit.WebTestCase):
         self.assertEquals(1, len(forms))
         
         form = forms[0]
-        params = form.params_list
+        params = form.params.list
         if isinstance(params, list):
             params = tuple(params)
         expected = (('selectf', 'second'),)
@@ -188,13 +188,13 @@ class FormTestCase(owebunit.WebTestCase):
         self.assertEquals(1, len(forms))
         
         form = forms[0]
-        params = dict(form.params_list)
+        params = form.params.dict
         # first submit element should be returned by default
         self.assertIn('submit-first', params)
         self.assertNotIn('submit-second', params)
         
         # choose another submit button
-        params = dict(form.params.submit('submit-second').list)
+        params = form.params.submit('submit-second').dict
         self.assertNotIn('submit-first', params)
         self.assertIn('submit-second', params)
 
