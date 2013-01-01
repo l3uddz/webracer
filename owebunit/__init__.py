@@ -583,21 +583,42 @@ def config(**kwargs):
     return decorator
 
 class FormParams(object):
-    def __init__(self, params):
+    def __init__(self, params, **kwargs):
         self.params = params
+        self.options = kwargs
     
     @property
     def list(self):
         filtered_params = []
-        submit_found = False
+        if 'submit_name' in self.options:
+            submit_name = self.options['submit_name']
+        else:
+            submit_name = None
+            submit_found = False
         for tag, type, name, value in self.params:
             if tag == 'input' and type == 'submit':
                 # allow only one submit element to provide a value.
-                if submit_found:
-                    continue
-                submit_found = True
+                if submit_name:
+                    if name != submit_name:
+                        continue
+                else:
+                    if submit_found:
+                        continue
+                    submit_found = True
             filtered_params.append((name, value))
         return filtered_params
+    
+    def submit(self, name):
+        found = False
+        for tag, type, name_, value in self.params:
+            if tag == 'input' and type == 'submit' and name == name_:
+                found = True
+                break
+        if not found:
+            raise ValueError, '"%s" is not a named submit element with a value on this form' % name
+        options = dict(self.options)
+        options['submit_name'] = name
+        return FormParams(self.params, **options)
 
 class Form(object):
     def __init__(self, form_tag, response):

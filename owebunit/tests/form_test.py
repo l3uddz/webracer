@@ -192,6 +192,11 @@ class FormTestCase(owebunit.WebTestCase):
         # first submit element should be returned by default
         self.assertIn('submit-first', params)
         self.assertNotIn('submit-second', params)
+        
+        # choose another submit button
+        params = dict(form.params.submit('submit-second').list)
+        self.assertNotIn('submit-first', params)
+        self.assertIn('submit-second', params)
 
 if __name__ == '__main__':
     import unittest
