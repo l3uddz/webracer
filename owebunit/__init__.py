@@ -355,6 +355,8 @@ class Session(object):
             ok = self.response.code == code
         if not ok:
             msg = 'Response status %s expected but was %s' % (code, self.response.code)
+            if 'location' in self.response.header_dict:
+                msg += ' (to %s)' % self.response.header_dict['location']
             if self.response.code == 500:
                 extra = self.test_case.get_500_extra_message()
                 if extra:
