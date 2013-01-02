@@ -197,7 +197,7 @@ class Response(object):
         if 'location' in headers:
             return headers['location']
         else:
-            raise ValueError, 'There is no location header in this response'
+            raise ValueError('There is no location header in this response')
     
     @property
     def location_uri(self):
@@ -324,7 +324,7 @@ class Session(object):
                 # sequence or mapping
                 encoded_query = urlencode_utf8(query)
             else:
-                raise ValueError, 'Query string is neither a string, a sequence nor a dict'
+                raise ValueError('Query string is neither a string, a sequence nor a dict')
             # XXX handle url also having a query
             uri += '?' + encoded_query
         
@@ -390,7 +390,7 @@ class Session(object):
                     os.unlink(last_path)
                 os.symlink(basename, last_path)
             else:
-                raise ConfigurationError, 'Could not save response body - save_dir is None'
+                raise ConfigurationError('Could not save response body - save_dir is None')
     
     def assert_redirected_to_uri(self, target):
         self.assert_status('redirect')
@@ -433,7 +433,7 @@ class Session(object):
             map = {}
             for key, value in user_headers:
                 if key in map:
-                    raise ValueError, 'Duplicate headers are not supported by httplib'
+                    raise ValueError('Duplicate headers are not supported by httplib')
                 map[key] = value
             user_headers = map
         
@@ -473,10 +473,10 @@ class Session(object):
         if url.startswith('/'):
             # convert to absolute url
             if self.config.host is None:
-                raise ValueError, 'Url is only a path and host is not specified in configuration: %s' % url
+                raise ValueError('Url is only a path and host is not specified in configuration: %s' % url)
             match = re.match(r'((\w+)://)?([^:]+)(:(\d+))?$', self.config.host)
             if not match:
-                raise ValueError, 'Default host is malformed: %s' % self.config.host
+                raise ValueError('Default host is malformed: %s' % self.config.host)
             if self.config.protocol is not None:
                 protocol = self.config.protocol
             elif match.group(1):
@@ -502,7 +502,7 @@ class Session(object):
             # prefix has no trailing slash, url has a leading slash
             url = prefix + url
         elif not re.match(r'\w+://', url):
-            raise ValueError, 'Url must either be an absolute url or an absolute path: %s' % url
+            raise ValueError('Url must either be an absolute url or an absolute path: %s' % url)
         return url
 
 class WebTestCase(unittest.TestCase):
@@ -672,7 +672,7 @@ class FormParams(object):
                 found = True
                 break
         if not found:
-            raise ValueError, '"%s" is not a named submit element with a value on this form' % name
+            raise ValueError('"%s" is not a named submit element with a value on this form' % name)
         options = dict(self.options)
         options['submit_name'] = name
         return FormParams(self.params, **options)
@@ -772,7 +772,7 @@ def extend_params(target, extra):
         if is_mapping(extra):
             target.update(extra)
         else:
-            raise ValueError, "Mappings can only be extended with other mappings"
+            raise ValueError("Mappings can only be extended with other mappings")
     elif is_container(target):
         # if target is a tuple we have to convert it to a list first
         # as tuples are immutable
@@ -783,7 +783,7 @@ def extend_params(target, extra):
         elif is_container(extra):
             target.extend(extra)
         else:
-            raise ValueError, 'Unsupported type for extra: %s' % type(extra)
+            raise ValueError('Unsupported type for extra: %s' % type(extra))
     else:
-        raise ValueError, 'Unsupported type for target: %s' % type(target)
+        raise ValueError('Unsupported type for target: %s' % type(target))
     return target
