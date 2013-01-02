@@ -1,5 +1,6 @@
 # Note: responses are assumed to be immutable.
 
+from __future__ import with_statement
 import functools
 import httplib
 import os.path
