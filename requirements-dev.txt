@@ -1,2 +1,3 @@
 bottle
+lxml
 git+git://github.com/p/ocookie.git@master#egg=ocookie
