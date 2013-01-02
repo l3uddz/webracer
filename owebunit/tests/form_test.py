@@ -200,8 +200,8 @@ class FormTestCase(owebunit.WebTestCase):
         
         # choose another submit button
         params = form.params.submit('submit-second').dict
-        self.assertTrue('submit-first', not in params)
-        self.assertTrue('submit-second', in params)
+        self.assertTrue('submit-first' not in params)
+        self.assertTrue('submit-second' in params)
         
         # submit and verify, this is really unnecessary but
         # I already wrote the target
