@@ -13,7 +13,7 @@ class ConfigInheritanceTestCase(unittest.TestCase):
                 pass
         
         self.assertEquals('foo', TestOne('test_method').config.host)
-        self.assertIs(None, TestTwo('test_method').config.host)
+        self.assertTrue(TestTwo('test_method').config.host is None)
 
 if __name__ == '__main__':
     import unittest

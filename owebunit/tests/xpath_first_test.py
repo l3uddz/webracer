@@ -9,7 +9,7 @@ class AbsolutizeUrlTestCase(owebunit.WebTestCase):
         
         # should not raise
         child = self.xpath_first(doc, '//child')
-        self.assertIsNot(child, None)
+        self.assertTrue(child is not None)
         self.assertEqual('child', child.tag)
         
         try:

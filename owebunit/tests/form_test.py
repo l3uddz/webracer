@@ -132,9 +132,9 @@ class FormTestCase(owebunit.WebTestCase):
         self.assertEquals(1, len(forms))
         
         form = forms[0]
-        self.assertIs(form.action, None)
+        self.assertTrue(form.action is None)
         self.assertEqual('http://localhost:8043/no-attribute-form', form.computed_action)
-        self.assertIs(form.method, None)
+        self.assertTrue(form.method is None)
         self.assertEqual('get', form.computed_method)
     
     def test_computed_action_relative(self):
