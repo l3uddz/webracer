@@ -195,13 +195,13 @@ class FormTestCase(owebunit.WebTestCase):
         form = forms[0]
         params = form.params.dict
         # first submit element should be returned by default
-        self.assertIn('submit-first', params)
-        self.assertNotIn('submit-second', params)
+        self.assertTrue('submit-first' in params)
+        self.assertTrue('submit-second' not in params)
         
         # choose another submit button
         params = form.params.submit('submit-second').dict
-        self.assertNotIn('submit-first', params)
-        self.assertIn('submit-second', params)
+        self.assertTrue('submit-first', not in params)
+        self.assertTrue('submit-second', in params)
         
         # submit and verify, this is really unnecessary but
         # I already wrote the target
