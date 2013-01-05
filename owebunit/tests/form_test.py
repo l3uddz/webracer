@@ -104,6 +104,18 @@ class FormTestCase(owebunit.WebTestCase):
         self.get(form.computed_action, body=params)
         self.assert_status(200)
         self.assertEquals({'submit-second': 'second'}, self.response.json)
+    
+    def test_set_value(self):
+        self.get('/one_form')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        elements = form.elements.mutable
+        elements.set_value('textf', 'newvalue')
+        params = elements.params.list
+        self.assertEqual([['textf', 'newvalue']], utils.listit(params))
 
 if __name__ == '__main__':
     import unittest

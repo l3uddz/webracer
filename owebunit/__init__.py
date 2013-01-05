@@ -618,6 +618,7 @@ class FormElements(object):
     def __init__(self, elements):
         self.elements = elements
         self.submit_name = None
+        self.chosen_values = {}
     
     @property
     def params(self):
@@ -629,7 +630,11 @@ class FormElements(object):
             # first pass: figure out which values to send when
             # the last value should be chosen
             if element_type == 'option':
-                if element_selected:
+                if element_name in self.chosen_values:
+                    # XXX rewrites destination if multiple options are present
+                    # for the given select tag
+                    selected_selects[element_name] = self.chosen_values[element_name]
+                elif element_selected:
                     selected_selects[element_name] = element_value
                 else:
                     # the first option should become selected
@@ -663,6 +668,15 @@ class FormElements(object):
                             if element_value is not None:
                                 params.append((element_name, element_value))
                             submit_found = True
+                elif element_name in self.chosen_values:
+                    if element_type == 'radio' or element_type == 'checkbox' or \
+                        element_type == 'option':
+                            if self.chosen_values[element_name] == element_value:
+                                params.append((element_name, element_value))
+                    else:
+                        params.append((element_name, self.chosen_values[element_name]))
+                        # XXX record that element_name was processed and
+                        # do not process it again?
                 elif element_value is not None:
                     params.append((element_name, element_value))
         return FormParams(params)
@@ -681,6 +695,43 @@ class MutableFormElements(FormElements):
         if not found:
             raise ValueError('"%s" is not a named submit element with a value on this form' % name)
         self.submit_name = name
+    
+    def set_value(self, name, value):
+        '''Sets form element identified by the given name to the specified
+        value.
+        
+        This method attempts to mimic closely what a human user could do with
+        a typical web browser. Therefore:
+        
+        - The element identified by `name` must exist on the form.
+        - The element must be of a type which allows user to change its value.
+          For example, text, radio, checkbox, textarea, select, etc.
+          Elements of unknown types are assumed to be user-changeable.
+          submit, reset and image type elements are rejected by this method;
+          to specify which submit element should be used, use `submit` method.
+        '''
+        
+        found = False
+        found_rejected = None
+        for element_type, element_name, element_value, element_selected in self.elements:
+            if element_name == name:
+                if element_type == 'submit' or element_type == 'image' or \
+                    element_type == 'reset' or element_type == 'button':
+                        found_rejected = 'Wrong element type: %s' % element_type
+                elif element_type == 'radio' or element_type == 'checkbox' or \
+                    element_type == 'option':
+                        if element_value == value:
+                            found = True
+                        else:
+                            found_rejected = 'Element `%s` does not have `%s` as a possible value' % (name, value)
+                else:
+                    # assume it's a text field or similar, e.g. email in html5
+                    found = True
+            if found:
+                self.chosen_values[name] = value
+                break
+        if not found and found_rejected:
+            raise ValueError(found_rejected)
 
 class FormParams(object):
     def __init__(self, params, **kwargs):
