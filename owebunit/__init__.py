@@ -614,6 +614,74 @@ def config(**kwargs):
         return cls
     return decorator
 
+class FormElements(object):
+    def __init__(self, elements):
+        self.elements = elements
+        self.submit_name = None
+    
+    @property
+    def params(self):
+        params = []
+        selected_selects = {}
+        for element_type, element_name, element_value, element_selected in self.elements:
+            if element_name is None or element_type == 'reset':
+                continue
+            # first pass: figure out which values to send when
+            # the last value should be chosen
+            if element_type == 'option':
+                if element_selected:
+                    selected_selects[element_name] = element_value
+                else:
+                    # the first option should become selected
+                    if element_name not in selected_selects:
+                        selected_selects[element_name] = element_value
+        
+        processed_selects = {}
+        submit_found = False
+        for element_type, element_name, element_value, element_selected in self.elements:
+            if element_name is None or element_type == 'reset':
+                continue
+            # second pass: actually build the parameter list
+            if element_type == 'option':
+                selected_value = selected_selects.get(element_name)
+                # avoid creating multiple params when there are several
+                # options with the same value.
+                # if there are multiple options without a value and there
+                # is no selected value and the valueless options come first,
+                # send the first one. otherwise send the last one
+                if element_value == selected_value and element_name not in processed_selects:
+                    params.append((element_name, element_value))
+                    processed_selects[element_name] = True
+            else:
+                if element_type == 'submit':
+                    if not submit_found:
+                        if self.submit_name is not None:
+                            found = self.submit_name == element_name
+                        else:
+                            found = True
+                        if found:
+                            if element_value is not None:
+                                params.append((element_name, element_value))
+                            submit_found = True
+                elif element_value is not None:
+                    params.append((element_name, element_value))
+        return FormParams(params)
+    
+    @property
+    def mutable(self):
+        return MutableFormElements(self.elements)
+
+class MutableFormElements(FormElements):
+    def submit(self, name):
+        found = False
+        for element_type, element_name, element_value, element_selected in self.elements:
+            if element_type == 'submit' and element_name == name:
+                found = True
+                break
+        if not found:
+            raise ValueError('"%s" is not a named submit element with a value on this form' % name)
+        self.submit_name = name
+
 class FormParams(object):
     def __init__(self, params, **kwargs):
         self.params = params
@@ -666,20 +734,6 @@ class FormParams(object):
         
         # XXX optimize?
         return dict(self.list)
-    
-    def submit(self, name):
-        raise NotImplementedError
-        
-        found = False
-        for tag, type, name_, value in self.params:
-            if tag == 'input' and type == 'submit' and name == name_:
-                found = True
-                break
-        if not found:
-            raise ValueError('"%s" is not a named submit element with a value on this form' % name)
-        options = dict(self.options)
-        options['submit_name'] = name
-        return FormParams(self.params, **options)
 
 class Form(object):
     def __init__(self, form_tag, response):
@@ -756,51 +810,11 @@ class Form(object):
                 else:
                     element_type = element.tag
                 elements.append((element_type, name, element.attrib.get('value'), selected))
-        return elements
-        #return FormElements(elements)
+        return FormElements(elements)
     
     @property
     def params(self):
-        params = []
-        selected_selects = {}
-        for element_type, element_name, element_value, element_selected in self.elements:
-            if element_name is None or element_type == 'reset':
-                continue
-            # first pass: figure out which values to send when
-            # the last value should be chosen
-            if element_type == 'option':
-                if element_selected:
-                    selected_selects[element_name] = element_value
-                else:
-                    # the first option should become selected
-                    if element_name not in selected_selects:
-                        selected_selects[element_name] = element_value
-        
-        processed_selects = {}
-        submit_found = False
-        for element_type, element_name, element_value, element_selected in self.elements:
-            if element_name is None or element_type == 'reset':
-                continue
-            # second pass: actually build the parameter list
-            if element_type == 'option':
-                selected_value = selected_selects.get(element_name)
-                # avoid creating multiple params when there are several
-                # options with the same value.
-                # if there are multiple options without a value and there
-                # is no selected value and the valueless options come first,
-                # send the first one. otherwise send the last one
-                if element_value == selected_value and element_name not in processed_selects:
-                    params.append((element_name, element_value))
-                    processed_selects[element_name] = True
-            else:
-                if element_type == 'submit':
-                    if not submit_found:
-                        if element_value is not None:
-                            params.append((element_name, element_value))
-                        submit_found = True
-                elif element_value is not None:
-                    params.append((element_name, element_value))
-        return FormParams(params)
+        return self.elements.params
 
 def extend_params(target, extra):
     '''Extends a target parameter list, which can be a sequence or a mapping,

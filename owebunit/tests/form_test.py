@@ -93,7 +93,9 @@ class FormTestCase(owebunit.WebTestCase):
         self.assertTrue('submit-second' not in params)
         
         # choose another submit button
-        params = form.params.submit('submit-second').dict
+        elements = form.elements.mutable
+        elements.submit('submit-second')
+        params = elements.params.dict
         self.assertTrue('submit-first' not in params)
         self.assertTrue('submit-second' in params)
         

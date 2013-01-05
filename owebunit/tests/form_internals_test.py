@@ -13,7 +13,7 @@ class FormInternalsTestCase(owebunit.WebTestCase):
         self.assertEquals(1, len(forms))
         
         form = forms[0]
-        elements = form.elements
+        elements = form.elements.elements
         self.assertEqual(3, len(elements))
         
         # type
@@ -43,7 +43,7 @@ class FormInternalsTestCase(owebunit.WebTestCase):
         self.assertEquals(1, len(forms))
         
         form = forms[0]
-        elements = form.elements
+        elements = form.elements.elements
         self.assertEqual(3, len(elements))
         
         # type
