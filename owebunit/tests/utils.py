@@ -15,3 +15,7 @@ class ServerThread(threading.Thread):
     
     def run(self):
         self.app.run(host='localhost', port=self.port)
+
+# http://code.activestate.com/recipes/106033-deep-list-to-convert-a-nested-tuple-of-tuples/
+def listit(t):
+    return list(map(listit, t)) if isinstance(t, (list, tuple)) else t

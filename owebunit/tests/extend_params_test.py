@@ -1,9 +1,6 @@
 import unittest
 import owebunit
-
-# http://code.activestate.com/recipes/106033-deep-list-to-convert-a-nested-tuple-of-tuples/
-def listit(t):
-    return list(map(listit, t)) if isinstance(t, (list, tuple)) else t
+from owebunit.tests import utils
 
 class ExtendParamsTestCase(unittest.TestCase):
     def test_tuple_into_tuple(self):
@@ -49,7 +46,7 @@ class ExtendParamsTestCase(unittest.TestCase):
     
     def _check(self, target, extra, expected):
         actual = owebunit.extend_params(target, extra)
-        self.assertEqual(listit(expected), listit(actual))
+        self.assertEqual(utils.listit(expected), utils.listit(actual))
 
 if __name__ == '__main__':
     import unittest
