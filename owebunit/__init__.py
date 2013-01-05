@@ -710,9 +710,9 @@ class Form(object):
         
         method = self.method
         if method:
-            method = method.lower()
+            method = method.upper()
         else:
-            method = 'get'
+            method = 'GET'
         return method
     
     @property

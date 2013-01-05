@@ -37,7 +37,7 @@ def relative_action_form():
 </html>
 '''
 
-@app.route('/no-attribute-form')
+@app.route('/no_attribute_form')
 def no_attribute_form():
     return '''
 <!doctype html>
@@ -123,19 +123,19 @@ class FormTestCase(owebunit.WebTestCase):
         # always a full url
         self.assertEqual('http://localhost:8043/there', form.computed_action)
         self.assertEqual('post', form.method)
-        self.assertEqual('post', form.computed_method)
+        self.assertEqual('POST', form.computed_method)
     
     def test_without_specified_attributes(self):
-        self.get('/no-attribute-form')
+        self.get('/no_attribute_form')
         self.assert_status(200)
         forms = self.response.forms
         self.assertEquals(1, len(forms))
         
         form = forms[0]
         self.assertTrue(form.action is None)
-        self.assertEqual('http://localhost:8043/no-attribute-form', form.computed_action)
+        self.assertEqual('http://localhost:8043/no_attribute_form', form.computed_action)
         self.assertTrue(form.method is None)
-        self.assertEqual('get', form.computed_method)
+        self.assertEqual('GET', form.computed_method)
     
     def test_computed_action_relative(self):
         self.get('/subdir/relative_action_form')
@@ -148,7 +148,7 @@ class FormTestCase(owebunit.WebTestCase):
         self.assertEqual('http://localhost:8043/subdir/in_subdir', form.computed_action)
     
     def test_params(self):
-        self.get('/no-attribute-form')
+        self.get('/no_attribute_form')
         self.assert_status(200)
         forms = self.response.forms
         self.assertEquals(1, len(forms))
