@@ -631,6 +631,8 @@ class FormParams(object):
         Form elements that do not have name or value attributes are ignored.
         '''
         
+        return self.params
+        
         filtered_params = []
         if 'submit_name' in self.options:
             submit_name = self.options['submit_name']
@@ -666,6 +668,8 @@ class FormParams(object):
         return dict(self.list)
     
     def submit(self, name):
+        raise NotImplementedError
+        
         found = False
         for tag, type, name_, value in self.params:
             if tag == 'input' and type == 'submit' and name == name_:
@@ -716,42 +720,86 @@ class Form(object):
         return method
     
     @property
-    def params(self):
-        params = []
+    def elements(self):
+        '''Returns all elements of the form.
+        
+        Elements without names or values are returned also, because selecting
+        e.g. a submit button without a name will not send any other submit
+        element names' with the form submission.
+        
+        For selects, the list of their options is returned, with select
+        name added to each of the options. Other tags are returned as is.
+        '''
+        
+        elements = []
         for element in self._form_tag.xpath('.//*[self::input or self::button or self::textarea or self::select]'):
-            if 'name' not in element.attrib:
-                continue
+            name = element.attrib.get('name')
             if element.tag == 'select':
-                options = element.xpath('.//option')
-                # try to find a selected option;
-                # use the last selected option if more than one is selected
-                value = None
-                for option in options:
+                # XXX check if options must be direct descendants of selects
+                for option in element.xpath('./option'):
                     # browsers differ on which values for selected attribute
                     # constitute the selection being active.
                     # consider presence of the attribute as the indicator
                     # that the option is selected.
                     # http://stackoverflow.com/questions/1033944/what-values-can-appear-in-the-selected-attribute-of-the-option-tag
-                    if 'selected' in option.attrib:
-                        # if the selected element has no value,
-                        # clear the selected value.
-                        # if there are multiple selected options,
-                        # this may result in not having a value for the select
-                        # despite some (earlier) selected options having values.
-                        # XXX handle multiple selection selects
-                        value = option.attrib.get('value')
-                if value is None:
-                    # get the first option as that will be selected
-                    # by the browser
-                    if len(options) > 0:
-                        option = options[0]
-                        # the first option may not have a value, in which case
-                        # we won't return a value as well
-                        value = option.attrib.get('value')
+                    selected = 'selected' in option.attrib
+                    elements.append(('option', name, option.attrib.get('value'), selected))
             else:
-                value = element.attrib.get('value')
-            if value is not None:
-                params.append((element.tag, element.attrib.get('type'), element.attrib['name'], value))
+                if element.tag == 'radio' or element.tag == 'checkbox':
+                    selected = 'checked' in element.attrib
+                else:
+                    selected = None
+                # use type attribute for element type, unless it is empty
+                # in which case us tag name
+                if 'type' in element.attrib:
+                    element_type = element.attrib['type']
+                else:
+                    element_type = element.tag
+                elements.append((element_type, name, element.attrib.get('value'), selected))
+        return elements
+        #return FormElements(elements)
+    
+    @property
+    def params(self):
+        params = []
+        selected_selects = {}
+        for element_type, element_name, element_value, element_selected in self.elements:
+            if element_name is None or element_type == 'reset':
+                continue
+            # first pass: figure out which values to send when
+            # the last value should be chosen
+            if element_type == 'option':
+                if element_selected:
+                    selected_selects[element_name] = element_value
+                else:
+                    # the first option should become selected
+                    if element_name not in selected_selects:
+                        selected_selects[element_name] = element_value
+        
+        processed_selects = {}
+        submit_found = False
+        for element_type, element_name, element_value, element_selected in self.elements:
+            if element_name is None or element_type == 'reset':
+                continue
+            # second pass: actually build the parameter list
+            if element_type == 'option':
+                selected_value = selected_selects.get(element_name)
+                # avoid creating multiple params when there are several
+                # options with the same value.
+                # if there are multiple options without a value and there
+                # is no selected value and the valueless options come first,
+                # send the first one. otherwise send the last one
+                if element_value == selected_value and element_name not in processed_selects:
+                    params.append((element_name, element_value))
+                    processed_selects[element_name] = True
+            else:
+                if element_type == 'submit':
+                    if not submit_found:
+                        if element_value is not None:
+                            params.append((element_name, element_value))
+                        submit_found = True
+                elif element_value is not None:
+                    params.append((element_name, element_value))
         return FormParams(params)
 
 def extend_params(target, extra):
