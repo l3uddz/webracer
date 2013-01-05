@@ -3,7 +3,7 @@ import bottle
 
 app = bottle.Bottle()
 
-@app.route('/one-form')
+@app.route('/one_form')
 def one_form():
     return '''
 <!doctype html>

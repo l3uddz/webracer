@@ -7,7 +7,7 @@ utils.start_bottle_server(form_app.app, 8043)
 @owebunit.config(host='localhost', port=8043)
 class FormTestCase(owebunit.WebTestCase):
     def test_with_specified_attributes(self):
-        self.get('/one-form')
+        self.get('/one_form')
         self.assert_status(200)
         forms = self.response.forms
         self.assertEquals(1, len(forms))
