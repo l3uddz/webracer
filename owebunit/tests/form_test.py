@@ -116,6 +116,16 @@ class FormTestCase(owebunit.WebTestCase):
         elements.set_value('textf', 'newvalue')
         params = elements.params.list
         self.assertEqual([['textf', 'newvalue']], utils.listit(params))
+    
+    def test_radios(self):
+        self.get('/first_radio_selected')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        elements = form.elements
+        self.assertEquals([['field', 'first']], utils.listit(elements.params.list))
 
 if __name__ == '__main__':
     import unittest

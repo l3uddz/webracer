@@ -640,6 +640,14 @@ class FormElements(object):
                     # the first option should become selected
                     if element_name not in selected_selects:
                         selected_selects[element_name] = element_value
+            elif element_type == 'radio':
+                # XXX completely duplicated
+                if element_name in self.chosen_values:
+                    # XXX rewrites destination if multiple options are present
+                    # for the given select tag
+                    selected_selects[element_name] = self.chosen_values[element_name]
+                elif element_selected:
+                    selected_selects[element_name] = element_value
         
         processed_selects = {}
         submit_found = False
@@ -678,7 +686,13 @@ class FormElements(object):
                         # XXX record that element_name was processed and
                         # do not process it again?
                 elif element_value is not None:
-                    params.append((element_name, element_value))
+                    if element_type == 'radio':
+                        ok = element_name not in processed_selects
+                    else:
+                        ok = True
+                    if ok:
+                        params.append((element_name, element_value))
+                        processed_selects[element_name] = True
         return FormParams(params)
     
     @property

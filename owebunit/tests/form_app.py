@@ -102,6 +102,22 @@ def form_with_two_submits():
 </html>
 '''
 
+@app.route('/first_radio_selected')
+def first_radio_selected():
+    return '''
+<!doctype html>
+<html>
+<head></head>
+<body>
+    <form action='/dump_params'>
+        <input type='radio' name='field' value='first' checked='checked' />
+        <input type='radio' name='field' value='second' />
+        <input type='submit' />
+    </form>
+</body>
+</html>
+'''
+
 @app.route('/dump_params')
 def dump_params():
     return json.dumps(dict(bottle.request.forms))
