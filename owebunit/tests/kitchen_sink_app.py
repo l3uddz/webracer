@@ -10,6 +10,10 @@ def ok():
 def internal_error():
     bottle.abort(500, 'internal server error')
 
+@app.route('/unhandled_exception')
+def unhandled_exception():
+    raise ValueError('This is an unhandled exception')
+
 @app.route('/redirect')
 def redirect():
     bottle.redirect('/found', 302)

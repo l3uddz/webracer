@@ -65,6 +65,14 @@ class Config(object):
     # assert_status must be called for check response status.
     save_failed_responses = False
     save_dir = None
+    
+    # A function that will be invoked with a session argument to retrieve
+    # any additional diagnostics for the response, if response status is 500.
+    # Mostly this is useful when the application being tested exists in
+    # the same process as the test suite, and the test suite has the ability
+    # to e.g. obtain a stack trace that is not otherwise exposed by the
+    # application.
+    extra_500_message = None
 
 class HeadersDict(dict):
     '''Dictionary type for headers. Performs case folding of header names.
@@ -274,9 +282,8 @@ class AssertRaisesContextManager(object):
         return True
 
 class Session(object):
-    def __init__(self, config, test_case, default_netloc=None):
-        self.config = config
-        self.test_case = test_case
+    def __init__(self, config=None, default_netloc=None):
+        self.config = config or Config()
         self._cookie_jar = ocookie.CookieJar()
         if default_netloc:
             self._default_host, self._default_port = default_netloc.split(':')
@@ -369,7 +376,10 @@ class Session(object):
             if 'location' in self.response.header_dict:
                 msg += ' (to %s)' % self.response.header_dict['location']
             if self.response.code == 500:
-                extra = self.test_case.get_500_extra_message()
+                if self.config.extra_500_message:
+                    extra = self.config.extra_500_message()
+                else:
+                    extra = None
                 if extra:
                     msg += "\n" + extra
             if self.config.save_failed_responses and not self.config.save_responses:
@@ -520,7 +530,6 @@ class WebTestCase(unittest.TestCase):
         if hasattr(self.__class__, 'DEFAULT_NETLOC'):
             kwargs['default_netloc'] = self.__class__.DEFAULT_NETLOC
         kwargs['config'] = self.config
-        kwargs['test_case'] = self
         return Session(**kwargs)
     
     def session(self):
@@ -568,9 +577,6 @@ class WebTestCase(unittest.TestCase):
     
     def assert_not_session_cookie(self, name):
         self._session.assert_not_session_cookie(name)
-    
-    def get_500_extra_message(self):
-        return None
     
     @property
     def cookie_dict(self):
