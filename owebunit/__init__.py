@@ -685,6 +685,9 @@ class FormElements(object):
                         params.append((element_name, self.chosen_values[element_name]))
                         # XXX record that element_name was processed and
                         # do not process it again?
+                elif element_type == 'radio' and element_name in selected_selects:
+                    if selected_selects[element_name] == element_value:
+                        params.append((element_name, element_value))
                 elif element_value is not None:
                     if element_type == 'radio':
                         ok = element_name not in processed_selects
