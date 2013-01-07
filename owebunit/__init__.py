@@ -864,8 +864,9 @@ class Form(object):
                     selected = 'selected' in option.attrib
                     elements.append(('option', name, option.attrib.get('value'), selected))
             else:
-                if element.tag == 'radio' or element.tag == 'checkbox':
-                    selected = 'checked' in element.attrib
+                if element.tag == 'input' and 'type' in element.attrib and \
+                    element.attrib['type'] in ('radio', 'checkbox'):
+                        selected = 'checked' in element.attrib
                 else:
                     selected = None
                 # use type attribute for element type, unless it is empty

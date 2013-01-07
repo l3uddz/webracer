@@ -73,6 +73,18 @@ class FormInternalsTestCase(owebunit.WebTestCase):
         form = forms[0]
         params = form.params
         self.assertEqual([['selectf', 'second']], utils.listit(params.params))
+    
+    def test_first_radio_selected(self):
+        self.get('/first_radio_selected')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        elements = form.elements.elements
+        self.assertEqual(3, len(elements))
+        self.assertEquals(['radio', 'field', 'first', True], utils.listit(elements[0]))
+        self.assertEquals(['radio', 'field', 'second', False], utils.listit(elements[1]))
 
 if __name__ == '__main__':
     import unittest
