@@ -1,7 +1,7 @@
 import sys
 import owebunit
-from owebunit.tests import utils
-from owebunit.tests import kitchen_sink_app
+import utils
+import kitchen_sink_app
 
 utils.start_bottle_server(kitchen_sink_app.app, 8045)
 
