@@ -7,3 +7,4 @@
  - Handle multiple submit form tags in form params
  - Checkboxes, checked and unchecked
  - str() for FormElements and FormParams
+ - Textareas are not handled correctly at all
