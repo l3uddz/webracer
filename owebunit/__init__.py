@@ -787,25 +787,6 @@ class FormParams(object):
         '''
         
         return self.params
-        
-        filtered_params = []
-        if 'submit_name' in self.options:
-            submit_name = self.options['submit_name']
-        else:
-            submit_name = None
-            submit_found = False
-        for tag, type, name, value in self.params:
-            if tag == 'input' and type == 'submit':
-                # allow only one submit element to provide a value.
-                if submit_name:
-                    if name != submit_name:
-                        continue
-                else:
-                    if submit_found:
-                        continue
-                    submit_found = True
-            filtered_params.append((name, value))
-        return filtered_params
     
     @property
     def dict(self):
