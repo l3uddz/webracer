@@ -92,6 +92,10 @@ class Config(object):
     # to e.g. obtain a stack trace that is not otherwise exposed by the
     # application.
     extra_500_message = None
+    
+    # Override session class to use. Allows defining additional helper methods
+    # on session objects.
+    session_class = None
 
 class HeadersDict(dict):
     '''Dictionary type for headers. Performs case folding of header names.
@@ -549,7 +553,8 @@ class WebTestCase(unittest.TestCase):
         if hasattr(self.__class__, 'DEFAULT_NETLOC'):
             kwargs['default_netloc'] = self.__class__.DEFAULT_NETLOC
         kwargs['config'] = self.config
-        return Session(**kwargs)
+        session_class = self.config.session_class or Session
+        return session_class(**kwargs)
     
     def session(self):
         session = self._create_session()
