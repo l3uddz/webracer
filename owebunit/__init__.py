@@ -589,17 +589,6 @@ class WebTestCase(unittest.TestCase):
     @property
     def header_dict(self):
         return self._session.header_dict
-    
-    # Various utility methods
-    
-    def xpath_first(self, doc, expr):
-        '''Performs a doc.xpath(expr) call, asserts that the result has
-        a non-zero length, and returns the first item of the result.
-        '''
-        
-        nodes = doc.xpath(expr)
-        self.assert_(len(nodes) > 0, 'No elements matching xpath: %s' % expr)
-        return nodes[0]
 
 def no_session(cls):
     '''Class decorator requesting that session management should not be
