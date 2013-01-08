@@ -1,16 +1,35 @@
 # Note: responses are assumed to be immutable.
 
 import functools
-import httplib
 import os.path
 import re
 import time as _time
 import unittest
 import urllib
-import urlparse
 import ocookie.httplibadapter
 
-class ConfigurationError(StandardError):
+# python 2/3 compatibility
+try:
+    # 2.x
+    import httplib
+except ImportError:
+    # 3.x
+    import http.client as httplib
+
+try:
+    # 2.x
+    import urlparse
+except ImportError:
+    import urllib.parse as urlparse
+
+try:
+    # 2.x
+    base_exception_class = StandardError
+except NameError:
+    # 3.x
+    base_exception_class = Exception
+
+class ConfigurationError(base_exception_class):
     pass
 
 def is_mapping(value):
