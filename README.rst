@@ -1,4 +1,5 @@
 owebunit - a comprehensive web application testing library for Python
+=====================================================================
 
 owebunit is intended for applications that are written without a framework,
 using a framework that does not provide a testing module or where the
@@ -15,5 +16,8 @@ Its goals are:
 - Possibly twill-like form handling in the future
 
 Note: API is not yet stable.
+
+.. image:: https://api.travis-ci.org/p/owebunit.png
+  :target: https://travis-ci.org/p/owebunit
 
 Released under the MIT license.
