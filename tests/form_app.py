@@ -150,6 +150,36 @@ def checkboxes():
 </html>
 '''
 
+@app.route('/empty_textarea')
+def empty_textarea():
+    return '''
+<!doctype html>
+<html>
+<head></head>
+<body>
+    <form action='/dump_params'>
+        <textarea name='field'></textarea>
+        <input type='submit' />
+    </form>
+</body>
+</html>
+'''
+
+@app.route('/textarea')
+def textarea():
+    return '''
+<!doctype html>
+<html>
+<head></head>
+<body>
+    <form action='/dump_params'>
+        <textarea name='field'>hello world</textarea>
+        <input type='submit' />
+    </form>
+</body>
+</html>
+'''
+
 @app.route('/dump_params')
 def dump_params():
     return json.dumps(dict(bottle.request.forms))

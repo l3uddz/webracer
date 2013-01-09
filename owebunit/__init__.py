@@ -869,6 +869,10 @@ class Form(object):
                     # http://stackoverflow.com/questions/1033944/what-values-can-appear-in-the-selected-attribute-of-the-option-tag
                     selected = 'selected' in option.attrib
                     elements.append(('option', name, option.attrib.get('value'), selected))
+            elif element.tag == 'textarea':
+                # textareas always have a value
+                value = element.text or ''
+                elements.append(('textarea', name, value, None))
             else:
                 if element.tag == 'input' and 'type' in element.attrib and \
                     element.attrib['type'] in ('radio', 'checkbox'):

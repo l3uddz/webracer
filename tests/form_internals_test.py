@@ -97,6 +97,28 @@ class FormInternalsTestCase(owebunit.WebTestCase):
         self.assertEqual(3, len(elements))
         self.assertEquals(['checkbox', 'field', 'first', False], utils.listit(elements[0]))
         self.assertEquals(['checkbox', 'field', 'second', True], utils.listit(elements[1]))
+    
+    def test_empty_textarea(self):
+        self.get('/empty_textarea')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        elements = form.elements.elements
+        self.assertEqual(2, len(elements))
+        self.assertEquals(['textarea', 'field', '', None], utils.listit(elements[0]))
+    
+    def test_textarea(self):
+        self.get('/textarea')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        elements = form.elements.elements
+        self.assertEqual(2, len(elements))
+        self.assertEquals(['textarea', 'field', 'hello world', None], utils.listit(elements[0]))
 
 if __name__ == '__main__':
     import unittest
