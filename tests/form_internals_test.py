@@ -85,6 +85,18 @@ class FormInternalsTestCase(owebunit.WebTestCase):
         self.assertEqual(3, len(elements))
         self.assertEquals(['radio', 'field', 'first', True], utils.listit(elements[0]))
         self.assertEquals(['radio', 'field', 'second', False], utils.listit(elements[1]))
+    
+    def test_checkboxes(self):
+        self.get('/checkboxes')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        elements = form.elements.elements
+        self.assertEqual(3, len(elements))
+        self.assertEquals(['checkbox', 'field', 'first', False], utils.listit(elements[0]))
+        self.assertEquals(['checkbox', 'field', 'second', True], utils.listit(elements[1]))
 
 if __name__ == '__main__':
     import unittest

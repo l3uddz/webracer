@@ -707,6 +707,9 @@ class FormElements(object):
                 elif element_type == 'radio' and element_name in selected_selects:
                     if selected_selects[element_name] == element_value:
                         params.append((element_name, element_value))
+                elif element_type == 'checkbox':
+                    if element_selected:
+                        params.append((element_name, element_value))
                 elif element_value is not None:
                     if element_type == 'radio':
                         ok = element_name not in processed_selects

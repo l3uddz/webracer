@@ -136,6 +136,16 @@ class FormTestCase(owebunit.WebTestCase):
         form = forms[0]
         elements = form.elements
         self.assertEquals([['field', 'second']], utils.listit(elements.params.list))
+    
+    def test_checkboxes(self):
+        self.get('/checkboxes')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        elements = form.elements
+        self.assertEquals([['field', 'second']], utils.listit(elements.params.list))
 
 if __name__ == '__main__':
     import unittest
