@@ -16,10 +16,12 @@ if py3:
     import http.client as httplib
     import urllib.parse as urlparse
     base_exception_class = Exception
+    string_type = str
 else:
     import httplib
     import urlparse
     base_exception_class = StandardError
+    string_type = basestring
 
 class ConfigurationError(base_exception_class):
     pass
@@ -44,13 +46,13 @@ def is_container(value):
     '''
     
     # sequence or mapping, but not a string as strings are mappings
-    return hasattr(value, '__getitem__') and not isinstance(value, basestring)
+    return hasattr(value, '__getitem__') and not isinstance(value, string_type)
 
 def is_string(value):
     '''Returns True if value is a string, and False otherwise.
     '''
     
-    return isinstance(value, basestring)
+    return isinstance(value, string_type)
 
 def immutable(func):
     @functools.wraps(func)
