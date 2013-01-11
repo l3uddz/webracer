@@ -2,9 +2,9 @@ import owebunit
 import utils
 import form_app
 
-utils.start_bottle_server(form_app.app, 8048)
+utils.start_bottle_server(form_app.app, 8049)
 
-@owebunit.config(host='localhost', port=8048)
+@owebunit.config(host='localhost', port=8049)
 class FormRetrievalTestCase(owebunit.WebTestCase):
     def setUp(self):
         super(FormRetrievalTestCase, self).setUp()
