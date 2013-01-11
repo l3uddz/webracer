@@ -345,10 +345,11 @@ def uri(self):
         uri += '?' + self.query
     return uri
 
+# XXX figure out if this is still needed and give it a better api
 def parse_url(url):
     parsed_url = urlparse.urlparse(url)
-    parsed_url.uri = uri(parsed_url)
-    return parsed_url
+    _uri = uri(parsed_url)
+    return parsed_url, _uri
 
 if py3:
     def _urlencode_value(value):
@@ -419,7 +420,7 @@ class Session(object):
     
     def request(self, method, url, body=None, query=None, headers=None):
         url = self._absolutize_url(url)
-        parsed_url = parse_url(url)
+        parsed_url, uri = parse_url(url)
         host, port = self._netloc_to_host_port(parsed_url.netloc)
         self.connection = httplib.HTTPConnection(host, port)
         kwargs = {}
@@ -450,7 +451,6 @@ class Session(object):
             headers = HeadersDict(headers)
         headers['connection'] = 'close'
         
-        uri = parsed_url.uri
         if query is not None:
             if is_string(query):
                 encoded_query = query
