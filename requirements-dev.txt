@@ -1,4 +1,5 @@
 bottle
+cssselect
 lxml
 mock
 git+git://github.com/p/ocookie.git@master#egg=ocookie

@@ -241,11 +241,99 @@ class Response(object):
         return location
     
     @property
+    @immutable
     def forms(self):
-        if getattr(self, '_forms', None) is None:
-            doc = self.lxml_etree
-            self._forms = [Form(form_tag, self) for form_tag in doc.xpath('//form')]
-        return self._forms
+        '''Returns forms in the response.
+        
+        By default, all forms are returned.
+        
+        It is possible to restrict forms to only ones matching specified
+        XPath expression, CSS selector, name or id attributes via
+        FormsCollection.__call__.
+        '''
+        
+        return FormsCollection(self.lxml_etree, self)
+
+class FormsCollection(object):
+    def __init__(self, doc, response):
+        self.doc = doc
+        self.response = response
+        self.all_forms = None
+    
+    def __call__(self, xpath=None, css=None, name=None, id=None):
+        '''Returns forms matching a specified XPath expression, CSS selector,
+        name or id attributes.
+        
+        Multiple restrictions can be specified, in which case only forms
+        matching all conditions will be returned.
+        '''
+        
+        if xpath is not None:
+            forms = self.doc.xpath(xpath)
+            if len(forms) == 0:
+                return forms
+        else:
+            forms = None
+        
+        if css is not None:
+            import lxml.cssselect
+            selector = lxml.cssselect.CSSSelector(css)
+            css_forms = selector(self.doc)
+            if len(css_forms) == 0:
+                return css_form
+            if forms is None:
+                forms = css_forms
+            else:
+                forms = [form for form in forms if form in css_forms]
+        
+        # restrict to form tags
+        if forms is not None:
+            # note: xpath may have selected text nodes, thus
+            # hasattr check
+            forms = [form for form in forms if hasattr(form, 'tag') and form.tag == 'form']
+        
+        if name is not None or id is not None:
+            if forms is None:
+                import xml.sax.saxutils
+                
+                conditions = []
+                if name is not None:
+                    conditions.append('@name=%s' % xml.sax.saxutils.quoteattr(name))
+                if id is not None:
+                    conditions.append('@id=%s' % xml.sax.saxutils.quoteattr(id))
+                xpath = ' and '.join(conditions)
+                xpath = '//form[%s]' % xpath
+                forms = self.doc.xpath(xpath)
+            else:
+                if name is not None:
+                    forms = [form for form in forms if form.attrib.get('name') == name]
+                if id is not None:
+                    forms = [form for form in forms if form.attrib.get('id') == name]
+        
+        if forms is None:
+            # no conditions specified, return all forms
+            self._initialize_all_forms()
+            forms = self.all_forms
+        
+        return [Form(form, self.response) for form in forms]
+    
+    # treating FormCollection as a list of (all) forms
+    def __len__(self):
+        self._initialize_all_forms()
+        return len(self.all_forms)
+    
+    def __getitem__(self, index):
+        self._initialize_all_forms()
+        return Form(self.all_forms[index], self.response)
+    
+    def __iter__(self):
+        self._initialize_all_forms()
+        forms = [Form(form, self.response) for form in self.all_forms]
+        return iter(forms)
+    
+    def _initialize_all_forms(self):
+        if self.all_forms is None:
+            self.all_forms = self.doc.xpath('//form')
 
 def uri(self):
     uri = self.path or '/'

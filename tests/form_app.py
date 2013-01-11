@@ -180,6 +180,26 @@ def textarea():
 </html>
 '''
 
+@app.route('/form_retrieval')
+def form_retrieval():
+    return '''
+<!doctype html>
+<html>
+<head></head>
+<body>
+    <form action='by-class' class='testclass'>
+    </form>
+    <form action='by-id' id='formid'>
+    </form>
+    <form action='by-name' name='testname'>
+    </form>
+    <form action='by-class-and-id' class='testclass' id='formid2'>
+    </form>
+    <form action='by-name-and-id' name='testname3' id='testid3'>
+</body>
+</html>
+'''
+
 @app.route('/dump_params')
 def dump_params():
     return json.dumps(dict(bottle.request.forms))
