@@ -350,12 +350,26 @@ def parse_url(url):
     parsed_url.uri = uri(parsed_url)
     return parsed_url
 
-def _urlencode_value(value):
-    if isinstance(value, unicode):
-        encoded = value.encode('utf-8')
-    else:
-        encoded = str(value)
-    return urllib.quote(encoded)
+if py3:
+    def _urlencode_value(value):
+        '''Encodes value, first converting it to string if necessary.
+        
+        value should be either a string or something with a meaningful
+        conversion to string, such as a number.
+        
+        If value is of bytes type, behavior is undefined.
+        '''
+        
+        if type(value) != str:
+            value = str(value)
+        return urlparse.quote(value)
+else:
+    def _urlencode_value(value):
+        if isinstance(value, unicode):
+            encoded = value.encode('utf-8')
+        else:
+            encoded = str(value)
+        return urllib.quote(encoded)
 
 def urlencode_utf8(params):
     encoded = []

@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
+
 import unittest
 import owebunit
 
-class UrlencodeTestCase(unittest.TestCase):
+class UrlencodeUtf8Test(unittest.TestCase):
     def test_urlencode_simple(self):
         input = dict(a='a', b='b')
         output = owebunit.urlencode_utf8(input)
@@ -45,6 +47,13 @@ class UrlencodeTestCase(unittest.TestCase):
     def test_tuple_of_lists(self):
         input = (['a', 'b'], ['c', 'd'])
         expected = 'a=b&c=d'
+        self.check(input, expected)
+    
+    def test_unicode(self):
+        # utf-8 as input
+        str = 'Колбаса'
+        input = [['a', str]]
+        expected = 'a=%D0%9A%D0%BE%D0%BB%D0%B1%D0%B0%D1%81%D0%B0'
         self.check(input, expected)
     
     def check(self, input, expected):
