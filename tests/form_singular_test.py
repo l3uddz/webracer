@@ -29,9 +29,17 @@ class FormRetrievalTestCase(owebunit.WebTestCase):
         form = self.response.form(name='testname')
         self.assertEqual('by-name', form.action)
     
+    def test_name_missing(self):
+        with self.assert_raises(owebunit.NoForms):
+            self.response.form(name='missing')
+    
     def test_id(self):
         form = self.response.form(id='formid')
         self.assertEqual('by-id', form.action)
+    
+    def test_id_missing(self):
+        with self.assert_raises(owebunit.NoForms):
+            self.response.form(id='missing')
     
     def test_xpath_noop(self):
         # multiple forms
@@ -41,6 +49,10 @@ class FormRetrievalTestCase(owebunit.WebTestCase):
     def test_xpath_all(self):
         with self.assert_raises(owebunit.MultipleForms):
             form = self.response.form(xpath='//node()')
+    
+    def test_xpath_missing(self):
+        with self.assert_raises(owebunit.NoForms):
+            self.response.form(xpath='//form[@id="missing"]')
     
     def test_xpath(self):
         form = self.response.form(xpath='//form[@id="testid3"]')
@@ -53,6 +65,10 @@ class FormRetrievalTestCase(owebunit.WebTestCase):
     def test_css(self):
         form = self.response.form(css='#testid3')
         self.assertEqual('by-name-and-id', form.action)
+    
+    def test_css_missing(self):
+        with self.assert_raises(owebunit.NoForms):
+            self.response.form(css='.missing')
     
     def test_css_and_name(self):
         form = self.response.form(css='*', name='testname')

@@ -290,7 +290,7 @@ class FormsCollection(object):
             selector = lxml.cssselect.CSSSelector(css)
             css_forms = selector(self.doc)
             if len(css_forms) == 0:
-                return css_form
+                return css_forms
             if forms is None:
                 forms = css_forms
             else:
