@@ -1,7 +1,7 @@
 import lxml.etree
 import owebunit
 import bottle
-import utils
+from . import utils
 
 app = bottle.Bottle()
 

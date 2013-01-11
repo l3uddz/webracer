@@ -1,6 +1,6 @@
 import unittest
 import owebunit
-import utils
+from . import utils
 
 class ExtendParamsTestCase(unittest.TestCase):
     def test_tuple_into_tuple(self):

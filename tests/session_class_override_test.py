@@ -1,8 +1,8 @@
 import time
 import owebunit
 import mock
-import utils
-import kitchen_sink_app
+from . import utils
+from . import kitchen_sink_app
 
 utils.start_bottle_server(kitchen_sink_app.app, 8047)
 
