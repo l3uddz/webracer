@@ -73,6 +73,31 @@ class FormRetrievalTestCase(owebunit.WebTestCase):
     def test_css_and_name(self):
         form = self.response.form(css='*', name='testname')
         self.assertEqual('by-name', form.action)
+    
+    def test_missing_combinations(self):
+        existing = [
+            dict(xpath='//form'),
+            dict(css='form'),
+            dict(name='testname'),
+            dict(id='formid'),
+        ]
+        missing = [
+            dict(xpath='//strong'),
+            dict(css='strong'),
+            dict(name='missing'),
+            dict(id='missing'),
+        ]
+        
+        for e in existing:
+            for m in missing:
+                if e.keys()[0] == m.keys()[0]:
+                    continue
+                
+                merged = dict(e)
+                merged.update(m)
+                
+                with self.assert_raises(owebunit.NoForms):
+                    form = self.response.form(**merged)
 
 if __name__ == '__main__':
     import unittest

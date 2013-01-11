@@ -318,7 +318,7 @@ class FormsCollection(object):
                 if name is not None:
                     forms = [form for form in forms if form.attrib.get('name') == name]
                 if id is not None:
-                    forms = [form for form in forms if form.attrib.get('id') == name]
+                    forms = [form for form in forms if form.attrib.get('id') == id]
         
         if forms is None:
             # no conditions specified, return all forms
