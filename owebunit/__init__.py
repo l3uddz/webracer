@@ -990,14 +990,23 @@ class Form(object):
     def params(self):
         return self.elements.params
 
+def _implement_form_property(prop):
+    @property
+    def getter(self):
+        self._materialize()
+        return getattr(self.form, prop)
+    return getter
+
 class FormProxy(object):
     def __init__(self, collection):
         self.collection = collection
     
-    @property
-    def action(self):
-        self._materialize()
-        return self.form.action
+    action = _implement_form_property('action')
+    computed_action = _implement_form_property('computed_action')
+    method = _implement_form_property('method')
+    computed_method = _implement_form_property('computed_method')
+    elements = _implement_form_property('elements')
+    params = _implement_form_property('params')
     
     def __call__(self, **kwargs):
         forms = self.collection(**kwargs)
