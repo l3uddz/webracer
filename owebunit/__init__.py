@@ -1,5 +1,6 @@
 # Note: responses are assumed to be immutable.
 
+import sys
 import functools
 import os.path
 import re
@@ -8,26 +9,17 @@ import unittest
 import urllib
 import ocookie.httplibadapter
 
+py3 = sys.version_info[0] == 3
+
 # python 2/3 compatibility
-try:
-    # 2.x
-    import httplib
-except ImportError:
-    # 3.x
+if py3:
     import http.client as httplib
-
-try:
-    # 2.x
-    import urlparse
-except ImportError:
     import urllib.parse as urlparse
-
-try:
-    # 2.x
-    base_exception_class = StandardError
-except NameError:
-    # 3.x
     base_exception_class = Exception
+else:
+    import httplib
+    import urlparse
+    base_exception_class = StandardError
 
 class ConfigurationError(base_exception_class):
     pass
