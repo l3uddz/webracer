@@ -386,9 +386,9 @@ class AssertRaisesContextManager(object):
     
     def __exit__(self, type, value, traceback):
         if type is None:
-            assert False, '%s expected but not raised' % str(self.expected)
+            raise AssertionError('%s expected but not raised' % str(self.expected))
         if type != self.expected:
-            assert False, '%s expected but %s was raised' % (str(self.expected), str(type))
+            raise AssertionError('%s expected, not `%s`' % (self.expected.__class__, str(value)))
         # silence exception
         return True
 
