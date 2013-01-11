@@ -32,6 +32,12 @@ except NameError:
 class ConfigurationError(base_exception_class):
     pass
 
+class NoForms(base_exception_class):
+    pass
+
+class MultipleForms(base_exception_class):
+    pass
+
 def is_mapping(value):
     '''Returns True if value is of a mapping type such as a dictionary,
     and False otherwise.
@@ -253,6 +259,10 @@ class Response(object):
         '''
         
         return FormsCollection(self.lxml_etree, self)
+    
+    @property
+    def form(self):
+        return FormProxy(self.forms)
 
 class FormsCollection(object):
     def __init__(self, doc, response):
@@ -979,6 +989,31 @@ class Form(object):
     @property
     def params(self):
         return self.elements.params
+
+class FormProxy(object):
+    def __init__(self, collection):
+        self.collection = collection
+    
+    @property
+    def action(self):
+        self._materialize()
+        return self.form.action
+    
+    def __call__(self, **kwargs):
+        forms = self.collection(**kwargs)
+        self._check_length(forms)
+        return forms[0]
+    
+    def _materialize(self):
+        forms = self.collection()
+        self._check_length(forms)
+        self.form = forms[0]
+    
+    def _check_length(self, forms):
+        if len(forms) == 0:
+            raise NoForms('No forms were found')
+        elif len(forms) > 1:
+            raise MultipleForms('Multiple (%d) forms were found' % len(forms))
 
 def extend_params(target, extra):
     '''Extends a target parameter list, which can be a sequence or a mapping,
