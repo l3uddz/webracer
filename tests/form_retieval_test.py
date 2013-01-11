@@ -61,7 +61,7 @@ class FormRetrievalTestCase(owebunit.WebTestCase):
         form = forms[0]
         self.assertEqual('by-name-and-id', form.action)
     
-    def test_css_all(self):
+    def test_css_and_name(self):
         forms = self.response.forms(css='*', name='testname')
         self.assertEquals(1, len(forms))
         
