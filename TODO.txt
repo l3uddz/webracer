@@ -9,3 +9,6 @@
  - str() for FormElements and FormParams
  - Textareas are not handled correctly at all
  - Should form.method be uppercased?
+ - Add a case-insensitive api to header_list
+ - Add tests for header_dict case insensitivity on keys (broken in py3)
+ - Document or remove DEFAULT_NETLOC
