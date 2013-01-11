@@ -28,7 +28,7 @@ class AbsolutizeUrlTestCase(owebunit.WebTestCase):
             owebunit.utils.xpath_first_check(self.doc, '//nonexistent')
         except AssertionError as e:
             # ok
-            self.assertTrue('No elements matching xpath: //nonexistent' in e.message)
+            self.assertTrue('No elements matching xpath: //nonexistent' in str(e))
         else:
             self.fail('Assertion was not raised')
 

@@ -14,7 +14,7 @@ class Extra500TestCase(owebunit.WebTestCase):
         try:
             self.assert_status(200)
         except AssertionError, e:
-            self.assertTrue('This is an unhandled exception' not in e.message)
+            self.assertTrue('This is an unhandled exception' not in str(e))
         else:
             self.assertTrue(False)
 
@@ -54,7 +54,7 @@ class Extra500TestCaseWithExtra(owebunit.WebTestCase):
         try:
             self.assert_status(200)
         except AssertionError, e:
-            self.assertTrue('This is an unhandled exception' in e.message)
+            self.assertTrue('This is an unhandled exception' in str(e))
         else:
             self.assertTrue(False)
 
