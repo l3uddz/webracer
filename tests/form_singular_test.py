@@ -5,9 +5,9 @@ import form_app
 utils.start_bottle_server(form_app.app, 8049)
 
 @owebunit.config(host='localhost', port=8049)
-class FormRetrievalTestCase(owebunit.WebTestCase):
+class FormSingularTestCase(owebunit.WebTestCase):
     def setUp(self):
-        super(FormRetrievalTestCase, self).setUp()
+        super(FormSingularTestCase, self).setUp()
         
         self.get('/form_retrieval')
         self.assert_status(200)
