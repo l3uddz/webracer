@@ -7,7 +7,8 @@ class UrlencodeUtf8Test(unittest.TestCase):
     def test_urlencode_simple(self):
         input = dict(a='a', b='b')
         output = owebunit.urlencode_utf8(input)
-        self.assertEqual('a=a&b=b', output)
+        # dictionary keys are not ordered
+        self.assertTrue(output == 'a=a&b=b' or output == 'b=b&a=a')
     
     def test_urlencode_list(self):
         input = dict(a=[1])
