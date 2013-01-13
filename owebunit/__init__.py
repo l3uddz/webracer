@@ -218,7 +218,7 @@ class Response(object):
     @property
     def header_dict(self):
         header_list = self.header_list
-        map = {}
+        map = HeadersDict()
         for key, value in header_list:
             map[key] = value
         return map
