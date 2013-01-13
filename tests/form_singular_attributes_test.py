@@ -27,6 +27,8 @@ class FormSingularAttributesTestCase(owebunit.WebTestCase):
         self.assertEqual('http://localhost:8050/there', form.computed_action)
         self.assertEqual('post', form.method)
         self.assertEqual('POST', form.computed_method)
+        self.assertEqual('formname', form.name)
+        self.assertEqual('formid', form.id)
         
         # internal
         self.assertEqual(3, len(form.elements.elements))

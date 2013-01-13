@@ -917,6 +917,14 @@ class Form(object):
         self._response = response
     
     @property
+    def name(self):
+        return self._form_tag.attrib.get('name')
+    
+    @property
+    def id(self):
+        return self._form_tag.attrib.get('id')
+    
+    @property
     def action(self):
         return self._form_tag.attrib.get('action')
     
@@ -1022,6 +1030,8 @@ class FormProxy(object):
     computed_method = _implement_form_property('computed_method')
     elements = _implement_form_property('elements')
     params = _implement_form_property('params')
+    name = _implement_form_property('name')
+    id = _implement_form_property('id')
     
     def __call__(self, **kwargs):
         forms = self.collection(**kwargs)
