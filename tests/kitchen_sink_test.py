@@ -1,4 +1,3 @@
-import time
 import owebunit
 import mock
 from tests import utils
