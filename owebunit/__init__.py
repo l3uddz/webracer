@@ -7,6 +7,7 @@ import re
 import time as _time
 import unittest
 import urllib
+import xml.sax.saxutils
 import ocookie.httplibadapter
 
 py3 = sys.version_info[0] == 3
@@ -298,8 +299,6 @@ class FormsCollection(object):
         
         if name is not None or id is not None:
             if forms is None:
-                import xml.sax.saxutils
-                
                 conditions = []
                 if name is not None:
                     conditions.append('@name=%s' % xml.sax.saxutils.quoteattr(name))
@@ -997,6 +996,14 @@ class Form(object):
     @property
     def params(self):
         return self.elements.params
+    
+    def __repr__(self):
+        bits = ['owebunit.Form']
+        for prop in ['id', 'name', 'action', 'method']:
+            value = getattr(self, prop)
+            if value is not None:
+                bits.append('%s=%s' % (prop, xml.sax.saxutils.quoteattr(value)))
+        return '<%s>' % ' '.join(bits)
 
 def _implement_form_property(prop):
     @property
