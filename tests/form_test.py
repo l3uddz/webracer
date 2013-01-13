@@ -1,6 +1,6 @@
 import owebunit
-from . import utils
-from . import form_app
+from tests import utils
+from tests import form_app
 
 utils.start_bottle_server(form_app.app, 8043)
 
