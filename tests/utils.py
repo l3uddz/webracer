@@ -13,9 +13,11 @@ def start_bottle_server(app, port, **kwargs):
         try:
             conn = socket.create_connection(('127.0.0.1', port), 0.1)
             ok = True
-            break
         except socket.error as e:
             _time.sleep(0.1)
+        if ok:
+            conn.close()
+            break
     if not ok:
         import warnings
         warnings.warn('Server did not start after 1 second')
