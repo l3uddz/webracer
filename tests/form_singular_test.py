@@ -98,6 +98,15 @@ class FormSingularTestCase(owebunit.WebTestCase):
                 
                 with self.assert_raises(owebunit.NoForms):
                     form = self.response.form(**merged)
+    
+    def test_no_forms_message(self):
+        try:
+            self.response.form(xpath='//form[@id="missing-id"]')
+        except owebunit.NoForms as exc:
+            # parameter should be included in the message
+            self.assertTrue('missing-id' in str(exc), 'id not included in message')
+        else:
+            self.fail('NoForms not raised')
 
 if __name__ == '__main__':
     import unittest

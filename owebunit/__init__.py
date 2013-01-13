@@ -1020,6 +1020,12 @@ def _implement_form_property(prop):
         return getattr(self.form, prop)
     return getter
 
+def _format_form_query(**kwargs):
+    items = []
+    for key in kwargs:
+        items.append('%s=%s' % (key, xml.sax.saxutils.quoteattr(kwargs[key])))
+    return ' and '.join(items)
+
 class FormProxy(object):
     def __init__(self, collection):
         self.collection = collection
@@ -1035,7 +1041,7 @@ class FormProxy(object):
     
     def __call__(self, **kwargs):
         forms = self.collection(**kwargs)
-        self._check_length(forms)
+        self._check_length(forms, **kwargs)
         return forms[0]
     
     def _materialize(self):
@@ -1043,9 +1049,13 @@ class FormProxy(object):
         self._check_length(forms)
         self.form = forms[0]
     
-    def _check_length(self, forms):
+    def _check_length(self, forms, **kwargs):
         if len(forms) == 0:
-            raise NoForms('No forms were found')
+            if kwargs:
+                msg = 'No forms matched %s' % _format_form_query(**kwargs)
+            else:
+                msg = 'No forms were found'
+            raise NoForms(msg)
         elif len(forms) > 1:
             raise MultipleForms('Multiple (%d) forms were found' % len(forms))
 
