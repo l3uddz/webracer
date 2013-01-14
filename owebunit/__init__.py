@@ -8,7 +8,7 @@ import time as _time
 import unittest
 import urllib
 import xml.sax.saxutils
-import ocookie.httplibadapter
+import ocookie.httplib_adapter
 import cidict
 
 py3 = sys.version_info[0] == 3
@@ -172,7 +172,7 @@ class Response(object):
         try:
             return self._cookie_list
         except AttributeError:
-            self._cookie_list = ocookie.httplibadapter.parse_response_cookies(
+            self._cookie_list = ocookie.httplib_adapter.parse_response_cookies(
                 self.httplib_response
             )
             return self._cookie_list
