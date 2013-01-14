@@ -1,7 +1,10 @@
+import sys
 import owebunit
 import mock
 from tests import utils
 from tests import kitchen_sink_app
+
+py3 = sys.version_info[0] == 3
 
 utils.start_bottle_server(kitchen_sink_app.app, 8041)
 
@@ -160,8 +163,13 @@ def mock_http_connection_returning_200():
     mock_http_connection.return_value = mock_cls
     return mock_http_connection
 
+if py3:
+    http_connection_class = 'http.client.HTTPConnection'
+else:
+    http_connection_class = 'httplib.HTTPConnection'
+
 class MockedServerTestCase(owebunit.WebTestCase):
-    @mock.patch('httplib.HTTPConnection', mock_http_connection_returning_200())
+    @mock.patch(http_connection_class, mock_http_connection_returning_200())
     def test_portless_url(self):
         '''Check that our logic for issuing requests does not have any
         local problems'''
