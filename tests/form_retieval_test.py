@@ -100,7 +100,8 @@ class FormRetrievalTestCase(owebunit.WebTestCase):
         
         for e in existing:
             for m in missing:
-                if e.keys()[0] == m.keys()[0]:
+                # TypeError: 'dict_keys' object does not support indexing
+                if tuple(e.keys())[0] == tuple(m.keys())[0]:
                     continue
                 
                 merged = dict(e)
