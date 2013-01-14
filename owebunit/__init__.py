@@ -536,7 +536,7 @@ class Session(object):
         assert name in self.response.cookie_dict
         if kwargs:
             cookie = self.response.cookie_dict[name]
-            if kwargs.has_key('value'):
+            if 'value' in kwargs:
                 self.assert_equal(kwargs['value'], cookie.value)
     
     def assert_not_response_cookie(self, name):
