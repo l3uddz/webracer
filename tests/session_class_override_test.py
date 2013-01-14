@@ -1,5 +1,4 @@
 import owebunit
-import mock
 from tests import utils
 from tests import kitchen_sink_app
 
