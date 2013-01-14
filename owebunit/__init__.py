@@ -108,12 +108,30 @@ class Response(object):
         return self.httplib_response.status
     
     @property
+    @immutable
+    def raw_body(self):
+        '''Returns the raw response body.
+        
+        In Python 3, this returns the bytes of the response.
+        In Python 2, this is identical to body.
+        '''
+        
+        # read() can only be called once, immutable decorator achieves this
+        return self.httplib_response.read()
+    
+    @property
+    @immutable
     def body(self):
-        try:
-            return self._body
-        except AttributeError:
-            self._body = self.httplib_response.read()
-            return self._body
+        '''Returns the response body.
+        
+        In Python 3, this returns the response decoded into a string.
+        In Python 2, this is identical to raw_body.
+        '''
+        
+        if py3:
+            return self.raw_body.decode('utf8')
+        else:
+            return self.raw_body
     
     @property
     def etree(self):
