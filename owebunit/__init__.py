@@ -9,6 +9,7 @@ import unittest
 import urllib
 import xml.sax.saxutils
 import ocookie.httplibadapter
+import cidict
 
 py3 = sys.version_info[0] == 3
 
@@ -97,33 +98,6 @@ class Config(object):
     # Override session class to use. Allows defining additional helper methods
     # on session objects.
     session_class = None
-
-class HeadersDict(dict):
-    '''Dictionary type for headers. Performs case folding of header names.
-    '''
-    
-    def __init__(self, map=None):
-        super(HeadersDict, self).__init__()
-        
-        if map:
-            for key in map:
-                self[key.lower()] = map[key]
-    
-    def __delitem__(self, key):
-        super(HeadersDict, self).__delitem__(key.lower())
-    
-    def __getitem__(self, key):
-        return super(HeadersDict, self).__getitem__(key.lower())
-    
-    def __setitem__(self, key, value):
-        super(HeadersDict, self).__setitem__(key.lower(), value)
-    
-    def __contains__(self, key):
-        return super(HeadersDict, self).__contains__(key.lower())
-    
-    def update(self, other):
-        for key in other:
-            self[key.lower()] = other[key]
 
 class Response(object):
     def __init__(self, httplib_response):
@@ -218,7 +192,7 @@ class Response(object):
     @property
     def header_dict(self):
         header_list = self.header_list
-        map = HeadersDict()
+        map = cidict.cidict()
         for key, value in header_list:
             map[key] = value
         return map
@@ -429,7 +403,7 @@ class Session(object):
         if headers is None:
             headers = headers
         else:
-            headers = HeadersDict(headers)
+            headers = cidict.cidict(headers)
         if body is not None:
             if is_container(body):
                 body = urlencode_utf8(body)
@@ -449,7 +423,7 @@ class Session(object):
         if headers is None:
             headers = {}
         else:
-            headers = HeadersDict(headers)
+            headers = cidict.cidict(headers)
         headers['connection'] = 'close'
         
         if query is not None:
@@ -587,7 +561,7 @@ class Session(object):
         
         if value:
             if user_headers:
-                headers = HeadersDict(user_headers)
+                headers = cidict.cidict(user_headers)
             else:
                 headers = {}
             headers['cookie'] = value

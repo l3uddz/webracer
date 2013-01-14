@@ -2,4 +2,5 @@ bottle
 cssselect
 lxml
 mock
+git+git://github.com/p/cidict.git@master#egg=cidict
 git+git://github.com/p/ocookie.git@master#egg=ocookie
