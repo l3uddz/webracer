@@ -48,6 +48,10 @@ def param():
 def get_content_length():
     return bottle.request.headers.get('content-length')
 
+@app.route('/get_user_agent')
+def get_user_agent():
+    return bottle.request.headers.get('user-agent')
+
 @app.route('/json/empty')
 def get_json_empty():
     return '{}'

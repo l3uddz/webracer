@@ -78,6 +78,8 @@ class Config(object):
     port = None
     protocol = None
     
+    user_agent = None
+    
     # If True, all responses will be saved in a directory specified by
     # save_dir.
     save_responses = False
@@ -419,6 +421,7 @@ class Session(object):
         kwargs = {}
         headers = self._merge_headers(headers)
         if headers is None:
+            # XXX this is very wrong
             headers = headers
         else:
             headers = cidict.cidict(headers)
@@ -443,6 +446,9 @@ class Session(object):
         else:
             headers = cidict.cidict(headers)
         headers['connection'] = 'close'
+        # XXX this assignment is a default and should be done earlier
+        if self.config.user_agent is not None:
+            headers['user-agent'] = self.config.user_agent
         
         if query is not None:
             if is_string(query):
