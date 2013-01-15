@@ -2,6 +2,7 @@
 
 import sys
 import functools
+import os
 import os.path
 import re
 import time as _time
