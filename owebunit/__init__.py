@@ -553,7 +553,7 @@ class Session(object):
         pass
     
     def _build_initial_headers(self):
-        # We do not set multiplel headers ourselves and therefore
+        # We do not set multiple headers ourselves and therefore
         # can use a dictionary for headers
         headers = cidict.cidict()
         
