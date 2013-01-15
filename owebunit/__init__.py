@@ -6,7 +6,6 @@ import os.path
 import re
 import time as _time
 import unittest
-import urllib
 import xml.sax.saxutils
 import ocookie.httplib_adapter
 import cidict
@@ -21,6 +20,7 @@ if py3:
     string_type = str
 else:
     import httplib
+    import urllib
     import urlparse
     base_exception_class = StandardError
     string_type = basestring
