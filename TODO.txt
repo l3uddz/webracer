@@ -16,4 +16,3 @@
    their own configuration
  - Investigate response body decoding further; respect encoding declared
    in content type, add tests
- - Support specifying a user agent for sessions and owebunit config

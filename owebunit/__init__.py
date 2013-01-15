@@ -419,36 +419,25 @@ class Session(object):
         host, port = self._netloc_to_host_port(parsed_url.netloc)
         self.connection = httplib.HTTPConnection(host, port)
         kwargs = {}
-        headers = self._merge_headers(headers)
-        if headers is None:
-            # XXX this is very wrong
-            headers = headers
-        else:
-            headers = cidict.cidict(headers)
+        computed_headers = self._build_initial_headers()
+        self._merge_headers(computed_headers, headers)
         if body is not None:
             if is_container(body):
                 body = urlencode_utf8(body)
-            if 'content-type' not in headers:
-                headers['content-type'] = 'application/x-www-form-urlencoded'
+            if 'content-type' not in computed_headers:
+                computed_headers['content-type'] = 'application/x-www-form-urlencoded'
             # cherrypy refuses to process x-www-form-urlencoded without
             # a content length
             if len(body) == 0:
-                headers['content-length'] = 0
+                computed_headers['content-length'] = 0
         else:
             # apparently content type is set to x-www-form-urlencoded
             # even when there is no body specified, which proceeds
             # to break cherrypy per above
-            headers['content-length'] = 0
+            computed_headers['content-length'] = 0
         
         # XXX cherrypy waits for keep-alives to expire, work around that
-        if headers is None:
-            headers = {}
-        else:
-            headers = cidict.cidict(headers)
-        headers['connection'] = 'close'
-        # XXX this assignment is a default and should be done earlier
-        if self.config.user_agent is not None:
-            headers['user-agent'] = self.config.user_agent
+        computed_headers['connection'] = 'close'
         
         if query is not None:
             if is_string(query):
@@ -461,7 +450,7 @@ class Session(object):
             # XXX handle url also having a query
             uri += '?' + encoded_query
         
-        self.connection.request(method.upper(), uri, body, headers)
+        self.connection.request(method.upper(), uri, body, computed_headers)
         self.response = Response(self.connection.getresponse())
         # XXX consider not writing attributes from here
         self.response.request_url = url
@@ -563,7 +552,17 @@ class Session(object):
     def __exit__(self, type, value, traceback):
         pass
     
-    def _merge_headers(self, user_headers):
+    def _build_initial_headers(self):
+        # We do not set multiplel headers ourselves and therefore
+        # can use a dictionary for headers
+        headers = cidict.cidict()
+        
+        if self.config.user_agent is not None:
+            headers['user-agent'] = self.config.user_agent
+        
+        return headers
+    
+    def _merge_headers(self, computed_headers, user_headers):
         if isinstance(user_headers, list) or isinstance(user_headers, tuple):
             # convert to a dictionary for httplib
             map = {}
@@ -574,24 +573,20 @@ class Session(object):
             user_headers = map
         
         if self._cookie_jar:
-            if user_headers is None:
-                user_headers = {}
-            if 'cookie' in user_headers:
+            if user_headers is not None and 'cookie' in user_headers:
                 value = self._merge_cookie_header_values(user_headers['cookie'])
             else:
                 value = self._cookie_jar.build_cookie_header_value()
         else:
             value = None
-        
         if value:
-            if user_headers:
-                headers = cidict.cidict(user_headers)
-            else:
-                headers = {}
-            headers['cookie'] = value
-        else:
-            headers = user_headers
-        return headers
+            computed_headers['cookie'] = value
+        
+        if user_headers is not None:
+            # need to exclude cookie headers since we already handled them
+            for key in user_headers:
+                if key.lower() != 'cookie':
+                    computed_headers[key] = user_headers[key]
     
     def _merge_cookie_header_values(self, user_header_value):
         user_cookie_dict = ocookie.CookieParser.parse_cookie_value(user_header_value)
