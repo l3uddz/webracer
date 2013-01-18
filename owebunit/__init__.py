@@ -384,6 +384,10 @@ def urlencode_utf8(params):
                 value = _urlencode_value(value)
                 encoded.append(key + '=' + value)
     else:
+        # Check for passing a list/tuple of two strings instead of a
+        # one-element list/tuple - easy mistake to make
+        if len(params) == 2 and type(params) in [list, tuple] and is_string(params[0]):
+            raise ValueError('Parameter must be a sequence of pairs, not a pair itself')
         # assume a list of pairs
         # http://docs.python.org/2/library/urllib.html#urllib.urlencode
         for pair in params:

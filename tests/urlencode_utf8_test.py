@@ -30,6 +30,22 @@ class UrlencodeUtf8Test(unittest.TestCase):
         output = owebunit.urlencode_utf8(input)
         self.assertEqual('a[]=1&a[]=2', output)
     
+    def test_one_elment_tuple(self):
+        # Use correct syntax
+        input = (('a', 'b'),)
+        expected = 'a=b'
+        self.check(input, expected)
+    
+    def test_tuple_wrong_msg(self):
+        # Pass a pair instead of a sequence of pairs
+        input = ('a', 'b')
+        try:
+            owebunit.urlencode_utf8(input)
+        except ValueError as e:
+            assert 'Parameter must be a sequence of pairs' in str(e)
+        else:
+            self.fail('Expected ValueError to be raised')
+    
     def test_tuple_of_tuples(self):
         input = (('a', 'b'), ('c', 'd'))
         expected = 'a=b&c=d'
