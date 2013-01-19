@@ -1,0 +1,19 @@
+owebunit recognizes the following form elements:
+
+- input type=text
+- input type=radio
+- input type=checkbox
+- input type=submit
+- input type=reset
+- input type=image
+- button
+- textarea
+- select
+
+Form element handling is independent from form attributes and forms themselves.
+
+Buttons/submit fields per http://symfony.com/doc/2.0/components/dom_crawler.html:
+
+- input[type=submit]
+- input[type=image]
+- button
