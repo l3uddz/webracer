@@ -4,7 +4,8 @@ import unittest
 from tests import utils
 from tests import kitchen_sink_app
 
-utils.start_bottle_server(kitchen_sink_app.app, 8099)
+def setup_module():
+    utils.start_bottle_server(kitchen_sink_app.app, 8099)
 
 class UrllibTest(unittest.TestCase):
     def setUp(self):

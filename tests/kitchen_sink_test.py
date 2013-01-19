@@ -6,7 +6,8 @@ from tests import kitchen_sink_app
 
 py3 = sys.version_info[0] == 3
 
-utils.start_bottle_server(kitchen_sink_app.app, 8041)
+def setup_module():
+    utils.start_bottle_server(kitchen_sink_app.app, 8041)
 
 class KitchenSinkTestCase(owebunit.WebTestCase):
     def test_simple(self):

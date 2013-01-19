@@ -2,7 +2,8 @@ import owebunit
 from tests import utils
 from tests import kitchen_sink_app
 
-utils.start_bottle_server(kitchen_sink_app.app, 8051)
+def setup_module():
+    utils.start_bottle_server(kitchen_sink_app.app, 8051)
 
 @owebunit.config(host='localhost', port=8051)
 class KitchenSinkTestCase(owebunit.WebTestCase):

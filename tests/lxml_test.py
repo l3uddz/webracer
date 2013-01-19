@@ -15,7 +15,8 @@ def html():
     bottle.response.content_type = 'text/html'
     return '<!doctype html><html><head><meta name=foo value=bar></head><body></body></html>'
 
-utils.start_bottle_server(app, 8042)
+def setup_module():
+    utils.start_bottle_server(app, 8042)
 
 @owebunit.config(host='localhost', port=8042)
 class LxmlTestCase(owebunit.WebTestCase):

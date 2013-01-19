@@ -3,7 +3,8 @@ import owebunit
 import utils
 import kitchen_sink_app
 
-utils.start_bottle_server(kitchen_sink_app.app, 8045)
+def setup_module():
+    utils.start_bottle_server(kitchen_sink_app.app, 8045)
 
 @owebunit.config(host='localhost', port=8045)
 class Extra500TestCase(owebunit.WebTestCase):
