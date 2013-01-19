@@ -1,8 +1,22 @@
-import urllib2
-import cookielib
+import sys
 import unittest
 from tests import utils
 from tests import kitchen_sink_app
+
+py3 = sys.version_info[0] == 3
+
+if py3:
+    import urllib.request as urllib_request
+    import http.cookiejar as cookielib
+    
+    def decode_str(str):
+        return str.decode('utf8')
+else:
+    import urllib2 as urllib_request
+    import cookielib
+    
+    def decode_str(str):
+        return str
 
 def setup_module():
     utils.start_bottle_server(kitchen_sink_app.app, 8099)
@@ -12,11 +26,11 @@ class UrllibTest(unittest.TestCase):
         super(UrllibTest, self).setUp()
         
         self.cookie_jar = cookielib.CookieJar()
-        self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookie_jar))
+        self.opener = urllib_request.build_opener(urllib_request.HTTPCookieProcessor(self.cookie_jar))
     
     def test_baseline(self):
         resp = self.opener.open('http://localhost:8099/ok')
-        body = resp.read()
+        body = decode_str(resp.read())
         self.assertEqual('ok', body)
     
     def test_cookie(self):
@@ -38,10 +52,12 @@ class UrllibTest(unittest.TestCase):
         # bottle must be escaping cookie value.
         # we should not care what it is in the cookie header
         # as long as subsequent requests correctly interpret it
-        self.assertEqual('"a:b"', cookie.value)
+        # Apparently the value is quoted on python 2.7 and
+        # not quoted on python 3.3
+        #self.assertEqual('"a:b"', cookie.value)
         
         resp = self.opener.open('http://localhost:8099/read_cookie_value/sink')
-        body = resp.read()
+        body = decode_str(resp.read())
         self.assertEqual('a:b', body)
 
 if __name__ == '__main__':
