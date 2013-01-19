@@ -52,6 +52,27 @@ class KitchenSinkTestCase(owebunit.WebTestCase):
         self.assert_response_cookie('foo_c')
         self.assert_response_cookie('foo_c', value='c_value')
     
+    def test_colon_in_cookie_value(self):
+        #self.get('http://127.0.0.1:8041/set_cookie_value', query=('v', 'a:b'))
+        self.get('http://127.0.0.1:8041/set_cookie_value', query=(('v', 'a:b'),))
+        self.assert_status(200)
+        
+        self.assertEqual('a:b', self.response.body)
+        self.assert_response_cookie('sink')
+        # should get back the same value we passed,
+        # but bottle appears to quote it
+        self.assert_response_cookie('sink', value='"a:b"')
+    
+    def test_colon_in_cookie_value_in_session(self):
+        self.get('http://127.0.0.1:8041/set_cookie_value', query=(('v', 'a:b'),))
+        self.assert_status(200)
+        
+        self.get('http://127.0.0.1:8041/read_cookie_value/sink')
+        self.assert_status(200)
+        # should get back the same value we passed initially.
+        # the value in this test passes through cookie jar
+        self.assertEqual('a:b', self.response.body)
+    
     def test_implicit_session(self):
         self.get('http://127.0.0.1:8041/set_cookie')
         self.assert_status(200)
