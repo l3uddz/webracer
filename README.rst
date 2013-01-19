@@ -30,4 +30,4 @@ The test suite uses some nose features and will not work with unittest alone.
 License
 -------
 
-Released under the MIT license.
+Released under the 2 clause BSD license.
