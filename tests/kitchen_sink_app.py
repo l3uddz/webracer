@@ -26,6 +26,11 @@ def redirect():
 def set_cookie():
     bottle.response.set_cookie('visited', 'yes')
 
+@app.route('/set_cookie_value')
+def set_cookie_value():
+    bottle.response.set_cookie('sink', bottle.request.query.v)
+    return bottle.request.query.v
+
 @app.route('/set_multiple_cookies')
 def set_multiple_cookies():
     bottle.response.set_cookie('foo_a', 'a_value', expires=1)
@@ -35,6 +40,10 @@ def set_multiple_cookies():
 @app.route('/read_cookie')
 def read_cookie():
     return bottle.request.get_cookie('visited')
+
+@app.route('/read_cookie_value/:name')
+def read_cookie_value(name):
+    return bottle.request.get_cookie(name)
 
 @app.route('/get_param')
 def get_param():
