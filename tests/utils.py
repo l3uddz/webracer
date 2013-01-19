@@ -12,11 +12,11 @@ def start_bottle_server(app, port, **kwargs):
     for i in range(10):
         try:
             conn = socket.create_connection(('127.0.0.1', port), 0.1)
-            ok = True
         except socket.error as e:
             _time.sleep(0.1)
-        if ok:
+        else:
             conn.close()
+            ok = True
             break
     if not ok:
         import warnings
