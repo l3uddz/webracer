@@ -253,6 +253,327 @@ class Response(object):
     def form(self):
         return FormProxy(self.forms)
 
+class FormElements(object):
+    def __init__(self, elements):
+        self.elements = elements
+        self.submit_name = None
+        self.chosen_values = {}
+    
+    @property
+    def params(self):
+        params = []
+        selected_selects = {}
+        for element_type, element_name, element_value, element_selected in self.elements:
+            if element_name is None or element_type == 'reset':
+                continue
+            # first pass: figure out which values to send when
+            # the last value should be chosen
+            if element_type == 'option':
+                if element_name in self.chosen_values:
+                    # XXX rewrites destination if multiple options are present
+                    # for the given select tag
+                    selected_selects[element_name] = self.chosen_values[element_name]
+                elif element_selected:
+                    selected_selects[element_name] = element_value
+                else:
+                    # the first option should become selected
+                    if element_name not in selected_selects:
+                        selected_selects[element_name] = element_value
+            elif element_type == 'radio':
+                # XXX completely duplicated
+                if element_name in self.chosen_values:
+                    # XXX rewrites destination if multiple options are present
+                    # for the given select tag
+                    selected_selects[element_name] = self.chosen_values[element_name]
+                elif element_selected:
+                    selected_selects[element_name] = element_value
+        
+        processed_selects = {}
+        submit_found = False
+        for element_type, element_name, element_value, element_selected in self.elements:
+            if element_name is None or element_type == 'reset':
+                continue
+            # second pass: actually build the parameter list
+            if element_type == 'option':
+                selected_value = selected_selects.get(element_name)
+                # avoid creating multiple params when there are several
+                # options with the same value.
+                # if there are multiple options without a value and there
+                # is no selected value and the valueless options come first,
+                # send the first one. otherwise send the last one
+                if element_value == selected_value and element_name not in processed_selects:
+                    params.append((element_name, element_value))
+                    processed_selects[element_name] = True
+            else:
+                if element_type == 'submit':
+                    if not submit_found:
+                        if self.submit_name is not None:
+                            found = self.submit_name == element_name
+                        else:
+                            found = True
+                        if found:
+                            if element_value is not None:
+                                params.append((element_name, element_value))
+                            submit_found = True
+                elif element_name in self.chosen_values:
+                    if element_type == 'radio' or element_type == 'checkbox' or \
+                        element_type == 'option':
+                            if self.chosen_values[element_name] == element_value:
+                                params.append((element_name, element_value))
+                    else:
+                        params.append((element_name, self.chosen_values[element_name]))
+                        # XXX record that element_name was processed and
+                        # do not process it again?
+                elif element_type == 'radio' and element_name in selected_selects:
+                    if selected_selects[element_name] == element_value:
+                        params.append((element_name, element_value))
+                elif element_type == 'checkbox':
+                    if element_selected:
+                        params.append((element_name, element_value))
+                elif element_value is not None:
+                    if element_type == 'radio':
+                        ok = element_name not in processed_selects
+                    else:
+                        ok = True
+                    if ok:
+                        params.append((element_name, element_value))
+                        processed_selects[element_name] = True
+        return FormParams(params)
+    
+    @property
+    def mutable(self):
+        return MutableFormElements(self.elements)
+
+class MutableFormElements(FormElements):
+    def submit(self, name):
+        found = False
+        for element_type, element_name, element_value, element_selected in self.elements:
+            if element_type == 'submit' and element_name == name:
+                found = True
+                break
+        if not found:
+            raise ValueError('"%s" is not a named submit element with a value on this form' % name)
+        self.submit_name = name
+    
+    def set_value(self, name, value):
+        '''Sets form element identified by the given name to the specified
+        value.
+        
+        This method attempts to mimic closely what a human user could do with
+        a typical web browser. Therefore:
+        
+        - The element identified by `name` must exist on the form.
+        - The element must be of a type which allows user to change its value.
+          For example, text, radio, checkbox, textarea, select, etc.
+          Elements of unknown types are assumed to be user-changeable.
+          submit, reset and image type elements are rejected by this method;
+          to specify which submit element should be used, use `submit` method.
+        '''
+        
+        found = False
+        found_rejected = None
+        for element_type, element_name, element_value, element_selected in self.elements:
+            if element_name == name:
+                if element_type == 'submit' or element_type == 'image' or \
+                    element_type == 'reset' or element_type == 'button':
+                        found_rejected = 'Wrong element type: %s' % element_type
+                elif element_type == 'radio' or element_type == 'checkbox' or \
+                    element_type == 'option':
+                        if element_value == value:
+                            found = True
+                        else:
+                            found_rejected = 'Element `%s` does not have `%s` as a possible value' % (name, value)
+                else:
+                    # assume it's a text field or similar, e.g. email in html5
+                    found = True
+            if found:
+                self.chosen_values[name] = value
+                break
+        if not found and found_rejected:
+            raise ValueError(found_rejected)
+
+class FormParams(object):
+    def __init__(self, params, **kwargs):
+        self.params = params
+        self.options = kwargs
+    
+    @property
+    def list(self):
+        '''Returns a list of parameters that the form will submit.
+        
+        Return value is a list of (name, value) pairs. Multiple pairs
+        may have the same name.
+        
+        Note: does not include parameters in form's action.
+        
+        Form elements that do not have name or value attributes are ignored.
+        '''
+        
+        return self.params
+    
+    @property
+    def dict(self):
+        '''Returns a dictionary of parameters that the form will submit.
+        
+        If there are multiple parameters with the same name, the last
+        parameter in document is used.
+        
+        Note: does not include parameters in form's action.
+        
+        Form elements that do not have name or value attributes are ignored.
+        '''
+        
+        # XXX optimize?
+        return dict(self.list)
+
+class Form(object):
+    def __init__(self, form_tag, response):
+        self._form_tag = form_tag
+        self._response = response
+    
+    @property
+    def name(self):
+        return self._form_tag.attrib.get('name')
+    
+    @property
+    def id(self):
+        return self._form_tag.attrib.get('id')
+    
+    @property
+    def action(self):
+        return self._form_tag.attrib.get('action')
+    
+    @property
+    @immutable
+    def computed_action(self):
+        '''The url that the form should submit to.
+        '''
+        
+        return urlparse.urljoin(self._response.request_url, self.action)
+    
+    @property
+    def method(self):
+        return self._form_tag.attrib.get('method')
+    
+    @property
+    @immutable
+    def computed_method(self):
+        '''The method that should be used to submit the form.
+        
+        If a method is given in the form, it is lowercased and returned.
+        
+        Otherwise, the default method of 'get' is returnd.
+        '''
+        
+        method = self.method
+        if method:
+            method = method.upper()
+        else:
+            method = 'GET'
+        return method
+    
+    @property
+    def elements(self):
+        '''Returns all elements of the form.
+        
+        Elements without names or values are returned also, because selecting
+        e.g. a submit button without a name will not send any other submit
+        element names' with the form submission.
+        
+        For selects, the list of their options is returned, with select
+        name added to each of the options. Other tags are returned as is.
+        '''
+        
+        elements = []
+        for element in self._form_tag.xpath('.//*[self::input or self::button or self::textarea or self::select]'):
+            name = element.attrib.get('name')
+            if element.tag == 'select':
+                # XXX check if options must be direct descendants of selects
+                for option in element.xpath('./option'):
+                    # browsers differ on which values for selected attribute
+                    # constitute the selection being active.
+                    # consider presence of the attribute as the indicator
+                    # that the option is selected.
+                    # http://stackoverflow.com/questions/1033944/what-values-can-appear-in-the-selected-attribute-of-the-option-tag
+                    selected = 'selected' in option.attrib
+                    elements.append(('option', name, option.attrib.get('value'), selected))
+            elif element.tag == 'textarea':
+                # textareas always have a value
+                value = element.text or ''
+                elements.append(('textarea', name, value, None))
+            else:
+                if element.tag == 'input' and 'type' in element.attrib and \
+                    element.attrib['type'] in ('radio', 'checkbox'):
+                        selected = 'checked' in element.attrib
+                else:
+                    selected = None
+                # use type attribute for element type, unless it is empty
+                # in which case us tag name
+                if 'type' in element.attrib:
+                    element_type = element.attrib['type']
+                else:
+                    element_type = element.tag
+                elements.append((element_type, name, element.attrib.get('value'), selected))
+        return FormElements(elements)
+    
+    @property
+    def params(self):
+        return self.elements.params
+    
+    def __repr__(self):
+        bits = ['owebunit.Form']
+        for prop in ['id', 'name', 'action', 'method']:
+            value = getattr(self, prop)
+            if value is not None:
+                bits.append('%s=%s' % (prop, xml.sax.saxutils.quoteattr(value)))
+        return '<%s>' % ' '.join(bits)
+
+def _implement_form_property(prop):
+    @property
+    def getter(self):
+        self._materialize()
+        return getattr(self.form, prop)
+    return getter
+
+def _format_form_query(**kwargs):
+    items = []
+    for key in kwargs:
+        items.append('%s=%s' % (key, xml.sax.saxutils.quoteattr(kwargs[key])))
+    return ' and '.join(items)
+
+class FormProxy(object):
+    def __init__(self, collection):
+        self.collection = collection
+    
+    action = _implement_form_property('action')
+    computed_action = _implement_form_property('computed_action')
+    method = _implement_form_property('method')
+    computed_method = _implement_form_property('computed_method')
+    elements = _implement_form_property('elements')
+    params = _implement_form_property('params')
+    name = _implement_form_property('name')
+    id = _implement_form_property('id')
+    
+    def __call__(self, **kwargs):
+        forms = self.collection(**kwargs)
+        self._check_length(forms, **kwargs)
+        return forms[0]
+    
+    def _materialize(self):
+        forms = self.collection()
+        self._check_length(forms)
+        self.form = forms[0]
+    
+    def _check_length(self, forms, **kwargs):
+        if len(forms) == 0:
+            if kwargs:
+                msg = 'No forms matched %s' % _format_form_query(**kwargs)
+            else:
+                msg = 'No forms were found'
+            raise NoForms(msg)
+        elif len(forms) > 1:
+            raise MultipleForms('Multiple (%d) forms were found' % len(forms))
+
 class FormsCollection(object):
     def __init__(self, doc, response):
         self.doc = doc
@@ -624,327 +945,6 @@ class Session(object):
         elif not re.match(r'\w+://', url):
             raise ValueError('Url must either be an absolute url or an absolute path: %s' % url)
         return url
-
-class FormElements(object):
-    def __init__(self, elements):
-        self.elements = elements
-        self.submit_name = None
-        self.chosen_values = {}
-    
-    @property
-    def params(self):
-        params = []
-        selected_selects = {}
-        for element_type, element_name, element_value, element_selected in self.elements:
-            if element_name is None or element_type == 'reset':
-                continue
-            # first pass: figure out which values to send when
-            # the last value should be chosen
-            if element_type == 'option':
-                if element_name in self.chosen_values:
-                    # XXX rewrites destination if multiple options are present
-                    # for the given select tag
-                    selected_selects[element_name] = self.chosen_values[element_name]
-                elif element_selected:
-                    selected_selects[element_name] = element_value
-                else:
-                    # the first option should become selected
-                    if element_name not in selected_selects:
-                        selected_selects[element_name] = element_value
-            elif element_type == 'radio':
-                # XXX completely duplicated
-                if element_name in self.chosen_values:
-                    # XXX rewrites destination if multiple options are present
-                    # for the given select tag
-                    selected_selects[element_name] = self.chosen_values[element_name]
-                elif element_selected:
-                    selected_selects[element_name] = element_value
-        
-        processed_selects = {}
-        submit_found = False
-        for element_type, element_name, element_value, element_selected in self.elements:
-            if element_name is None or element_type == 'reset':
-                continue
-            # second pass: actually build the parameter list
-            if element_type == 'option':
-                selected_value = selected_selects.get(element_name)
-                # avoid creating multiple params when there are several
-                # options with the same value.
-                # if there are multiple options without a value and there
-                # is no selected value and the valueless options come first,
-                # send the first one. otherwise send the last one
-                if element_value == selected_value and element_name not in processed_selects:
-                    params.append((element_name, element_value))
-                    processed_selects[element_name] = True
-            else:
-                if element_type == 'submit':
-                    if not submit_found:
-                        if self.submit_name is not None:
-                            found = self.submit_name == element_name
-                        else:
-                            found = True
-                        if found:
-                            if element_value is not None:
-                                params.append((element_name, element_value))
-                            submit_found = True
-                elif element_name in self.chosen_values:
-                    if element_type == 'radio' or element_type == 'checkbox' or \
-                        element_type == 'option':
-                            if self.chosen_values[element_name] == element_value:
-                                params.append((element_name, element_value))
-                    else:
-                        params.append((element_name, self.chosen_values[element_name]))
-                        # XXX record that element_name was processed and
-                        # do not process it again?
-                elif element_type == 'radio' and element_name in selected_selects:
-                    if selected_selects[element_name] == element_value:
-                        params.append((element_name, element_value))
-                elif element_type == 'checkbox':
-                    if element_selected:
-                        params.append((element_name, element_value))
-                elif element_value is not None:
-                    if element_type == 'radio':
-                        ok = element_name not in processed_selects
-                    else:
-                        ok = True
-                    if ok:
-                        params.append((element_name, element_value))
-                        processed_selects[element_name] = True
-        return FormParams(params)
-    
-    @property
-    def mutable(self):
-        return MutableFormElements(self.elements)
-
-class MutableFormElements(FormElements):
-    def submit(self, name):
-        found = False
-        for element_type, element_name, element_value, element_selected in self.elements:
-            if element_type == 'submit' and element_name == name:
-                found = True
-                break
-        if not found:
-            raise ValueError('"%s" is not a named submit element with a value on this form' % name)
-        self.submit_name = name
-    
-    def set_value(self, name, value):
-        '''Sets form element identified by the given name to the specified
-        value.
-        
-        This method attempts to mimic closely what a human user could do with
-        a typical web browser. Therefore:
-        
-        - The element identified by `name` must exist on the form.
-        - The element must be of a type which allows user to change its value.
-          For example, text, radio, checkbox, textarea, select, etc.
-          Elements of unknown types are assumed to be user-changeable.
-          submit, reset and image type elements are rejected by this method;
-          to specify which submit element should be used, use `submit` method.
-        '''
-        
-        found = False
-        found_rejected = None
-        for element_type, element_name, element_value, element_selected in self.elements:
-            if element_name == name:
-                if element_type == 'submit' or element_type == 'image' or \
-                    element_type == 'reset' or element_type == 'button':
-                        found_rejected = 'Wrong element type: %s' % element_type
-                elif element_type == 'radio' or element_type == 'checkbox' or \
-                    element_type == 'option':
-                        if element_value == value:
-                            found = True
-                        else:
-                            found_rejected = 'Element `%s` does not have `%s` as a possible value' % (name, value)
-                else:
-                    # assume it's a text field or similar, e.g. email in html5
-                    found = True
-            if found:
-                self.chosen_values[name] = value
-                break
-        if not found and found_rejected:
-            raise ValueError(found_rejected)
-
-class FormParams(object):
-    def __init__(self, params, **kwargs):
-        self.params = params
-        self.options = kwargs
-    
-    @property
-    def list(self):
-        '''Returns a list of parameters that the form will submit.
-        
-        Return value is a list of (name, value) pairs. Multiple pairs
-        may have the same name.
-        
-        Note: does not include parameters in form's action.
-        
-        Form elements that do not have name or value attributes are ignored.
-        '''
-        
-        return self.params
-    
-    @property
-    def dict(self):
-        '''Returns a dictionary of parameters that the form will submit.
-        
-        If there are multiple parameters with the same name, the last
-        parameter in document is used.
-        
-        Note: does not include parameters in form's action.
-        
-        Form elements that do not have name or value attributes are ignored.
-        '''
-        
-        # XXX optimize?
-        return dict(self.list)
-
-class Form(object):
-    def __init__(self, form_tag, response):
-        self._form_tag = form_tag
-        self._response = response
-    
-    @property
-    def name(self):
-        return self._form_tag.attrib.get('name')
-    
-    @property
-    def id(self):
-        return self._form_tag.attrib.get('id')
-    
-    @property
-    def action(self):
-        return self._form_tag.attrib.get('action')
-    
-    @property
-    @immutable
-    def computed_action(self):
-        '''The url that the form should submit to.
-        '''
-        
-        return urlparse.urljoin(self._response.request_url, self.action)
-    
-    @property
-    def method(self):
-        return self._form_tag.attrib.get('method')
-    
-    @property
-    @immutable
-    def computed_method(self):
-        '''The method that should be used to submit the form.
-        
-        If a method is given in the form, it is lowercased and returned.
-        
-        Otherwise, the default method of 'get' is returnd.
-        '''
-        
-        method = self.method
-        if method:
-            method = method.upper()
-        else:
-            method = 'GET'
-        return method
-    
-    @property
-    def elements(self):
-        '''Returns all elements of the form.
-        
-        Elements without names or values are returned also, because selecting
-        e.g. a submit button without a name will not send any other submit
-        element names' with the form submission.
-        
-        For selects, the list of their options is returned, with select
-        name added to each of the options. Other tags are returned as is.
-        '''
-        
-        elements = []
-        for element in self._form_tag.xpath('.//*[self::input or self::button or self::textarea or self::select]'):
-            name = element.attrib.get('name')
-            if element.tag == 'select':
-                # XXX check if options must be direct descendants of selects
-                for option in element.xpath('./option'):
-                    # browsers differ on which values for selected attribute
-                    # constitute the selection being active.
-                    # consider presence of the attribute as the indicator
-                    # that the option is selected.
-                    # http://stackoverflow.com/questions/1033944/what-values-can-appear-in-the-selected-attribute-of-the-option-tag
-                    selected = 'selected' in option.attrib
-                    elements.append(('option', name, option.attrib.get('value'), selected))
-            elif element.tag == 'textarea':
-                # textareas always have a value
-                value = element.text or ''
-                elements.append(('textarea', name, value, None))
-            else:
-                if element.tag == 'input' and 'type' in element.attrib and \
-                    element.attrib['type'] in ('radio', 'checkbox'):
-                        selected = 'checked' in element.attrib
-                else:
-                    selected = None
-                # use type attribute for element type, unless it is empty
-                # in which case us tag name
-                if 'type' in element.attrib:
-                    element_type = element.attrib['type']
-                else:
-                    element_type = element.tag
-                elements.append((element_type, name, element.attrib.get('value'), selected))
-        return FormElements(elements)
-    
-    @property
-    def params(self):
-        return self.elements.params
-    
-    def __repr__(self):
-        bits = ['owebunit.Form']
-        for prop in ['id', 'name', 'action', 'method']:
-            value = getattr(self, prop)
-            if value is not None:
-                bits.append('%s=%s' % (prop, xml.sax.saxutils.quoteattr(value)))
-        return '<%s>' % ' '.join(bits)
-
-def _implement_form_property(prop):
-    @property
-    def getter(self):
-        self._materialize()
-        return getattr(self.form, prop)
-    return getter
-
-def _format_form_query(**kwargs):
-    items = []
-    for key in kwargs:
-        items.append('%s=%s' % (key, xml.sax.saxutils.quoteattr(kwargs[key])))
-    return ' and '.join(items)
-
-class FormProxy(object):
-    def __init__(self, collection):
-        self.collection = collection
-    
-    action = _implement_form_property('action')
-    computed_action = _implement_form_property('computed_action')
-    method = _implement_form_property('method')
-    computed_method = _implement_form_property('computed_method')
-    elements = _implement_form_property('elements')
-    params = _implement_form_property('params')
-    name = _implement_form_property('name')
-    id = _implement_form_property('id')
-    
-    def __call__(self, **kwargs):
-        forms = self.collection(**kwargs)
-        self._check_length(forms, **kwargs)
-        return forms[0]
-    
-    def _materialize(self):
-        forms = self.collection()
-        self._check_length(forms)
-        self.form = forms[0]
-    
-    def _check_length(self, forms, **kwargs):
-        if len(forms) == 0:
-            if kwargs:
-                msg = 'No forms matched %s' % _format_form_query(**kwargs)
-            else:
-                msg = 'No forms were found'
-            raise NoForms(msg)
-        elif len(forms) > 1:
-            raise MultipleForms('Multiple (%d) forms were found' % len(forms))
 
 def extend_params(target, extra):
     '''Extends a target parameter list, which can be a sequence or a mapping,
