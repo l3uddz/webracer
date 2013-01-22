@@ -177,7 +177,7 @@ class FormTestCase(owebunit.WebTestCase):
         elements = form.elements.mutable
         self.assertEquals([['field', 'second']], utils.listit(elements.params.list))
         
-        # select the other radio button
+        # select the other checkbox
         elements.set_value('field', 'first')
         self.assertEquals([['field', 'first'], ['field', 'second']], utils.listit(elements.params.list))
     
