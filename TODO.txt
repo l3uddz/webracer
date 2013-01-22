@@ -16,3 +16,5 @@
    their own configuration
  - Investigate response body decoding further; respect encoding declared
    in content type, add tests
+ - Rename set_value to set?
+ - Need a way to unset checkboxes + tests

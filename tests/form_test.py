@@ -169,6 +169,18 @@ class FormTestCase(owebunit.WebTestCase):
         elements = form.elements
         self.assertEquals([['field', 'second']], utils.listit(elements.params.list))
     
+    def test_checkbox_selection(self):
+        self.get('/checkboxes')
+        self.assert_status(200)
+        
+        form = self.response.form()
+        elements = form.elements.mutable
+        self.assertEquals([['field', 'second']], utils.listit(elements.params.list))
+        
+        # select the other radio button
+        elements.set_value('field', 'first')
+        self.assertEquals([['field', 'first'], ['field', 'second']], utils.listit(elements.params.list))
+    
     def test_empty_textarea(self):
         self.get('/empty_textarea')
         self.assert_status(200)

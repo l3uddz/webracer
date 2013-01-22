@@ -316,10 +316,14 @@ class FormElements(object):
                                 params.append((element_name, element_value))
                             submit_found = True
                 elif element_name in self.chosen_values:
-                    if element_type == 'radio' or element_type == 'checkbox' or \
-                        element_type == 'option':
+                    if element_type == 'radio' or element_type == 'option':
                             if self.chosen_values[element_name] == element_value:
                                 params.append((element_name, element_value))
+                    elif element_type == 'checkbox':
+                        # either user selected, or selected on the form
+                        # XXX does not handle user deselection
+                        if element_value in self.chosen_values[element_name] or element_selected:
+                            params.append((element_name, element_value))
                     else:
                         params.append((element_name, self.chosen_values[element_name]))
                         # XXX record that element_name was processed and
@@ -368,6 +372,13 @@ class MutableFormElements(FormElements):
           Elements of unknown types are assumed to be user-changeable.
           submit, reset and image type elements are rejected by this method;
           to specify which submit element should be used, use `submit` method.
+        
+        The exact behavior depends on the type of element. For controls
+        that allow selection among alternatives (radio buttons, selects)
+        the selected value changes from whatever it was previously to
+        the supplied value. For controls that allow multiple selection
+        (checkboxes, multiple selection selects) the given value is added
+        to the selection.
         '''
         
         found = False
@@ -387,7 +398,15 @@ class MutableFormElements(FormElements):
                     # assume it's a text field or similar, e.g. email in html5
                     found = True
             if found:
-                self.chosen_values[name] = value
+                if element_type == 'checkbox':
+                    # multiple selection
+                    if name in self.chosen_values:
+                        self.chosen_values[name][value] = True
+                    else:
+                        self.chosen_values[name] = {value: True}
+                else:
+                    # single selection
+                    self.chosen_values[name] = value
                 break
         if not found and found_rejected:
             raise ValueError(found_rejected)
