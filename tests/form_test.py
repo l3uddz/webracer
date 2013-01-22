@@ -1,4 +1,5 @@
 import owebunit
+import re
 from tests import utils
 from tests import form_app
 
@@ -137,6 +138,26 @@ class FormTestCase(owebunit.WebTestCase):
         form = forms[0]
         elements = form.elements
         self.assertEquals([['field', 'second']], utils.listit(elements.params.list))
+    
+    def test_radio_selection(self):
+        self.get('/first_radio_selected')
+        self.assert_status(200)
+        
+        form = self.response.form()
+        elements = form.elements.mutable
+        self.assertEquals([['field', 'first']], utils.listit(elements.params.list))
+        
+        # select the other radio button
+        elements.set_value('field', 'second')
+        self.assertEquals([['field', 'second']], utils.listit(elements.params.list))
+        
+        # select a nonexistent radio button
+        try:
+            elements.set_value('field', 'nonexistent')
+        except ValueError as e:
+            assert re.search(r'Element .* does not have .* as a possible value', str(e))
+        else:
+            self.fail('Expected ValueError to be raised')
     
     def test_checkboxes(self):
         self.get('/checkboxes')
