@@ -1,5 +1,5 @@
 import unittest
-from owebunit import Config, Session
+from .session import Config, Session
 
 class AssertRaisesContextManager(object):
     def __init__(self, expected):
