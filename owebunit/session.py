@@ -100,6 +100,13 @@ class Config(object):
     # Override session class to use. Allows defining additional helper methods
     # on session objects.
     session_class = None
+    
+    def __init__(self, **kwargs):
+        for key in kwargs:
+            if hasattr(self, key):
+                setattr(self, key, kwargs[key])
+            else:
+                raise ValueError('Unknown parameter: %s' % key)
 
 class Response(object):
     def __init__(self, httplib_response):
