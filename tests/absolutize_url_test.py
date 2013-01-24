@@ -51,7 +51,7 @@ class AbsolutizeUrlTestCase(unittest.TestCase):
         self.assertRaises(ValueError, self._perform, config, url, expected)
     
     def _perform(self, config, url, expected):
-        session = owebunit.Session(config, None)
+        session = owebunit.Session(config)
         absolutized = session._absolutize_url(url)
         self.assertEqual(expected, absolutized)
 

@@ -28,8 +28,6 @@ class WebTestCase(unittest.TestCase):
     
     def _create_session(self):
         kwargs = {}
-        if hasattr(self.__class__, 'DEFAULT_NETLOC'):
-            kwargs['default_netloc'] = self.__class__.DEFAULT_NETLOC
         kwargs['config'] = self.config
         session_class = self.config.session_class or Session
         return session_class(**kwargs)

@@ -11,7 +11,6 @@
  - Should form.method be uppercased?
  - Add a case-insensitive api to header_list
  - Add tests for header_dict case insensitivity on keys (broken in py3)
- - Document or remove DEFAULT_NETLOC
  - Rename self.config to self.owebunit_config - tests are likely to have
    their own configuration
  - Investigate response body decoding further; respect encoding declared

@@ -13,7 +13,7 @@ class NetlocToHostPortTestCase(unittest.TestCase):
         self._perform(netloc, expected)
     
     def _perform(self, netloc, expected):
-        session = owebunit.Session(owebunit.Config(), None)
+        session = owebunit.Session(owebunit.Config())
         actual = session._netloc_to_host_port(netloc)
         if isinstance(actual, list):
             actual = tuple(actual)

@@ -734,13 +734,9 @@ def urlencode_utf8(params):
     return '&'.join(encoded)
 
 class Session(object):
-    def __init__(self, config=None, default_netloc=None):
+    def __init__(self, config=None):
         self.config = config or Config()
         self._cookie_jar = ocookie.CookieJar()
-        if default_netloc:
-            self._default_host, self._default_port = default_netloc.split(':')
-        else:
-            self._default_host, self._default_port = None, None
     
     def request(self, method, url, body=None, query=None, headers=None):
         url = self._absolutize_url(url)
@@ -794,10 +790,10 @@ class Session(object):
                 host, port = netloc.split(':')
                 return (host, int(port))
             else:
-                return (netloc, self._default_port)
+                port = self.config.port
+                return (netloc, port)
         else:
-            # url contained path only
-            return (self._default_host, self._default_port)
+            raise AssertionError('Should not be here')
     
     # note: cherrypy webtest has a protocol argument
     def get(self, url, **kwargs):
