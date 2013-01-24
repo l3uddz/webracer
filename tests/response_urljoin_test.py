@@ -1,6 +1,6 @@
 import owebunit
-import utils
-import kitchen_sink_app
+from tests import utils
+from tests import kitchen_sink_app
 
 def setup_module():
     utils.start_bottle_server(kitchen_sink_app.app, 8053)

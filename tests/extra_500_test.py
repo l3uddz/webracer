@@ -1,7 +1,7 @@
 import sys
 import owebunit
-import utils
-import kitchen_sink_app
+from tests import utils
+from tests import kitchen_sink_app
 
 def setup_module():
     utils.start_bottle_server(kitchen_sink_app.app, 8045)
@@ -15,7 +15,7 @@ class Extra500Test(owebunit.WebTestCase):
         
         try:
             self.assert_status(200)
-        except AssertionError, e:
+        except AssertionError as e:
             self.assertTrue('This is an unhandled exception' not in str(e))
         else:
             self.assertTrue(False)
@@ -26,12 +26,15 @@ def bottle_unhandled_exception_info():
     return _errors
 
 import wsgiref.simple_server
-import cStringIO as StringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 class TracebackHandler(wsgiref.simple_server.WSGIRequestHandler):
     def __init__(self, *args, **kwargs):
         # must come before superclass init call
-        self._error_file = StringIO.StringIO()
+        self._error_file = StringIO()
         wsgiref.simple_server.WSGIRequestHandler.__init__(self, *args, **kwargs)
     
     def get_stderr(self):
@@ -53,7 +56,7 @@ class Extra500WithExtraTest(owebunit.WebTestCase):
         
         try:
             self.assert_status(200)
-        except AssertionError, e:
+        except AssertionError as e:
             self.assertTrue('This is an unhandled exception' in str(e))
         else:
             self.assertTrue(False)
