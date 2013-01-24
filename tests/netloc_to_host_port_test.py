@@ -1,7 +1,7 @@
 import unittest
 import owebunit
 
-class NetlocToHostPortTestCase(unittest.TestCase):
+class NetlocToHostPortTest(unittest.TestCase):
     def test_host(self):
         netloc = 'foo'
         expected = ('foo', None)

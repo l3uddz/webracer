@@ -6,7 +6,7 @@ def setup_module():
     utils.start_bottle_server(kitchen_sink_app.app, 8051)
 
 @owebunit.config(host='localhost', port=8051)
-class KitchenSinkTestCase(owebunit.WebTestCase):
+class KitchenSinkTest(owebunit.WebTestCase):
     def test_header_list(self):
         self.get('/ok')
         self.assert_status(200)

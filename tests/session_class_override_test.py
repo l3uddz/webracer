@@ -10,7 +10,7 @@ class MySession(owebunit.Session):
         return 'extra'
 
 @owebunit.config(session_class=MySession)
-class SessionClassOverrideTestCase(owebunit.WebTestCase):
+class SessionClassOverrideTest(owebunit.WebTestCase):
     def test_extra_method(self):
         with self.session() as s:
             s.get('http://127.0.0.1:8047/ok')

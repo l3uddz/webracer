@@ -6,7 +6,7 @@ def setup_module():
     utils.start_bottle_server(form_app.app, 8044)
 
 @owebunit.config(host='localhost', port=8044)
-class FormInternalsTestCase(owebunit.WebTestCase):
+class FormInternalsTest(owebunit.WebTestCase):
     def test_elements_input(self):
         self.get('/one_form')
         self.assert_status(200)

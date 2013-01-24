@@ -19,7 +19,7 @@ def setup_module():
     utils.start_bottle_server(app, 8042)
 
 @owebunit.config(host='localhost', port=8042)
-class LxmlTestCase(owebunit.WebTestCase):
+class LxmlTest(owebunit.WebTestCase):
     def test_parse_xml(self):
         self.get('/xml')
         self.assert_status(200)

@@ -6,9 +6,9 @@ def setup_module():
     utils.start_bottle_server(form_app.app, 8049)
 
 @owebunit.config(host='localhost', port=8049)
-class FormSingularTestCase(owebunit.WebTestCase):
+class FormSingularTest(owebunit.WebTestCase):
     def setUp(self):
-        super(FormSingularTestCase, self).setUp()
+        super(FormSingularTest, self).setUp()
         
         self.get('/form_retrieval')
         self.assert_status(200)

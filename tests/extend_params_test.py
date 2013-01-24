@@ -2,7 +2,7 @@ import unittest
 import owebunit
 from tests import utils
 
-class ExtendParamsTestCase(unittest.TestCase):
+class ExtendParamsTest(unittest.TestCase):
     def test_tuple_into_tuple(self):
         target = (('a', '1'), ('b', '2'))
         extra = (('c', '3'),)

@@ -2,7 +2,7 @@ import unittest
 import lxml.etree
 import owebunit.utils
 
-class AbsolutizeUrlTestCase(owebunit.WebTestCase):
+class AbsolutizeUrlTest(owebunit.WebTestCase):
     def setUp(self):
         xml = '<root><el><child><grandchild>text</grandchild></child></el></root>'
         self.doc = lxml.etree.XML(xml)

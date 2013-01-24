@@ -1,7 +1,7 @@
 import unittest
 import owebunit
 
-class AbsolutizeUrlTestCase(unittest.TestCase):
+class AbsolutizeUrlTest(unittest.TestCase):
     def test_noop(self):
         config = owebunit.Config(host=None, port=None, protocol=None)
         url = 'http://absolute/url'

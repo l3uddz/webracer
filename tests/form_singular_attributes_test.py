@@ -6,7 +6,7 @@ def setup_module():
     utils.start_bottle_server(form_app.app, 8050)
 
 @owebunit.config(host='localhost', port=8050)
-class FormSingularAttributesTestCase(owebunit.WebTestCase):
+class FormSingularAttributesTest(owebunit.WebTestCase):
     def test_attributes_explicit(self):
         self.get('/one_form')
         self.assert_status(200)

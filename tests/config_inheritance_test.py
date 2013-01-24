@@ -1,7 +1,7 @@
 import unittest
 import owebunit
 
-class ConfigInheritanceTestCase(unittest.TestCase):
+class ConfigInheritanceTest(unittest.TestCase):
     def test_not_propagates_inappropriately(self):
         @owebunit.config(host='foo')
         class TestOne(owebunit.WebTestCase):

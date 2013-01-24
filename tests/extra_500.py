@@ -7,7 +7,7 @@ def setup_module():
     utils.start_bottle_server(kitchen_sink_app.app, 8045)
 
 @owebunit.config(host='localhost', port=8045)
-class Extra500TestCase(owebunit.WebTestCase):
+class Extra500Test(owebunit.WebTestCase):
     def test_without_extras(self):
         self.get('/unhandled_exception')
         self.assert_status(500)
@@ -47,7 +47,7 @@ utils.start_bottle_server(kitchen_sink_app.app, 8046, handler_class=TracebackHan
 @owebunit.config(host='localhost', port=8046,
     extra_500_message=bottle_unhandled_exception_info,
 )
-class Extra500TestCaseWithExtra(owebunit.WebTestCase):
+class Extra500WithExtraTest(owebunit.WebTestCase):
     def test_with_extra(self):
         self.get('/unhandled_exception')
         self.assert_status(500)
