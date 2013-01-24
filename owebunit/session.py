@@ -109,7 +109,8 @@ class Config(object):
                 raise ValueError('Unknown parameter: %s' % key)
 
 class Response(object):
-    def __init__(self, httplib_response):
+    def __init__(self, request_uri, httplib_response):
+        self.request_uri = request_uri
         self.httplib_response = httplib_response
     
     @property
@@ -259,6 +260,9 @@ class Response(object):
     @property
     def form(self):
         return FormProxy(self.forms)
+    
+    def urljoin(self, url):
+        return urlparse.urljoin(self.request_uri, url)
 
 class FormElements(object):
     def __init__(self, elements):
@@ -783,7 +787,7 @@ class Session(object):
             uri += '?' + encoded_query
         
         self.connection.request(method.upper(), uri, body, computed_headers)
-        self.response = Response(self.connection.getresponse())
+        self.response = Response(uri, self.connection.getresponse())
         # XXX consider not writing attributes from here
         self.response.request_url = url
         for cookie in self.response.cookie_list:
