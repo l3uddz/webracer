@@ -5,6 +5,7 @@ import kitchen_sink_app
 
 def setup_module():
     utils.start_bottle_server(kitchen_sink_app.app, 8045)
+    utils.start_bottle_server(kitchen_sink_app.app, 8046, handler_class=TracebackHandler)
 
 @owebunit.config(host='localhost', port=8045)
 class Extra500Test(owebunit.WebTestCase):
@@ -41,8 +42,6 @@ class TracebackHandler(wsgiref.simple_server.WSGIRequestHandler):
         
         global _errors
         _errors = self._error_file.getvalue()
-
-utils.start_bottle_server(kitchen_sink_app.app, 8046, handler_class=TracebackHandler)
 
 @owebunit.config(host='localhost', port=8046,
     extra_500_message=bottle_unhandled_exception_info,
