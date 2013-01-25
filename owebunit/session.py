@@ -358,6 +358,14 @@ class FormElements(object):
     @property
     def mutable(self):
         return MutableFormElements(self.elements)
+    
+    def __repr__(self):
+        bits = []
+        for element_type, element_name, element_value, element_selected in self.elements:
+            selected = ', selected' if element_selected else ''
+            bits.append('[%s name=%s, value=%s%s]' % (element_type, element_name, element_value, selected))
+        text = ', '.join(bits) or '[]'
+        return '<owebunit.%s: %s>' % (self.__class__.__name__, text)
 
 class MutableFormElements(FormElements):
     def submit(self, name):
