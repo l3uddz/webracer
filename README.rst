@@ -1,19 +1,58 @@
-owebunit - a comprehensive web application testing library for Python
-=====================================================================
+WebRacer - a web crawler and web application testing library in Python
+======================================================================
 
-owebunit is intended for applications that are written without a framework,
-using a framework that does not provide a testing module or where the
-provided testing module is lacking in functionality.
+WebRacer started as a high level web application testing library, similar
+to twill but with a more comprehensive API. With time the client portion
+became sufficiently useful standalone.
 
-owebunit is a general-purpose library not tied to any specific framework.
-Its goals are:
+Session module
+--------------
 
-- Testing complete target application stack via HTTP
-- Faster testing of WSGI-compliant target applications via WSGI
-- Support for multiple concurrent sessions
-- Easy to use API
-- Complete documentation
-- Possibly twill-like form handling in the future
+The session module provides a browser level HTTP client. Besides the standard
+request/response functionality the session module notably offers an easy
+to use form API.
+
+Test case module
+----------------
+
+WebRacer provides a test case class that offers more convenient integration
+of the rest of WebRacer into unittest-based test suites.
+
+Both intuitive to use and exhaustive
+------------------------------------
+
+The goal of WebRacer is to expose HTTP and web-related functions in
+a manner that makes code for common tasks intuitive and concise, but
+does not compromise completeness. Phrased differently, WebRacer is meant
+to be suitable for all use cases involving driving or testing web applications
+rather than a certain predetermined subset of them.
+
+WebRacer does not require the use of a framework. In fact, assertions that
+it provides are defined on the session class and may be used in web crawlers
+that do not employ unittest at all.
+
+Documented and tested
+---------------------
+
+WebRacer aims to eventually have 100% documentation and test coverage.
+
+Scope
+-----
+
+Currently WebRacer tests HTTP applications via actual HTTP.
+
+Support for testing WSGI applications without running an HTTP server
+is planned.
+
+The application being tested may be launched in another thread in
+the test process or may be external to the test/driver process.
+
+Features
+--------
+
+- Multiple concurrent test sessions
+- Response assertions
+- Comprehensive form handling
 
 Note: API is not yet stable.
 
