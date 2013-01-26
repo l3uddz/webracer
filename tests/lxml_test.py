@@ -1,5 +1,5 @@
 import lxml.etree
-import owebunit
+import webracer
 import bottle
 from tests import utils
 
@@ -18,8 +18,8 @@ def html():
 def setup_module():
     utils.start_bottle_server(app, 8042)
 
-@owebunit.config(host='localhost', port=8042)
-class LxmlTest(owebunit.WebTestCase):
+@webracer.config(host='localhost', port=8042)
+class LxmlTest(webracer.WebTestCase):
     def test_parse_xml(self):
         self.get('/xml')
         self.assert_status(200)

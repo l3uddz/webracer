@@ -1,12 +1,12 @@
-import owebunit
+import webracer
 from tests import utils
 from tests import form_app
 
 def setup_module():
     utils.start_bottle_server(form_app.app, 8049)
 
-@owebunit.config(host='localhost', port=8049)
-class FormSingularTest(owebunit.WebTestCase):
+@webracer.config(host='localhost', port=8049)
+class FormSingularTest(webracer.WebTestCase):
     def setUp(self):
         super(FormSingularTest, self).setUp()
         
@@ -18,12 +18,12 @@ class FormSingularTest(owebunit.WebTestCase):
         form = self.response.form
         
         # materializes
-        with self.assert_raises(owebunit.MultipleForms):
+        with self.assert_raises(webracer.MultipleForms):
             form.action
     
     def test_all_call(self):
         # materializes when called
-        with self.assert_raises(owebunit.MultipleForms):
+        with self.assert_raises(webracer.MultipleForms):
             form = self.response.form()
     
     def test_name(self):
@@ -31,7 +31,7 @@ class FormSingularTest(owebunit.WebTestCase):
         self.assertEqual('by-name', form.action)
     
     def test_name_missing(self):
-        with self.assert_raises(owebunit.NoForms):
+        with self.assert_raises(webracer.NoForms):
             self.response.form(name='missing')
     
     def test_id(self):
@@ -39,20 +39,20 @@ class FormSingularTest(owebunit.WebTestCase):
         self.assertEqual('by-id', form.action)
     
     def test_id_missing(self):
-        with self.assert_raises(owebunit.NoForms):
+        with self.assert_raises(webracer.NoForms):
             self.response.form(id='missing')
     
     def test_xpath_noop(self):
         # multiple forms
-        with self.assert_raises(owebunit.MultipleForms):
+        with self.assert_raises(webracer.MultipleForms):
             form = self.response.form(xpath='//form')
     
     def test_xpath_all(self):
-        with self.assert_raises(owebunit.MultipleForms):
+        with self.assert_raises(webracer.MultipleForms):
             form = self.response.form(xpath='//node()')
     
     def test_xpath_missing(self):
-        with self.assert_raises(owebunit.NoForms):
+        with self.assert_raises(webracer.NoForms):
             self.response.form(xpath='//form[@id="missing"]')
     
     def test_xpath(self):
@@ -60,7 +60,7 @@ class FormSingularTest(owebunit.WebTestCase):
         self.assertEqual('by-name-and-id', form.action)
     
     def test_css_all(self):
-        with self.assert_raises(owebunit.MultipleForms):
+        with self.assert_raises(webracer.MultipleForms):
             form = self.response.form(css='*')
     
     def test_css(self):
@@ -68,7 +68,7 @@ class FormSingularTest(owebunit.WebTestCase):
         self.assertEqual('by-name-and-id', form.action)
     
     def test_css_missing(self):
-        with self.assert_raises(owebunit.NoForms):
+        with self.assert_raises(webracer.NoForms):
             self.response.form(css='.missing')
     
     def test_css_and_name(self):
@@ -99,13 +99,13 @@ class FormSingularTest(owebunit.WebTestCase):
                 merged = dict(e)
                 merged.update(m)
                 
-                with self.assert_raises(owebunit.NoForms):
+                with self.assert_raises(webracer.NoForms):
                     form = self.response.form(**merged)
     
     def test_no_forms_message(self):
         try:
             self.response.form(xpath='//form[@id="missing-id"]')
-        except owebunit.NoForms as exc:
+        except webracer.NoForms as exc:
             # parameter should be included in the message
             self.assertTrue('missing-id' in str(exc), 'id not included in message')
         else:

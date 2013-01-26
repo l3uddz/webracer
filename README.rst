@@ -63,8 +63,8 @@ Execute the test suite by running ``nosetests``.
 
 The test suite uses some nose features and will not work with unittest alone.
 
-.. image:: https://api.travis-ci.org/p/owebunit.png
-  :target: https://travis-ci.org/p/owebunit
+.. image:: https://api.travis-ci.org/p/webracer.png
+  :target: https://travis-ci.org/p/webracer
 
 License
 -------

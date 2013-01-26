@@ -1,5 +1,5 @@
 import unittest
-import owebunit
+import webracer
 
 class NetlocToHostPortTest(unittest.TestCase):
     def test_host(self):
@@ -13,7 +13,7 @@ class NetlocToHostPortTest(unittest.TestCase):
         self._perform(netloc, expected)
     
     def _perform(self, netloc, expected):
-        session = owebunit.Session(owebunit.Config())
+        session = webracer.Session(webracer.Config())
         actual = session._netloc_to_host_port(netloc)
         if isinstance(actual, list):
             actual = tuple(actual)

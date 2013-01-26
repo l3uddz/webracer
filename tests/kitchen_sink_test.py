@@ -1,5 +1,5 @@
 import sys
-import owebunit
+import webracer
 import mock
 from tests import utils
 from tests import kitchen_sink_app
@@ -9,7 +9,7 @@ py3 = sys.version_info[0] == 3
 def setup_module():
     utils.start_bottle_server(kitchen_sink_app.app, 8041)
 
-class KitchenSinkTest(owebunit.WebTestCase):
+class KitchenSinkTest(webracer.WebTestCase):
     def test_simple(self):
         self.get('http://127.0.0.1:8041/ok')
         self.assert_status(200)
@@ -160,8 +160,8 @@ class KitchenSinkTest(owebunit.WebTestCase):
         self.assert_status(200)
         self.assertEqual('ok', self.response.body)
 
-@owebunit.no_session
-class NoSessionTest(owebunit.WebTestCase):
+@webracer.no_session
+class NoSessionTest(webracer.WebTestCase):
     def test_implicit_session(self):
         self.get('http://127.0.0.1:8041/set_cookie')
         self.assert_status(200)
@@ -175,7 +175,7 @@ class NoSessionTest(owebunit.WebTestCase):
         # session cookie is not carried over
         self.assert_not_session_cookie('visited')
 
-class DefaultHostUrlTest(owebunit.WebTestCase):
+class DefaultHostUrlTest(webracer.WebTestCase):
     def __init__(self, *args, **kwargs):
         super(DefaultHostUrlTest, self).__init__(*args, **kwargs)
         self.config.host = 'http://127.0.0.1:8041'
@@ -197,7 +197,7 @@ if py3:
 else:
     http_connection_class = 'httplib.HTTPConnection'
 
-class MockedServerTest(owebunit.WebTestCase):
+class MockedServerTest(webracer.WebTestCase):
     @mock.patch(http_connection_class, mock_http_connection_returning_200())
     def test_portless_url(self):
         '''Check that our logic for issuing requests does not have any

@@ -1,4 +1,4 @@
-import owebunit
+import webracer
 import re
 from tests import utils
 from tests import form_app
@@ -6,8 +6,8 @@ from tests import form_app
 def setup_module():
     utils.start_bottle_server(form_app.app, 8043)
 
-@owebunit.config(host='localhost', port=8043)
-class FormTest(owebunit.WebTestCase):
+@webracer.config(host='localhost', port=8043)
+class FormTest(webracer.WebTestCase):
     def test_with_specified_attributes(self):
         self.get('/one_form')
         self.assert_status(200)

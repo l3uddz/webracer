@@ -1,4 +1,4 @@
-owebunit recognizes the following form elements:
+WebRacer recognizes the following form elements:
 
 - input type=text
 - input type=radio

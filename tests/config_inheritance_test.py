@@ -1,14 +1,14 @@
 import unittest
-import owebunit
+import webracer
 
 class ConfigInheritanceTest(unittest.TestCase):
     def test_not_propagates_inappropriately(self):
-        @owebunit.config(host='foo')
-        class TestOne(owebunit.WebTestCase):
+        @webracer.config(host='foo')
+        class TestOne(webracer.WebTestCase):
             def test_method(self):
                 pass
         
-        class TestTwo(owebunit.WebTestCase):
+        class TestTwo(webracer.WebTestCase):
             def test_method(self):
                 pass
         

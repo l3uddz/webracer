@@ -1,5 +1,5 @@
 import unittest
-import owebunit
+import webracer
 from tests import utils
 
 class ExtendParamsTest(unittest.TestCase):
@@ -45,7 +45,7 @@ class ExtendParamsTest(unittest.TestCase):
         self._check(target, extra, expected)
     
     def _check(self, target, extra, expected):
-        actual = owebunit.extend_params(target, extra)
+        actual = webracer.extend_params(target, extra)
         self.assertEqual(utils.listit(expected), utils.listit(actual))
 
 if __name__ == '__main__':

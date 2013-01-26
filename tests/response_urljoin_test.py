@@ -1,12 +1,12 @@
-import owebunit
+import webracer
 from tests import utils
 from tests import kitchen_sink_app
 
 def setup_module():
     utils.start_bottle_server(kitchen_sink_app.app, 8053)
 
-@owebunit.config(host='localhost', port=8053)
-class ResponseUrljoinTest(owebunit.WebTestCase):
+@webracer.config(host='localhost', port=8053)
+class ResponseUrljoinTest(webracer.WebTestCase):
     def test_request_uri(self):
         self.get('/json/empty')
         self.assert_status(200)

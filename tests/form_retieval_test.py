@@ -1,12 +1,12 @@
-import owebunit
+import webracer
 from tests import utils
 from tests import form_app
 
 def setup_module():
     utils.start_bottle_server(form_app.app, 8048)
 
-@owebunit.config(host='localhost', port=8048)
-class FormRetrievalTest(owebunit.WebTestCase):
+@webracer.config(host='localhost', port=8048)
+class FormRetrievalTest(webracer.WebTestCase):
     def setUp(self):
         super(FormRetrievalTest, self).setUp()
         

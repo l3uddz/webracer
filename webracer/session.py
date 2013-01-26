@@ -365,7 +365,7 @@ class FormElements(object):
             selected = ', selected' if element_selected else ''
             bits.append('[%s name=%s, value=%s%s]' % (element_type, element_name, element_value, selected))
         text = ', '.join(bits) or '[]'
-        return '<owebunit.%s: %s>' % (self.__class__.__name__, text)
+        return '<webracer.%s: %s>' % (self.__class__.__name__, text)
 
 class MutableFormElements(FormElements):
     def submit(self, name):
@@ -559,7 +559,7 @@ class Form(object):
         return self.elements.params
     
     def __repr__(self):
-        bits = ['owebunit.Form']
+        bits = ['webracer.Form']
         for prop in ['id', 'name', 'action', 'method']:
             value = getattr(self, prop)
             if value is not None:

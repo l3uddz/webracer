@@ -1,33 +1,33 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import owebunit
+import webracer
 
 class UrlencodeUtf8Test(unittest.TestCase):
     def test_urlencode_simple(self):
         input = dict(a='a', b='b')
-        output = owebunit.urlencode_utf8(input)
+        output = webracer.urlencode_utf8(input)
         # dictionary keys are not ordered
         self.assertTrue(output == 'a=a&b=b' or output == 'b=b&a=a')
     
     def test_urlencode_list(self):
         input = dict(a=[1])
-        output = owebunit.urlencode_utf8(input)
+        output = webracer.urlencode_utf8(input)
         self.assertEqual('a[]=1', output)
     
     def test_urlencode_list_multi(self):
         input = dict(a=[1, 2])
-        output = owebunit.urlencode_utf8(input)
+        output = webracer.urlencode_utf8(input)
         self.assertEqual('a[]=1&a[]=2', output)
     
     def test_urlencode_tuple(self):
         input = dict(a=(1,))
-        output = owebunit.urlencode_utf8(input)
+        output = webracer.urlencode_utf8(input)
         self.assertEqual('a[]=1', output)
     
     def test_urlencode_tuple_multi(self):
         input = dict(a=(1, 2))
-        output = owebunit.urlencode_utf8(input)
+        output = webracer.urlencode_utf8(input)
         self.assertEqual('a[]=1&a[]=2', output)
     
     def test_one_elment_tuple(self):
@@ -40,7 +40,7 @@ class UrlencodeUtf8Test(unittest.TestCase):
         # Pass a pair instead of a sequence of pairs
         input = ('a', 'b')
         try:
-            owebunit.urlencode_utf8(input)
+            webracer.urlencode_utf8(input)
         except ValueError as e:
             assert 'Parameter must be a sequence of pairs' in str(e)
         else:
@@ -74,7 +74,7 @@ class UrlencodeUtf8Test(unittest.TestCase):
         self.check(input, expected)
     
     def check(self, input, expected):
-        output = owebunit.urlencode_utf8(input)
+        output = webracer.urlencode_utf8(input)
         self.assertEqual(expected, output)
 
 if __name__ == '__main__':
