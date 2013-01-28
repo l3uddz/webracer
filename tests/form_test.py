@@ -1,5 +1,6 @@
 import webracer
 import re
+import nose.tools
 from tests import utils
 from tests import form_app
 
@@ -131,6 +132,20 @@ class FormTest(webracer.WebTestCase):
         elements.set_value('textf', 'newvalue')
         params = elements.params.list
         self.assertEqual([['textf', 'newvalue']], utils.listit(params))
+    
+    def test_set_value_on_missing_element(self):
+        self.get('/one_form')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        elements = form.elements.mutable
+        # https://github.com/nose-devs/nose/issues/30
+        with nose.tools.assert_raises(ValueError) as cm:
+            elements.set_value('missing', 'newvalue')
+        
+        assert 'Did not find element with name' in str(cm.exception)
     
     def test_first_radio_selected(self):
         self.get('/first_radio_selected')

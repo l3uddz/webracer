@@ -427,8 +427,11 @@ class MutableFormElements(FormElements):
                     # single selection
                     self.chosen_values[name] = value
                 break
-        if not found and found_rejected:
-            raise ValueError(found_rejected)
+        if not found:
+            if found_rejected:
+                raise ValueError(found_rejected)
+            else:
+                raise ValueError('Did not find element with name %s' % name)
 
 class FormParams(object):
     def __init__(self, params, **kwargs):
