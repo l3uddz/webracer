@@ -1,6 +1,7 @@
 import unittest
 from .session import Config, Session
 
+# XXX bring into compliance with python 2.7 unittest api
 class AssertRaisesContextManager(object):
     def __init__(self, expected):
         self.expected = expected
@@ -13,6 +14,7 @@ class AssertRaisesContextManager(object):
             raise AssertionError('%s expected but not raised' % str(self.expected))
         if type != self.expected:
             raise AssertionError('%s expected, not `%s`' % (self.expected.__class__, str(value)))
+        self.exception = value
         # silence exception
         return True
 
@@ -54,6 +56,8 @@ class WebTestCase(unittest.TestCase):
     def follow_redirect(self):
         return self._session.follow_redirect()
     
+    # XXX move to utu
+    # XXX accept kwargs
     def assert_raises(self, expected, *args):
         if args:
             return self.assertRaises(expected, *args)

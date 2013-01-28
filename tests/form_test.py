@@ -142,7 +142,7 @@ class FormTest(webracer.WebTestCase):
         form = forms[0]
         elements = form.elements.mutable
         # https://github.com/nose-devs/nose/issues/30
-        with nose.tools.assert_raises(ValueError) as cm:
+        with self.assert_raises(ValueError) as cm:
             elements.set_value('missing', 'newvalue')
         
         assert 'Did not find element with name' in str(cm.exception)
