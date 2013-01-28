@@ -82,6 +82,19 @@ class FormTest(webracer.WebTestCase):
         expected = (('selectf', 'second'),)
         self.assertEqual(expected, params)
     
+    def test_params_select_with_optgroup(self):
+        self.get('/form_with_optgroup')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        params = form.params.list
+        if isinstance(params, list):
+            params = tuple(params)
+        expected = (('selectf', 'first'),)
+        self.assertEqual(expected, params)
+    
     def test_multiple_submits(self):
         self.get('/form_with_two_submits')
         self.assert_status(200)

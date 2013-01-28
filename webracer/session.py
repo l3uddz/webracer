@@ -526,8 +526,9 @@ class Form(object):
         for element in self._form_tag.xpath('.//*[self::input or self::button or self::textarea or self::select]'):
             name = element.attrib.get('name')
             if element.tag == 'select':
-                # XXX check if options must be direct descendants of selects
-                for option in element.xpath('./option'):
+                # Options need not be direct descendants of selects -
+                # the path could be select/optgroup/option.
+                for option in element.xpath('.//option'):
                     # browsers differ on which values for selected attribute
                     # constitute the selection being active.
                     # consider presence of the attribute as the indicator

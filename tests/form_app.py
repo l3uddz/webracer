@@ -87,6 +87,26 @@ def form_with_select_selected():
 </html>
 '''
 
+@app.route('/form_with_optgroup')
+def form_with_optgroup():
+    return '''
+<!doctype html>
+<html>
+<head></head>
+<body>
+    <form>
+        <select name='selectf'>
+            <optgroup label='Option group'>
+                <option value='first'>First</option>
+                <option value='second'>Second</option>
+                <option value='third'>Third</option>
+            </optgroup>
+        </select>
+    </form>
+</body>
+</html>
+'''
+
 @app.route('/form_with_two_submits')
 def form_with_two_submits():
     return '''
