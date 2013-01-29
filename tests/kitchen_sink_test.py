@@ -107,17 +107,17 @@ class KitchenSinkTest(webracer.WebTestCase):
         self.assert_session_cookie('visited')
     
     def test_query_string(self):
-        self.get('http://127.0.01:8041/get_param', query='p=value')
+        self.get('/get_param', query='p=value')
         self.assert_status(200)
         self.assertEqual('value', self.response.body)
     
     def test_query_tuple(self):
-        self.get('http://127.0.01:8041/get_param', query=(('p', 'value'),))
+        self.get('/get_param', query=(('p', 'value'),))
         self.assert_status(200)
         self.assertEqual('value', self.response.body)
     
     def test_query_dict(self):
-        self.get('http://127.0.01:8041/get_param', query=dict(p='value'))
+        self.get('/get_param', query=dict(p='value'))
         self.assert_status(200)
         self.assertEqual('value', self.response.body)
     
