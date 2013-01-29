@@ -18,3 +18,4 @@
  - Rename set_value to set?
  - Need a way to unset checkboxes + tests
  - Allow second positional argument to post to be the body
+ - Using multiple config decorators per test class does not seem to work
