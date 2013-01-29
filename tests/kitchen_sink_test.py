@@ -9,28 +9,45 @@ py3 = sys.version_info[0] == 3
 def setup_module():
     utils.start_bottle_server(kitchen_sink_app.app, 8041)
 
-class KitchenSinkTest(webracer.WebTestCase):
+class FullUrlTest(webracer.WebTestCase):
     def test_simple(self):
         self.get('http://127.0.0.1:8041/ok')
         self.assert_status(200)
+
+class DefaultHostUrlTest(webracer.WebTestCase):
+    def __init__(self, *args, **kwargs):
+        super(DefaultHostUrlTest, self).__init__(*args, **kwargs)
+        self.config.host = 'http://127.0.0.1:8041'
     
+    def test_simple(self):
+        self.get('/ok')
+        self.assert_status(200)
+
+@webracer.config(host='localhost', port=8041)
+class ConfigDecoratortest(webracer.WebTestCase):
+    def test_simple(self):
+        self.get('/ok')
+        self.assert_status(200)
+
+@webracer.config(host='localhost', port=8041)
+class KitchenSinkTest(webracer.WebTestCase):
     def test_session(self):
         with self.session() as s:
-            s.get('http://127.0.0.1:8041/ok')
+            s.get('/ok')
             s.assert_status(200)
     
     def test_multiple_sessions(self):
         one = self.session()
-        one.get('http://127.0.0.1:8041/ok')
+        one.get('/ok')
         
         two = self.session()
-        two.get('http://127.0.0.1:8041/internal_server_error')
+        two.get('/internal_server_error')
         
         one.assert_status(200)
         two.assert_status(500)
     
     def test_cookie(self):
-        self.get('http://127.0.0.1:8041/set_cookie')
+        self.get('/set_cookie')
         self.assert_status(200)
         
         self.assert_response_cookie('visited')
@@ -43,7 +60,7 @@ class KitchenSinkTest(webracer.WebTestCase):
             self.assert_response_cookie('visited', value='no')
     
     def test_multiple_cookies(self):
-        self.get('http://127.0.0.1:8041/set_multiple_cookies')
+        self.get('/set_multiple_cookies')
         self.assert_status(200)
         
         self.assert_response_cookie('foo_a')
@@ -54,8 +71,8 @@ class KitchenSinkTest(webracer.WebTestCase):
         self.assert_response_cookie('foo_c', value='c_value')
     
     def test_colon_in_cookie_value(self):
-        #self.get('http://127.0.0.1:8041/set_cookie_value', query=('v', 'a:b'))
-        self.get('http://127.0.0.1:8041/set_cookie_value', query=(('v', 'a:b'),))
+        #self.get('/set_cookie_value', query=('v', 'a:b'))
+        self.get('/set_cookie_value', query=(('v', 'a:b'),))
         self.assert_status(200)
         
         self.assertEqual('a:b', self.response.body)
@@ -67,22 +84,22 @@ class KitchenSinkTest(webracer.WebTestCase):
         #self.assert_response_cookie('sink', value='"a:b"')
     
     def test_colon_in_cookie_value_in_session(self):
-        self.get('http://127.0.0.1:8041/set_cookie_value', query=(('v', 'a:b'),))
+        self.get('/set_cookie_value', query=(('v', 'a:b'),))
         self.assert_status(200)
         
-        self.get('http://127.0.0.1:8041/read_cookie_value/sink')
+        self.get('/read_cookie_value/sink')
         self.assert_status(200)
         # should get back the same value we passed initially.
         # the value in this test passes through cookie jar
         self.assertEqual('a:b', self.response.body)
     
     def test_implicit_session(self):
-        self.get('http://127.0.0.1:8041/set_cookie')
+        self.get('/set_cookie')
         self.assert_status(200)
         self.assert_response_cookie('visited')
         self.assert_session_cookie('visited')
         
-        self.get('http://127.0.0.1:8041/read_cookie')
+        self.get('/read_cookie')
         self.assert_status(200)
         self.assertEqual('yes', self.response.body)
         self.assert_not_response_cookie('visited')
@@ -105,84 +122,76 @@ class KitchenSinkTest(webracer.WebTestCase):
         self.assertEqual('value', self.response.body)
     
     def test_param_string(self):
-        self.post('http://127.0.0.1:8041/param', body='p=value')
+        self.post('/param', body='p=value')
         self.assert_status(200)
         self.assertEqual('value', self.response.body)
     
     def test_param_dict(self):
-        self.post('http://127.0.0.1:8041/param', body=dict(p='value'))
+        self.post('/param', body=dict(p='value'))
         self.assert_status(200)
         self.assertEqual('value', self.response.body)
     
     def test_param_tuple(self):
-        self.post('http://127.0.0.1:8041/param', body=(('p', 'value'),))
+        self.post('/param', body=(('p', 'value'),))
         self.assert_status(200)
         self.assertEqual('value', self.response.body)
     
     def test_post_without_params(self):
-        self.post('http://127.0.0.1:8041/param')
+        self.post('/param')
         self.assert_status(200)
         self.assertEqual('', self.response.body)
         
         # content-length should be set to zero for cherrypy
-        self.post('http://127.0.0.1:8041/get_content_length')
+        self.post('/get_content_length')
         self.assert_status(200)
         self.assertEqual('0', self.response.body)
     
     def test_post_with_empty_params(self):
-        self.post('http://127.0.0.1:8041/param', body={})
+        self.post('/param', body={})
         self.assert_status(200)
         self.assertEqual('', self.response.body)
         
         # content-length should be set to zero for cherrypy
-        self.post('http://127.0.0.1:8041/get_content_length', body={})
+        self.post('/get_content_length', body={})
         self.assert_status(200)
         self.assertEqual('0', self.response.body)
     
     def test_json_parsing_empty(self):
-        self.get('http://127.0.0.1:8041/json/empty')
+        self.get('/json/empty')
         self.assert_status(200)
         self.assertEqual({}, self.response.json)
     
     def test_json_parsing_hash(self):
-        self.get('http://127.0.0.1:8041/json/hash')
+        self.get('/json/hash')
         self.assert_status(200)
         self.assertEqual({'a': 'b'}, self.response.json)
     
     def test_redirect_assertion(self):
-        self.get('http://127.0.0.1:8041/redirect')
+        self.get('/redirect')
         self.assert_redirected_to_uri('/found')
     
     def test_follow_redirect(self):
-        self.get('http://127.0.0.1:8041/redirect_to', query=dict(target='/ok'))
+        self.get('/redirect_to', query=dict(target='/ok'))
         self.assert_redirected_to_uri('/ok')
         self.follow_redirect()
         self.assert_status(200)
         self.assertEqual('ok', self.response.body)
 
 @webracer.no_session
+@webracer.config(host='localhost', port=8041)
 class NoSessionTest(webracer.WebTestCase):
     def test_implicit_session(self):
-        self.get('http://127.0.0.1:8041/set_cookie')
+        self.get('/set_cookie')
         self.assert_status(200)
         self.assert_response_cookie('visited')
         self.assert_session_cookie('visited')
         
-        self.get('http://127.0.0.1:8041/read_cookie')
+        self.get('/read_cookie')
         self.assert_status(200)
         self.assertEqual('', self.response.body)
         self.assert_not_response_cookie('visited')
         # session cookie is not carried over
         self.assert_not_session_cookie('visited')
-
-class DefaultHostUrlTest(webracer.WebTestCase):
-    def __init__(self, *args, **kwargs):
-        super(DefaultHostUrlTest, self).__init__(*args, **kwargs)
-        self.config.host = 'http://127.0.0.1:8041'
-    
-    def test_simple(self):
-        self.get('/ok')
-        self.assert_status(200)
 
 def mock_http_connection_returning_200():
     response = mock.MagicMock(status=200)
