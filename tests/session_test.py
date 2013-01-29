@@ -5,10 +5,11 @@ from tests import kitchen_sink_app
 def setup_module():
     utils.start_bottle_server(kitchen_sink_app.app, 8052)
 
+@webracer.config(host='localhost', port=8052)
 class SessionTest(webracer.WebTestCase):
     def test_get(self):
         s = webracer.Session()
-        s.get('http://127.0.0.1:8052/ok')
+        s.get('/ok')
         self.assertEqual(200, s.response.code)
         self.assertEqual('ok', s.response.body)
     
@@ -16,7 +17,7 @@ class SessionTest(webracer.WebTestCase):
         # XXX improve this api
         config = webracer.Config(user_agent='Quux-o-matic/1.0')
         s = webracer.Session(config)
-        s.get('http://127.0.0.1:8052/get_user_agent')
+        s.get('/get_user_agent')
         self.assertEqual(200, s.response.code)
         self.assertEqual('Quux-o-matic/1.0', s.response.body)
     
@@ -25,7 +26,7 @@ class SessionTest(webracer.WebTestCase):
         config = webracer.Config(user_agent='Quux-o-matic/1.0')
         s = webracer.Session(config)
         headers = {'user-agent': 'Barlicious/2.0'}
-        s.get('http://127.0.0.1:8052/get_user_agent', headers=headers)
+        s.get('/get_user_agent', headers=headers)
         self.assertEqual(200, s.response.code)
         self.assertEqual('Barlicious/2.0', s.response.body)
 
