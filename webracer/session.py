@@ -819,11 +819,11 @@ class Session(object):
             raise AssertionError('Should not be here')
     
     # note: cherrypy webtest has a protocol argument
-    def get(self, url, **kwargs):
-        return self.request('get', url, **kwargs)
+    def get(self, url, *args, **kwargs):
+        return self.request('get', url, *args, **kwargs)
     
-    def post(self, url, **kwargs):
-        return self.request('post', url, **kwargs)
+    def post(self, url, *args, **kwargs):
+        return self.request('post', url, *args, **kwargs)
     
     def follow_redirect(self):
         assert 'location' in self.response.header_dict

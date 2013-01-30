@@ -42,16 +42,16 @@ class WebTestCase(unittest.TestCase):
     def response(self):
         return self._session.response
     
-    def request(self, method, url, **kwargs):
+    def request(self, method, url, *args, **kwargs):
         if hasattr(self, '_no_session') and self._no_session:
             self._session = self._create_session()
-        return self._session.request(method, url, **kwargs)
+        return self._session.request(method, url, *args, **kwargs)
     
-    def get(self, url, **kwargs):
-        return self.request('get', url, **kwargs)
+    def get(self, url, *args, **kwargs):
+        return self.request('get', url, *args, **kwargs)
     
-    def post(self, url, **kwargs):
-        return self.request('post', url, **kwargs)
+    def post(self, url, *args, **kwargs):
+        return self.request('post', url, *args, **kwargs)
     
     def follow_redirect(self):
         return self._session.follow_redirect()

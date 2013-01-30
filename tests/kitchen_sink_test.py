@@ -136,6 +136,11 @@ class KitchenSinkTest(webracer.WebTestCase):
         self.assert_status(200)
         self.assertEqual('value', self.response.body)
     
+    def test_param_positional(self):
+        self.post('/param', dict(p='value'))
+        self.assert_status(200)
+        self.assertEqual('value', self.response.body)
+    
     def test_post_without_params(self):
         self.post('/param')
         self.assert_status(200)
