@@ -5,7 +5,6 @@
  - Generic memoization for attributes on response, forms, etc.
  - Multiple selection select support for form params
  - Handle multiple submit form tags in form params
- - Checkboxes, checked and unchecked
  - str() for FormElements and FormParams
  - Add a case-insensitive api to header_list
  - Add tests for header_dict case insensitivity on keys (broken in py3)
