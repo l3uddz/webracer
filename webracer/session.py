@@ -494,6 +494,15 @@ class Form(object):
     
     @property
     def method(self):
+        '''Returns the value of method attribute on the form, or None if
+        the attribute does not exist.
+        
+        This property returns the method exactly as it was specified in source
+        document. In particular, no case changes are performed.
+        
+        Use computed_method to get a normalized value.
+        '''
+        
         return self._form_tag.attrib.get('method')
     
     @property
@@ -501,7 +510,7 @@ class Form(object):
     def computed_method(self):
         '''The method that should be used to submit the form.
         
-        If a method is given in the form, it is lowercased and returned.
+        If a method is given in the form, it is uppercased and returned.
         
         Otherwise, the default method of 'get' is returnd.
         '''
