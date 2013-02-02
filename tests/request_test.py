@@ -24,7 +24,7 @@ class DefaultHostUrlTest(webracer.WebTestCase):
         self.assert_status(200)
 
 @webracer.config(host='localhost', port=8054)
-class ConfigDecoratortest(webracer.WebTestCase):
+class ConfigDecoratorTest(webracer.WebTestCase):
     def test_simple(self):
         self.get('/ok')
         self.assert_status(200)
