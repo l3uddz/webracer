@@ -25,6 +25,7 @@ def redirect():
 @app.route('/set_cookie')
 def set_cookie():
     bottle.response.set_cookie('visited', 'yes')
+    return 'ok'
 
 @app.route('/set_cookie_value')
 def set_cookie_value():

@@ -101,6 +101,9 @@ class Config(object):
     # on session objects.
     session_class = None
     
+    # Whether to use a cookie jar, allowing for session tracking.
+    use_cookie_jar = True
+    
     def __init__(self, **kwargs):
         for key in kwargs:
             if hasattr(self, key):
@@ -811,8 +814,9 @@ class Session(object):
         self.response = Response(uri, self.connection.getresponse())
         # XXX consider not writing attributes from here
         self.response.request_url = url
-        for cookie in self.response.cookie_list:
-            self._cookie_jar.add(cookie)
+        if self.config.use_cookie_jar:
+            for cookie in self.response.cookie_list:
+                self._cookie_jar.add(cookie)
         if self.config.save_responses:
             self._save_response()
     
@@ -898,10 +902,10 @@ class Session(object):
         assert name not in self.response.cookie_dict
     
     def assert_session_cookie(self, name, **kwargs):
-        assert name in self._cookie_jar
+        assert name in self._cookie_jar, 'Cookie expected but not present: %s' % name
     
     def assert_not_session_cookie(self, name, **kwargs):
-        assert name not in self._cookie_jar
+        assert name not in self._cookie_jar, 'Cookie not expected but present: %s' % name
     
     def __enter__(self):
         return self

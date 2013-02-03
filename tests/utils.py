@@ -47,3 +47,9 @@ else:
             return webracer.case.AssertRaisesContextManager(exception)
         else:
             return nose.tools.assert_raises(exception, callable, *args, **kwargs)
+
+def add_dicts(one, two):
+    out = dict(one)
+    for key in two:
+        out[key] = two[key]
+    return out
