@@ -59,6 +59,7 @@ def is_string(value):
 def immutable(func):
     @functools.wraps(func)
     def decorated(self):
+        # XXX consider caching in __dict__
         if not getattr(self, '_cache', None):
             self._cache = {}
         name = func.__name__

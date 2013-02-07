@@ -1,6 +1,5 @@
  - Input/output headers
  - Use setUpClass/tearDownClass for starting and stopping bottle servers
- - Generic memoization for attributes on response, forms, etc.
  - Multiple selection select support for form params
  - str() for FormElements and FormParams
  - Add a case-insensitive api to header_list
