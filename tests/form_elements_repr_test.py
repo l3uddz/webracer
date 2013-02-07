@@ -1,7 +1,7 @@
 import unittest
 import webracer
 
-class ElementsReprTest(unittest.TestCase):
+class FormElementsReprTest(unittest.TestCase):
     def test_repr_with_no_elements(self):
         elements = webracer.FormElements([])
         r = repr(elements)
