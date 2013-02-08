@@ -13,7 +13,7 @@ class ResponseUrljoinTest(webracer.WebTestCase):
         self.assert_status(200)
         # XXX should this be an absolute uri?
         #self.assertEqual('http://localhost:8053/json/empty', self.response.request_uri)
-        self.assertEqual('/json/empty', self.response.request_uri)
+        self.assertEqual('http://localhost:8053/json/empty', self.response.request_url)
     
     def test_urljoin(self):
         self.get('/json/empty')
@@ -21,4 +21,4 @@ class ResponseUrljoinTest(webracer.WebTestCase):
         
         url = self.response.urljoin('bar/quux')
         # XXX should this be an absolute uri?
-        self.assertEqual('/json/bar/quux', url)
+        self.assertEqual('http://localhost:8053/json/bar/quux', url)

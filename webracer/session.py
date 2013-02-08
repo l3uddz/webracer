@@ -7,19 +7,17 @@ import os.path
 import re
 import time as _time
 import xml.sax.saxutils
-import ocookie.httplib_adapter
 import cidict
+import ocookie
 
 py3 = sys.version_info[0] == 3
 
 # python 2/3 compatibility
 if py3:
-    import http.client as httplib
     import urllib.parse as urlparse
     base_exception_class = Exception
     string_type = str
 else:
-    import httplib
     import urllib
     import urlparse
     base_exception_class = StandardError
@@ -113,13 +111,13 @@ class Config(object):
                 raise ValueError('Unknown parameter: %s' % key)
 
 class Response(object):
-    def __init__(self, request_uri, httplib_response):
-        self.request_uri = request_uri
-        self.httplib_response = httplib_response
+    def __init__(self, request_url, cl_response):
+        self.request_url = request_url
+        self.cl_response = cl_response
     
     @property
     def code(self):
-        return self.httplib_response.status
+        return self.cl_response.code
     
     @property
     @immutable
@@ -131,7 +129,8 @@ class Response(object):
         '''
         
         # read() can only be called once, immutable decorator achieves this
-        return self.httplib_response.read()
+        # XXX fix this comment
+        return self.cl_response.raw_body
     
     @property
     @immutable
@@ -200,14 +199,9 @@ class Response(object):
         return json.loads(self.body)
     
     @property
+    @immutable
     def cookie_list(self):
-        try:
-            return self._cookie_list
-        except AttributeError:
-            self._cookie_list = ocookie.httplib_adapter.parse_response_cookies(
-                self.httplib_response
-            )
-            return self._cookie_list
+        return self.cl_response.cookie_list
     
     @property
     def cookie_dict(self):
@@ -218,8 +212,9 @@ class Response(object):
             return self._cookie_dict
     
     @property
+    @immutable
     def header_list(self):
-        return self.httplib_response.getheaders()
+        return self.cl_response.header_list
     
     @property
     def header_dict(self):
@@ -266,7 +261,7 @@ class Response(object):
         return FormProxy(self.forms)
     
     def urljoin(self, url):
-        return urlparse.urljoin(self.request_uri, url)
+        return urlparse.urljoin(self.request_url, url)
 
 class FormElements(object):
     def __init__(self, elements):
@@ -712,20 +707,6 @@ class FormsCollection(object):
         if self.all_forms is None:
             self.all_forms = self.doc.xpath('//form')
 
-def uri(self):
-    uri = self.path or '/'
-    if self.params:
-        uri += ';' + self.params
-    if self.query:
-        uri += '?' + self.query
-    return uri
-
-# XXX figure out if this is still needed and give it a better api
-def parse_url(url):
-    parsed_url = urlparse.urlparse(url)
-    _uri = uri(parsed_url)
-    return parsed_url, _uri
-
 if py3:
     def _urlencode_value(value):
         '''Encodes value, first converting it to string if necessary.
@@ -780,9 +761,6 @@ class Session(object):
     
     def request(self, method, url, body=None, query=None, headers=None):
         url = self._absolutize_url(url)
-        parsed_url, uri = parse_url(url)
-        host, port = self._netloc_to_host_port(parsed_url.netloc)
-        self.connection = httplib.HTTPConnection(host, port)
         kwargs = {}
         computed_headers = self._build_initial_headers()
         self._merge_headers(computed_headers, headers)
@@ -813,28 +791,17 @@ class Session(object):
             else:
                 raise ValueError('Query string is neither a string, a sequence nor a dict')
             # XXX handle url also having a query
-            uri += '?' + encoded_query
+            url += '?' + encoded_query
         
-        self.connection.request(method.upper(), uri, body, computed_headers)
-        self.response = Response(uri, self.connection.getresponse())
-        # XXX consider not writing attributes from here
-        self.response.request_url = url
+        from . import httplib_facade
+        client = httplib_facade.Client()
+        response = client.request(method.upper(), url, body, computed_headers)
+        self.response = Response(url, response)
         if self.config.use_cookie_jar:
             for cookie in self.response.cookie_list:
                 self._cookie_jar.add(cookie)
         if self.config.save_responses:
             self._save_response()
-    
-    def _netloc_to_host_port(self, netloc):
-        if netloc:
-            if ':' in netloc:
-                host, port = netloc.split(':')
-                return (host, int(port))
-            else:
-                port = self.config.port
-                return (netloc, port)
-        else:
-            raise AssertionError('Should not be here')
     
     # note: cherrypy webtest has a protocol argument
     def get(self, url, *args, **kwargs):

@@ -1,5 +1,5 @@
 import unittest
-import webracer
+import webracer.support
 
 class NetlocToHostPortTest(unittest.TestCase):
     def test_host(self):
@@ -14,7 +14,7 @@ class NetlocToHostPortTest(unittest.TestCase):
     
     def _perform(self, netloc, expected):
         session = webracer.Session(webracer.Config())
-        actual = session._netloc_to_host_port(netloc)
+        actual = webracer.support.netloc_to_host_port(netloc)
         if isinstance(actual, list):
             actual = tuple(actual)
         self.assertEqual(expected, actual)
