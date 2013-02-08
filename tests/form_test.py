@@ -4,8 +4,7 @@ import nose.tools
 from tests import utils
 from tests import form_app
 
-def setup_module():
-    utils.start_bottle_server(form_app.app, 8043)
+utils.app_runner_setup(__name__, form_app.app, 8043)
 
 @webracer.config(host='localhost', port=8043)
 class FormTest(webracer.WebTestCase):

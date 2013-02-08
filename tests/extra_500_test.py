@@ -3,10 +3,6 @@ import webracer
 from tests import utils
 from tests import kitchen_sink_app
 
-def setup_module():
-    utils.start_bottle_server(kitchen_sink_app.app, 8045)
-    utils.start_bottle_server(kitchen_sink_app.app, 8046, handler_class=TracebackHandler)
-
 @webracer.config(host='localhost', port=8045)
 class Extra500Test(webracer.WebTestCase):
     def test_without_extras(self):
@@ -45,6 +41,11 @@ class TracebackHandler(wsgiref.simple_server.WSGIRequestHandler):
         
         global _errors
         _errors = self._error_file.getvalue()
+
+utils.app_runner_setup_multiple(__name__, [
+    [kitchen_sink_app.app, 8045],
+    [kitchen_sink_app.app, 8046, dict(handler_class=TracebackHandler)],
+])
 
 @webracer.config(host='localhost', port=8046,
     extra_500_message=bottle_unhandled_exception_info,

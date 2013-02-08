@@ -6,8 +6,7 @@ from tests import kitchen_sink_app
 
 py3 = sys.version_info[0] == 3
 
-def setup_module():
-    utils.start_bottle_server(kitchen_sink_app.app, 8054)
+utils.app_runner_setup(__name__, kitchen_sink_app.app, 8054)
 
 class FullUrlTest(webracer.WebTestCase):
     def test_simple(self):

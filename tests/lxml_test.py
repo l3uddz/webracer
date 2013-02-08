@@ -15,8 +15,7 @@ def html():
     bottle.response.content_type = 'text/html'
     return '<!doctype html><html><head><meta name=foo value=bar></head><body></body></html>'
 
-def setup_module():
-    utils.start_bottle_server(app, 8042)
+utils.app_runner_setup(__name__, app, 8042)
 
 @webracer.config(host='localhost', port=8042)
 class LxmlTest(webracer.WebTestCase):

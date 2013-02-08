@@ -2,8 +2,7 @@ import webracer
 from tests import utils
 from tests import kitchen_sink_app
 
-def setup_module():
-    utils.start_bottle_server(kitchen_sink_app.app, 8047)
+utils.app_runner_setup(__name__, kitchen_sink_app.app, 8047)
 
 class MySession(webracer.Session):
     def extra_method(self):
