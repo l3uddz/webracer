@@ -27,7 +27,7 @@ try:
 except ImportError:
     from io import StringIO
 
-class TracebackHandler(wsgiref.simple_server.WSGIRequestHandler):
+class ErrorSilencingHandler(wsgiref.simple_server.WSGIRequestHandler):
     def __init__(self, *args, **kwargs):
         # must come before superclass init call
         self._error_file = StringIO()
@@ -35,7 +35,8 @@ class TracebackHandler(wsgiref.simple_server.WSGIRequestHandler):
     
     def get_stderr(self):
         return self._error_file
-    
+
+class TracebackHandler(ErrorSilencingHandler):
     def handle(self):
         wsgiref.simple_server.WSGIRequestHandler.handle(self)
         
@@ -43,7 +44,7 @@ class TracebackHandler(wsgiref.simple_server.WSGIRequestHandler):
         _errors = self._error_file.getvalue()
 
 utils.app_runner_setup_multiple(__name__, [
-    [kitchen_sink_app.app, 8045],
+    [kitchen_sink_app.app, 8045, dict(handler_class=ErrorSilencingHandler)],
     [kitchen_sink_app.app, 8046, dict(handler_class=TracebackHandler)],
 ])
 
