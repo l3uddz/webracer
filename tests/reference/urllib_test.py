@@ -18,8 +18,7 @@ else:
     def decode_str(str):
         return str
 
-def setup_module():
-    utils.start_bottle_server(kitchen_sink_app.app, 8099)
+utils.app_runner_setup(__name__, kitchen_sink_app.app, 8099)
 
 class UrllibTest(unittest.TestCase):
     def setUp(self):
@@ -59,7 +58,3 @@ class UrllibTest(unittest.TestCase):
         resp = self.opener.open('http://localhost:8099/read_cookie_value/sink')
         body = decode_str(resp.read())
         self.assertEqual('a:b', body)
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()
