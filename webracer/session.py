@@ -470,6 +470,10 @@ class FormParams(object):
         
         # XXX optimize?
         return dict(self.list)
+    
+    def __repr__(self):
+        pairs = ['%s=%s' % tuple(pair) for pair in self.params]
+        return '<webracer.FormParams: [%s]>' % ', '.join(pairs)
 
 class Form(object):
     def __init__(self, form_tag, response):
