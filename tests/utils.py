@@ -9,7 +9,8 @@ class Server(bottle.WSGIRefServer):
     def run(self, handler): # pragma: no cover
         from wsgiref.simple_server import make_server, WSGIRequestHandler
         if self.quiet:
-            class QuietHandler(WSGIRequestHandler):
+            base = self.options.get('handler_class', WSGIRequestHandler)
+            class QuietHandler(base):
                 def log_request(*args, **kw): pass
             self.options['handler_class'] = QuietHandler
         self.srv = make_server(self.host, self.port, handler, **self.options)
@@ -45,7 +46,7 @@ class ServerThread(threading.Thread):
         self.server = Server(host='localhost', port=self.port, **self.server_kwargs)
     
     def run(self):
-        bottle.run(self.app, server=self.server)
+        bottle.run(self.app, server=self.server, quiet=True)
 
 def app_runner_setup(module_name, app, port):
     app_runner_setup_multiple(module_name, [[app, port]])
