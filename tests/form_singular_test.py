@@ -1,6 +1,6 @@
 import webracer
 import nose.plugins.attrib
-from tests import utils
+from . import utils
 from .apps import form_app
 
 utils.app_runner_setup(__name__, form_app.app, 8049)

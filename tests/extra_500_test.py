@@ -1,7 +1,7 @@
 import sys
 import webracer
 import nose.plugins.attrib
-from tests import utils
+from . import utils
 from .apps import kitchen_sink_app
 
 @nose.plugins.attrib.attr('client')

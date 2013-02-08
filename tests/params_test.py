@@ -1,6 +1,6 @@
 import webracer
 import nose.plugins.attrib
-from tests import utils
+from . import utils
 from .apps import kitchen_sink_app
 
 utils.app_runner_setup(__name__, kitchen_sink_app.app, 8055)

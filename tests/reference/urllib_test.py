@@ -1,6 +1,6 @@
 import sys
 import unittest
-from tests import utils
+from .. import utils
 from ..apps import kitchen_sink_app
 
 py3 = sys.version_info[0] == 3
