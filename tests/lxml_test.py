@@ -1,22 +1,10 @@
 import lxml.etree
 import webracer
-import bottle
 import nose.plugins.attrib
 from tests import utils
+from tests import xml_app
 
-app = bottle.Bottle()
-
-@app.route('/xml')
-def xml():
-    bottle.response.content_type = 'application/xml'
-    return '<rootelement><element><subelement>text</subelement></element></rootelement>'
-
-@app.route('/html')
-def html():
-    bottle.response.content_type = 'text/html'
-    return '<!doctype html><html><head><meta name=foo value=bar></head><body></body></html>'
-
-utils.app_runner_setup(__name__, app, 8042)
+utils.app_runner_setup(__name__, xml_app.app, 8042)
 
 @nose.plugins.attrib.attr('client')
 @webracer.config(host='localhost', port=8042)
