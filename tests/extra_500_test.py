@@ -2,7 +2,7 @@ import sys
 import webracer
 import nose.plugins.attrib
 from tests import utils
-from tests import kitchen_sink_app
+from .apps import kitchen_sink_app
 
 @nose.plugins.attrib.attr('client')
 @webracer.config(host='localhost', port=8045)

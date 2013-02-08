@@ -2,7 +2,7 @@ import lxml.etree
 import webracer
 import nose.plugins.attrib
 from tests import utils
-from tests import xml_app
+from .apps import xml_app
 
 utils.app_runner_setup(__name__, xml_app.app, 8042)
 
