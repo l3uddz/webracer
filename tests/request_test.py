@@ -1,6 +1,7 @@
 import sys
 import webracer
 import mock
+import nose.plugins.attrib
 from tests import utils
 from tests import kitchen_sink_app
 
@@ -8,11 +9,13 @@ py3 = sys.version_info[0] == 3
 
 utils.app_runner_setup(__name__, kitchen_sink_app.app, 8054)
 
+@nose.plugins.attrib.attr('client')
 class FullUrlTest(webracer.WebTestCase):
     def test_simple(self):
         self.get('http://127.0.0.1:8054/ok')
         self.assert_status(200)
 
+@nose.plugins.attrib.attr('client')
 class DefaultHostUrlTest(webracer.WebTestCase):
     def __init__(self, *args, **kwargs):
         super(DefaultHostUrlTest, self).__init__(*args, **kwargs)
@@ -22,6 +25,7 @@ class DefaultHostUrlTest(webracer.WebTestCase):
         self.get('/ok')
         self.assert_status(200)
 
+@nose.plugins.attrib.attr('client')
 @webracer.config(host='localhost', port=8054)
 class ConfigDecoratorTest(webracer.WebTestCase):
     def test_simple(self):

@@ -1,8 +1,10 @@
 import sys
 import webracer
+import nose.plugins.attrib
 from tests import utils
 from tests import kitchen_sink_app
 
+@nose.plugins.attrib.attr('client')
 @webracer.config(host='localhost', port=8045)
 class Extra500Test(webracer.WebTestCase):
     def test_without_extras(self):
@@ -48,6 +50,7 @@ utils.app_runner_setup_multiple(__name__, [
     [kitchen_sink_app.app, 8046, dict(handler_class=TracebackHandler)],
 ])
 
+@nose.plugins.attrib.attr('client')
 @webracer.config(host='localhost', port=8046,
     extra_500_message=bottle_unhandled_exception_info,
 )

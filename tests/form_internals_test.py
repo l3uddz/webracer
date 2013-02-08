@@ -1,9 +1,11 @@
 import webracer
+import nose.plugins.attrib
 from tests import utils
 from tests import form_app
 
 utils.app_runner_setup(__name__, form_app.app, 8044)
 
+@nose.plugins.attrib.attr('client')
 @webracer.config(host='localhost', port=8044)
 class FormInternalsTest(webracer.WebTestCase):
     def test_elements_input(self):

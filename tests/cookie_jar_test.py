@@ -1,4 +1,5 @@
 import webracer
+import nose.plugins.attrib
 from tests import utils
 from tests import kitchen_sink_app
 
@@ -6,6 +7,7 @@ utils.app_runner_setup(__name__, kitchen_sink_app.app, 8056)
 
 base_config = dict(host='localhost', port=8056)
 
+@nose.plugins.attrib.attr('client')
 class SessionWithoutCookieJarTest(webracer.WebTestCase):
     def test_request(self):
         '''Tests that the client works when use_cookie_jar is False.

@@ -1,9 +1,11 @@
 import webracer
+import nose.plugins.attrib
 from tests import utils
 from tests import form_app
 
 utils.app_runner_setup(__name__, form_app.app, 8050)
 
+@nose.plugins.attrib.attr('client')
 @webracer.config(host='localhost', port=8050)
 class FormSingularAttributesTest(webracer.WebTestCase):
     def test_attributes_explicit(self):

@@ -1,9 +1,11 @@
 import webracer
+import nose.plugins.attrib
 from tests import utils
 from tests import kitchen_sink_app
 
 utils.app_runner_setup(__name__, kitchen_sink_app.app, 8052)
 
+@nose.plugins.attrib.attr('client')
 @webracer.config(host='localhost', port=8052)
 class BasicSessionTest(webracer.WebTestCase):
     def test_session(self):
@@ -34,6 +36,7 @@ class BasicSessionTest(webracer.WebTestCase):
         # session cookie is carried over
         self.assert_session_cookie('visited')
 
+@nose.plugins.attrib.attr('client')
 @webracer.no_session
 @webracer.config(host='localhost', port=8052)
 class NoSessionTest(webracer.WebTestCase):
@@ -52,6 +55,7 @@ class NoSessionTest(webracer.WebTestCase):
 
 base_config = dict(host='localhost', port=8052)
 
+@nose.plugins.attrib.attr('client')
 class SessionWithCustomConfigTest(webracer.WebTestCase):
     def test_get(self):
         config = webracer.Config(**base_config)

@@ -1,6 +1,7 @@
 import lxml.etree
 import webracer
 import bottle
+import nose.plugins.attrib
 from tests import utils
 
 app = bottle.Bottle()
@@ -17,6 +18,7 @@ def html():
 
 utils.app_runner_setup(__name__, app, 8042)
 
+@nose.plugins.attrib.attr('client')
 @webracer.config(host='localhost', port=8042)
 class LxmlTest(webracer.WebTestCase):
     def test_parse_xml(self):

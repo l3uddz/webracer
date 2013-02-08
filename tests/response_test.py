@@ -1,9 +1,11 @@
 import webracer
+import nose.plugins.attrib
 from tests import utils
 from tests import kitchen_sink_app
 
 utils.app_runner_setup(__name__, kitchen_sink_app.app, 8041)
 
+@nose.plugins.attrib.attr('client')
 @webracer.config(host='localhost', port=8041)
 class ResponseTest(webracer.WebTestCase):
     def test_json_parsing_empty(self):

@@ -1,9 +1,11 @@
 import webracer
+import nose.plugins.attrib
 from tests import utils
 from tests import form_app
 
 utils.app_runner_setup(__name__, form_app.app, 8048)
 
+@nose.plugins.attrib.attr('client')
 @webracer.config(host='localhost', port=8048)
 class FormRetrievalTest(webracer.WebTestCase):
     def setUp(self):

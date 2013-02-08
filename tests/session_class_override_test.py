@@ -1,4 +1,5 @@
 import webracer
+import nose.plugins.attrib
 from tests import utils
 from tests import kitchen_sink_app
 
@@ -8,6 +9,7 @@ class MySession(webracer.Session):
     def extra_method(self):
         return 'extra'
 
+@nose.plugins.attrib.attr('client')
 @webracer.config(session_class=MySession)
 @webracer.config(host='localhost', port=8047)
 class SessionClassOverrideTest(webracer.WebTestCase):
