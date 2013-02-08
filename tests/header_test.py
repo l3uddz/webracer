@@ -32,7 +32,3 @@ class KitchenSinkTest(webracer.WebTestCase):
         assert 'content-length' in actual
         assert 'Content-Length' in actual
         assert 'content-LENGTH' in actual
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()

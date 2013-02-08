@@ -227,7 +227,3 @@ class FormTest(webracer.WebTestCase):
         form = forms[0]
         elements = form.elements
         self.assertEquals([['field', 'hello world']], utils.listit(elements.params.list))
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()

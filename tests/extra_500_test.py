@@ -64,7 +64,3 @@ class Extra500WithExtraTest(webracer.WebTestCase):
             self.fail('Wrong response code: %d (expected 500)' % self.response.code)
         
         self.assertTrue('This is an unhandled exception' in str(e), 'Exception did not have expected additional information: %s' % str(e))
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()

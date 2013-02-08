@@ -16,7 +16,3 @@ class SessionClassOverrideTest(webracer.WebTestCase):
             s.get('/ok')
             s.assert_status(200)
             self.assertEqual('extra', s.extra_method())
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()

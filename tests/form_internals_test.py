@@ -119,7 +119,3 @@ class FormInternalsTest(webracer.WebTestCase):
         elements = form.elements.elements
         self.assertEqual(2, len(elements))
         self.assertEquals(['textarea', 'field', 'hello world', None], utils.listit(elements[0]))
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()

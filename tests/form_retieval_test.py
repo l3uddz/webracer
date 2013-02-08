@@ -110,7 +110,3 @@ class FormRetrievalTest(webracer.WebTestCase):
                 forms = self.response.forms(**merged)
                 found_forms = [form.action for form in forms]
                 self.assertEquals(0, len(forms), 'Forms found for %s: %s' % (repr(merged), found_forms))
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()

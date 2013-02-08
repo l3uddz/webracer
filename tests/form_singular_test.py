@@ -109,7 +109,3 @@ class FormSingularTest(webracer.WebTestCase):
             self.assertTrue('missing-id' in str(exc), 'id not included in message')
         else:
             self.fail('NoForms not raised')
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()

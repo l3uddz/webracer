@@ -35,7 +35,3 @@ class FormSingularAttributesTest(webracer.WebTestCase):
         
         self.assertEqual([['textf', 'textv']], utils.listit(form.elements.params.list))
         self.assertEqual([['textf', 'textv']], utils.listit(form.params.list))
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()

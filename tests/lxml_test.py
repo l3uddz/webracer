@@ -42,7 +42,3 @@ class LxmlTest(webracer.WebTestCase):
         self.assert_status(200)
         doc = self.response.lxml_etree
         self.assertTrue(isinstance(doc, lxml.etree._Element))
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()
