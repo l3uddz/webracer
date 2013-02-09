@@ -45,6 +45,7 @@ if py3:
 else:
     http_connection_class = 'httplib.HTTPConnection'
 
+@nose.plugins.attrib.attr(facade='httplib')
 class MockedServerTest(webracer.WebTestCase):
     @mock.patch(http_connection_class, mock_http_connection_returning_200())
     def test_portless_url(self):

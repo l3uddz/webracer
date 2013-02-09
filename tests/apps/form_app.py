@@ -220,6 +220,6 @@ def form_retrieval():
 </html>
 '''
 
-@app.route('/dump_params')
+@app.route('/dump_params', method='POST')
 def dump_params():
     return json.dumps(dict(bottle.request.forms))

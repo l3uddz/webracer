@@ -118,7 +118,7 @@ class FormTest(webracer.WebTestCase):
         
         # submit and verify, this is really unnecessary but
         # I already wrote the target
-        self.get(form.computed_action, body=params)
+        self.post(form.computed_action, body=params)
         self.assert_status(200)
         self.assertEquals({'submit-second': 'second'}, self.response.json)
     
