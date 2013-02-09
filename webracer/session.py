@@ -793,8 +793,10 @@ class Session(object):
             # XXX handle url also having a query
             url += '?' + encoded_query
         
-        from . import httplib_facade
-        client = httplib_facade.Client()
+        facade = 'httplib'
+        facade_mod = __import__('%s_facade' % facade, globals(), locals(),
+            [], 1)
+        client = facade_mod.Client()
         response = client.request(method.upper(), url, body, computed_headers)
         self.response = Response(url, response)
         if self.config.use_cookie_jar:
