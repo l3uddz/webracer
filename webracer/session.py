@@ -103,6 +103,13 @@ class Config(object):
     # Whether to use a cookie jar, allowing for session tracking.
     use_cookie_jar = True
     
+    # Force using a certain client library.
+    # Supported values are:
+    # - httplib
+    # - http.client (alias for httplib)
+    # - pycurl
+    client_library = None
+    
     def __init__(self, **kwargs):
         for key in kwargs:
             if hasattr(self, key):
@@ -793,7 +800,9 @@ class Session(object):
             # XXX handle url also having a query
             url += '?' + encoded_query
         
-        facade = 'httplib'
+        facade = self.config.client_library or 'httplib'
+        if facade == 'http.client':
+            facade = 'httplib'
         facade_mod = __import__('%s_facade' % facade, globals(), locals(),
             [], 1)
         client = facade_mod.Client()
