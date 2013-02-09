@@ -1,6 +1,12 @@
 bottle
 cssselect
 lxml
+
+# for python 2
+#pycurl
+# possibly more promising for python 3
+#pycurl2
+
 mock
 nose
 git+git://github.com/p/cidict.git@master#egg=cidict
