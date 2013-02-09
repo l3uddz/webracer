@@ -800,7 +800,9 @@ class Session(object):
             # XXX handle url also having a query
             url += '?' + encoded_query
         
-        facade = self.config.client_library or 'httplib'
+        facade = self.config.client_library
+        if facade is None:
+            facade = os.environ.get('WEBRACER_CLIENT', 'httplib')
         if facade == 'http.client':
             facade = 'httplib'
         facade_mod = __import__('%s_facade' % facade, globals(), locals(),
