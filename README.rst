@@ -56,6 +56,11 @@ Features
 
 Note: API is not yet stable.
 
+Examples
+--------
+
+The largest application using WebRacer at this time is Wolis_.
+
 Tests
 -----
 
@@ -70,3 +75,5 @@ License
 -------
 
 Released under the 2 clause BSD license.
+
+.. _Wolis: https://github.com/p/wolis
