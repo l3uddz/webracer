@@ -5,9 +5,10 @@ import re
 try:
     from cStringIO import StringIO
 except ImportError:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+    try:
+        from StringIO import StringIO
+    except ImportError:
+        from io import StringIO
 
 class Response(object):
     def __init__(self, curl, buf, headers):

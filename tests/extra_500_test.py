@@ -27,9 +27,10 @@ import wsgiref.simple_server
 try:
     from cStringIO import StringIO
 except ImportError:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+    try:
+        from StringIO import StringIO
+    except ImportError:
+        from io import StringIO
 
 class ErrorSilencingHandler(wsgiref.simple_server.WSGIRequestHandler):
     def __init__(self, *args, **kwargs):
