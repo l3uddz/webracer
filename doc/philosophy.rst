@@ -46,3 +46,13 @@ should be no "obscure" functionality. The API should be nice everywhere.
 
 Code using WebRacer should be easily readable and understandable. Boilerplate
 should be kept to minimum.
+
+Interaction with other layers
+-----------------------------
+
+WebRacer intends to use existing HTTP client implementation, e.g. httplib
+or pycurl. WebRacer interacts with HTTP clients through respective facades,
+allowing for new HTTP client implementations to be supported.
+
+Test suites can be considered clients of WebRacer. Other possible clients
+would be web crawlers, caching crawlers or mirrorers.
