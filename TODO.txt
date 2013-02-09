@@ -10,3 +10,4 @@
  - Rename set_value to set?
  - Need a way to unset checkboxes + tests
  - Consider renaming WEBRACER_CLIENT to WEBRACER_HTTP_CLIENT
+ - Share curl instances across requests for keep-alives
