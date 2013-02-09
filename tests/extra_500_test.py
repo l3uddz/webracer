@@ -65,8 +65,9 @@ class Extra500WithExtraTest(webracer.WebTestCase):
         try:
             self.assert_status(200)
         except AssertionError as e:
-            pass
+            exception = e
         else:
             self.fail('Wrong response code: %d (expected 500)' % self.response.code)
         
-        self.assertTrue('This is an unhandled exception' in str(e), 'Exception did not have expected additional information: %s' % str(e))
+        self.assertTrue('This is an unhandled exception' in str(exception),
+            'Exception did not have expected additional information: %s' % str(exception))
