@@ -4,4 +4,9 @@ python:
   - "2.7"
   - "3.2"
 install: "pip install -r requirements-dev.txt --use-mirrors"
-script: nosetests --version && nosetests
+script: >
+  if python -V |grep -q '^Python 3'; then
+    nosetests --version && nosetests
+  else
+    make test
+  fi
