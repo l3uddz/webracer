@@ -103,12 +103,14 @@ class Config(object):
     # Whether to use a cookie jar, allowing for session tracking.
     use_cookie_jar = True
     
-    # Force using a certain client library.
+    # Force using a certain HTTP client library.
     # Supported values are:
     # - httplib
     # - http.client (alias for httplib)
     # - pycurl
-    client_library = None
+    # This can also be specified via WEBRACER_HTTP_CLIENT environment variable
+    # (Config setting takes precedence over environment variable).
+    http_client = None
     
     def __init__(self, **kwargs):
         for key in kwargs:
@@ -800,7 +802,7 @@ class Session(object):
             # XXX handle url also having a query
             url += '?' + encoded_query
         
-        facade = self.config.client_library
+        facade = self.config.http_client
         if facade is None:
             facade = os.environ.get('WEBRACER_HTTP_CLIENT', 'httplib')
         if facade == 'http.client':
