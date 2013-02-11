@@ -9,5 +9,4 @@
    in content type, add tests
  - Rename set_value to set?
  - Need a way to unset checkboxes + tests
- - Share curl instances across requests for keep-alives
  - Expose curl objects somehow, to let applications tweak them
