@@ -802,7 +802,7 @@ class Session(object):
         
         facade = self.config.client_library
         if facade is None:
-            facade = os.environ.get('WEBRACER_CLIENT', 'httplib')
+            facade = os.environ.get('WEBRACER_HTTP_CLIENT', 'httplib')
         if facade == 'http.client':
             facade = 'httplib'
         facade_mod = __import__('%s_facade' % facade, globals(), locals(),
