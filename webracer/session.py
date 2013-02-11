@@ -767,6 +767,7 @@ class Session(object):
     def __init__(self, config=None):
         self.config = config or Config()
         self._cookie_jar = ocookie.CookieJar()
+        self.__client = None
     
     def request(self, method, url, body=None, query=None, headers=None):
         url = self._absolutize_url(url)
@@ -802,14 +803,7 @@ class Session(object):
             # XXX handle url also having a query
             url += '?' + encoded_query
         
-        facade = self.config.http_client
-        if facade is None:
-            facade = os.environ.get('WEBRACER_HTTP_CLIENT', 'httplib')
-        if facade == 'http.client':
-            facade = 'httplib'
-        facade_mod = __import__('%s_facade' % facade, globals(), locals(),
-            [], 1)
-        client = facade_mod.Client()
+        client = self._client()
         response = client.request(method.upper(), url, body, computed_headers)
         self.response = Response(url, response)
         if self.config.use_cookie_jar:
@@ -817,6 +811,18 @@ class Session(object):
                 self._cookie_jar.add(cookie)
         if self.config.save_responses:
             self._save_response()
+    
+    def _client(self):
+        if self.__client is None:
+            facade = self.config.http_client
+            if facade is None:
+                facade = os.environ.get('WEBRACER_HTTP_CLIENT', 'httplib')
+            if facade == 'http.client':
+                facade = 'httplib'
+            facade_mod = __import__('%s_facade' % facade, globals(), locals(),
+                [], 1)
+            self.__client = facade_mod.Client()
+        return self.__client
     
     # note: cherrypy webtest has a protocol argument
     def get(self, url, *args, **kwargs):
