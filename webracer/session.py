@@ -764,7 +764,9 @@ def urlencode_utf8(params):
     return '&'.join(encoded)
 
 class Session(object):
-    def __init__(self, config=None):
+    def __init__(self, config=None, **kwargs):
+        if config is None:
+            config = Config(**kwargs)
         self.config = config or Config()
         self._cookie_jar = ocookie.CookieJar()
         self.__client = None
