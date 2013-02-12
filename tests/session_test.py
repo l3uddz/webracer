@@ -58,24 +58,23 @@ base_config = dict(host='localhost', port=8052)
 @nose.plugins.attrib.attr('client')
 class SessionWithCustomConfigTest(webracer.WebTestCase):
     def test_get(self):
-        config = webracer.Config(**base_config)
-        s = webracer.Session(config)
+        s = webracer.Session(**base_config)
         s.get('/ok')
         self.assertEqual(200, s.response.code)
         self.assertEqual('ok', s.response.body)
     
     def test_custom_user_agent(self):
         # XXX improve this api
-        config = webracer.Config(**utils.add_dicts(base_config, dict(user_agent='Quux-o-matic/1.0')))
-        s = webracer.Session(config)
+        config = utils.add_dicts(base_config, dict(user_agent='Quux-o-matic/1.0'))
+        s = webracer.Session(**config)
         s.get('/get_user_agent')
         self.assertEqual(200, s.response.code)
         self.assertEqual('Quux-o-matic/1.0', s.response.body)
     
     def test_double_user_agent_override(self):
         # XXX improve this api
-        config = webracer.Config(**utils.add_dicts(base_config, dict(user_agent='Quux-o-matic/1.0')))
-        s = webracer.Session(config)
+        config = utils.add_dicts(base_config, dict(user_agent='Quux-o-matic/1.0'))
+        s = webracer.Session(**config)
         headers = {'user-agent': 'Barlicious/2.0'}
         s.get('/get_user_agent', headers=headers)
         self.assertEqual(200, s.response.code)

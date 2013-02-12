@@ -13,17 +13,17 @@ class SessionWithoutCookieJarTest(webracer.WebTestCase):
         '''Tests that the client works when use_cookie_jar is False.
         '''
         
-        config = webracer.Config(**utils.add_dicts(base_config, dict(
-            use_cookie_jar=False)))
-        s = webracer.Session(config)
+        config = utils.add_dicts(base_config, dict(
+            use_cookie_jar=False))
+        s = webracer.Session(**config)
         s.get('/ok')
         self.assertEqual(200, s.response.code)
         self.assertEqual('ok', s.response.body)
     
     def test_no_cookie_jar(self):
-        config = webracer.Config(**utils.add_dicts(base_config, dict(
-            use_cookie_jar=False)))
-        s = webracer.Session(config)
+        config = utils.add_dicts(base_config, dict(
+            use_cookie_jar=False))
+        s = webracer.Session(**config)
         s.get('/set_cookie')
         self.assertEqual(200, s.response.code)
         self.assertEqual('ok', s.response.body)

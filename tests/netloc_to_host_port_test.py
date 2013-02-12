@@ -13,7 +13,7 @@ class NetlocToHostPortTest(unittest.TestCase):
         self._perform(netloc, expected)
     
     def _perform(self, netloc, expected):
-        session = webracer.Session(webracer.Config())
+        session = webracer.Session()
         actual = webracer.support.netloc_to_host_port(netloc)
         if isinstance(actual, list):
             actual = tuple(actual)
