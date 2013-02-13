@@ -153,6 +153,18 @@ class FormTest(webracer.WebTestCase):
         
         assert 'Did not find element with name' in str(cm.exception)
     
+    def test_clear_on_missing_element(self):
+        self.get('/one_form')
+        self.assert_status(200)
+        
+        form = self.response.form()
+        elements = form.elements.mutable
+        # https://github.com/nose-devs/nose/issues/30
+        with self.assert_raises(ValueError) as cm:
+            elements.clear('missing')
+        
+        assert 'Did not find element with name' in str(cm.exception)
+    
     def test_first_radio_selected(self):
         self.get('/first_radio_selected')
         self.assert_status(200)
