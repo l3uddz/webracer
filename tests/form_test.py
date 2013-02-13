@@ -116,6 +116,31 @@ class FormTest(webracer.WebTestCase):
         params = elements.params.list
         self.assertEqual([['textf', 'newvalue']], utils.listit(params))
     
+    def test_clear_text(self):
+        self.get('/one_form')
+        self.assert_status(200)
+        
+        form = self.response.form()
+        elements = form.elements.mutable
+        elements.clear('textf')
+        params = elements.params.list
+        self.assertEqual([['textf', '']], utils.listit(params))
+    
+    def test_set_and_clear_text(self):
+        self.get('/one_form')
+        self.assert_status(200)
+        
+        form = self.response.form()
+        elements = form.elements.mutable
+        
+        elements.set_value('textf', 'newvalue')
+        params = elements.params.list
+        self.assertEqual([['textf', 'newvalue']], utils.listit(params))
+        
+        elements.clear('textf')
+        params = elements.params.list
+        self.assertEqual([['textf', '']], utils.listit(params))
+    
     def test_set_value_on_missing_element(self):
         self.get('/one_form')
         self.assert_status(200)

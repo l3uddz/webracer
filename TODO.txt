@@ -9,4 +9,6 @@
   in content type, add tests
 - Rename set_value to set?
 - Need a way to unset checkboxes + tests
+- Deal with multiple elements having the same name, e.g. foo[]
+- Form element selection via id/xpath/css
 - Expose curl objects somehow, to let applications tweak them

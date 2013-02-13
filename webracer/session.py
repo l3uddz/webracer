@@ -410,20 +410,16 @@ class MutableFormElements(FormElements):
         
         found = False
         found_rejected = None
-        for element_type, element_name, element_value, element_selected in self.elements:
-            if element_name == name:
-                if element_type == 'submit' or element_type == 'image' or \
-                    element_type == 'reset' or element_type == 'button':
-                        found_rejected = 'Wrong element type: %s' % element_type
-                elif element_type == 'radio' or element_type == 'checkbox' or \
-                    element_type == 'option':
-                        if element_value == value:
-                            found = True
-                        else:
-                            found_rejected = 'Element `%s` does not have `%s` as a possible value' % (name, value)
-                else:
-                    # assume it's a text field or similar, e.g. email in html5
-                    found = True
+        for element_type, element_name, element_value, element_selected in self._find_element(name):
+            if element_type == 'radio' or element_type == 'checkbox' or \
+                element_type == 'option':
+                    if element_value == value:
+                        found = True
+                    else:
+                        found_rejected = 'Element `%s` does not have `%s` as a possible value' % (name, value)
+            else:
+                # assume it's a text field or similar, e.g. email in html5
+                found = True
             if found:
                 if element_type == 'checkbox':
                     # multiple selection
@@ -440,6 +436,47 @@ class MutableFormElements(FormElements):
                 raise ValueError(found_rejected)
             else:
                 raise ValueError('Did not find element with name %s' % name)
+    
+    def clear(self, name):
+        '''Clears the element with the given name.
+        
+        Text fields and textareas are set to an empty value.
+        Checkboxes are unchecked.
+        Radio buttons are unchecked, resulting in no selection at all
+        (use set_value to change radio button value).
+        '''
+        
+        for element_type, element_name, element_value, element_selected in self._find_element(name):
+            if element_type == 'radio' or element_type == 'checkbox':
+                raise NotImplemented
+            elif element_type == 'option':
+                raise NotImplemented
+            else:
+                self.chosen_values[name] = ''
+    
+    def _find_element(self, name, value=None):
+        candidates = []
+        found_rejected = None
+        for element_type, element_name, element_value, element_selected in self.elements:
+            found = False
+            if element_name == name:
+                if element_type == 'submit' or element_type == 'image' or \
+                    element_type == 'reset' or element_type == 'button':
+                        found_rejected = 'Wrong element type: %s' % element_type
+                elif element_type == 'radio' or element_type == 'checkbox' or \
+                    element_type == 'option':
+                        found = True
+                else:
+                    # assume it's a text field or similar, e.g. email in html5
+                    found = True
+            if found:
+                candidates.append((element_type, element_name, element_value, element_selected))
+        if len(candidates) == 0:
+            if found_rejected:
+                raise ValueError(found_rejected)
+            else:
+                raise ValueError('Did not find element with name %s' % name)
+        return candidates
 
 class FormParams(object):
     def __init__(self, params, **kwargs):
