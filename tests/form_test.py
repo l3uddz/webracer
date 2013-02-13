@@ -13,10 +13,8 @@ class FormTest(webracer.WebTestCase):
     def test_with_specified_attributes(self):
         self.get('/one_form')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         self.assertEqual('/there', form.action)
         # always a full url
         self.assertEqual('http://localhost:8043/there', form.computed_action)
@@ -26,10 +24,8 @@ class FormTest(webracer.WebTestCase):
     def test_without_specified_attributes(self):
         self.get('/no_attribute_form')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         self.assertTrue(form.action is None)
         self.assertEqual('http://localhost:8043/no_attribute_form', form.computed_action)
         self.assertTrue(form.method is None)
@@ -38,20 +34,16 @@ class FormTest(webracer.WebTestCase):
     def test_computed_action_relative(self):
         self.get('/subdir/relative_action_form')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         self.assertEqual('in_subdir', form.action)
         self.assertEqual('http://localhost:8043/subdir/in_subdir', form.computed_action)
     
     def test_params(self):
         self.get('/no_attribute_form')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         params = form.params.list
         if isinstance(params, list):
             params = tuple(params)
@@ -61,10 +53,8 @@ class FormTest(webracer.WebTestCase):
     def test_params_select_not_selected(self):
         self.get('/form_with_select_not_selected')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         params = form.params.list
         if isinstance(params, list):
             params = tuple(params)
@@ -74,10 +64,8 @@ class FormTest(webracer.WebTestCase):
     def test_params_select_selected(self):
         self.get('/form_with_select_selected')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         params = form.params.list
         if isinstance(params, list):
             params = tuple(params)
@@ -87,10 +75,8 @@ class FormTest(webracer.WebTestCase):
     def test_params_select_with_optgroup(self):
         self.get('/form_with_optgroup')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         params = form.params.list
         if isinstance(params, list):
             params = tuple(params)
@@ -100,10 +86,8 @@ class FormTest(webracer.WebTestCase):
     def test_multiple_submits(self):
         self.get('/form_with_two_submits')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         params = form.params.dict
         # first submit element should be returned by default
         self.assertTrue('submit-first' in params)
@@ -125,10 +109,8 @@ class FormTest(webracer.WebTestCase):
     def test_set_value(self):
         self.get('/one_form')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         elements = form.elements.mutable
         elements.set_value('textf', 'newvalue')
         params = elements.params.list
@@ -137,10 +119,8 @@ class FormTest(webracer.WebTestCase):
     def test_set_value_on_missing_element(self):
         self.get('/one_form')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         elements = form.elements.mutable
         # https://github.com/nose-devs/nose/issues/30
         with self.assert_raises(ValueError) as cm:
@@ -151,20 +131,16 @@ class FormTest(webracer.WebTestCase):
     def test_first_radio_selected(self):
         self.get('/first_radio_selected')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         elements = form.elements
         self.assertEquals([['field', 'first']], utils.listit(elements.params.list))
     
     def test_second_radio_selected(self):
         self.get('/second_radio_selected')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         elements = form.elements
         self.assertEquals([['field', 'second']], utils.listit(elements.params.list))
     
@@ -191,10 +167,8 @@ class FormTest(webracer.WebTestCase):
     def test_checkboxes(self):
         self.get('/checkboxes')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         elements = form.elements
         self.assertEquals([['field', 'second']], utils.listit(elements.params.list))
     
@@ -213,19 +187,15 @@ class FormTest(webracer.WebTestCase):
     def test_empty_textarea(self):
         self.get('/empty_textarea')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         elements = form.elements
         self.assertEquals([['field', '']], utils.listit(elements.params.list))
     
     def test_textarea(self):
         self.get('/textarea')
         self.assert_status(200)
-        forms = self.response.forms
-        self.assertEquals(1, len(forms))
         
-        form = forms[0]
+        form = self.response.form()
         elements = form.elements
         self.assertEquals([['field', 'hello world']], utils.listit(elements.params.list))
