@@ -209,6 +209,17 @@ class FormTest(webracer.WebTestCase):
         elements = form.elements
         self.assertEquals([['field', 'second']], utils.listit(elements.params.list))
     
+    def test_clear_checkbox_selection(self):
+        self.get('/checkboxes')
+        self.assert_status(200)
+        
+        form = self.response.form()
+        elements = form.elements.mutable
+        self.assertEquals([['field', 'second']], utils.listit(elements.params.list))
+        
+        elements.clear('field', 'second')
+        self.assertEquals([], utils.listit(elements.params.list))
+    
     def test_checkbox_selection(self):
         self.get('/checkboxes')
         self.assert_status(200)

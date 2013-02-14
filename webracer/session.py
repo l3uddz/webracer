@@ -339,9 +339,15 @@ class FormElements(object):
                             if self.chosen_values[element_name] == element_value:
                                 params.append((element_name, element_value))
                     elif element_type == 'checkbox':
+                        include = None
                         # either user selected, or selected on the form
                         # XXX does not handle user deselection
-                        if element_value in self.chosen_values[element_name] or element_selected:
+                        if element_value is not None and \
+                            element_value in self.chosen_values[element_name]:
+                                include = self.chosen_values[element_name][element_value] is not None
+                        elif element_selected:
+                            include = True
+                        if include:
                             params.append((element_name, element_value))
                     else:
                         params.append((element_name, self.chosen_values[element_name]))
@@ -408,51 +414,75 @@ class MutableFormElements(FormElements):
         to the selection.
         '''
         
-        found = False
-        found_rejected = None
-        for element_type, element_name, element_value, element_selected in self._find_element(name):
-            if element_type == 'radio' or element_type == 'checkbox' or \
-                element_type == 'option':
-                    if element_value == value:
-                        found = True
-                    else:
-                        found_rejected = 'Element `%s` does not have `%s` as a possible value' % (name, value)
-            else:
-                # assume it's a text field or similar, e.g. email in html5
-                found = True
-            if found:
-                if element_type == 'checkbox':
-                    # multiple selection
-                    if name in self.chosen_values:
-                        self.chosen_values[name][value] = True
-                    else:
-                        self.chosen_values[name] = {value: True}
-                else:
-                    # single selection
-                    self.chosen_values[name] = value
-                break
-        if not found:
-            if found_rejected:
-                raise ValueError(found_rejected)
-            else:
-                raise ValueError('Did not find element with name %s' % name)
+        self._set_or_clear(name, value, clear=False)
     
-    def clear(self, name):
-        '''Clears the element with the given name.
+    def clear(self, name, value=None):
+        '''Clears the element with the given name and optionally value.
         
         Text fields and textareas are set to an empty value.
         Checkboxes are unchecked.
         Radio buttons are unchecked, resulting in no selection at all
         (use set_value to change radio button value).
+        
+        The value argument only makes sense for multiple selection controls
+        like checkboxes and selects. If given, the element with the specified
+        value is cleared. If value is not given, all elements with the
+        provided name are cleared.
         '''
         
-        for element_type, element_name, element_value, element_selected in self._find_element(name):
-            if element_type == 'radio' or element_type == 'checkbox':
-                raise NotImplemented
-            elif element_type == 'option':
-                raise NotImplemented
+        self._set_or_clear(name, value, clear=True)
+    
+    def _set_or_clear(self, name, value, clear):
+        found = False
+        found_rejected = None
+        for element_type, element_name, element_value, element_selected in self.elements:
+            if element_name == name:
+                if element_type == 'submit' or element_type == 'image' or \
+                    element_type == 'reset' or element_type == 'button':
+                        found_rejected = 'Wrong element type: %s' % element_type
+                elif element_type == 'radio' or element_type == 'checkbox' or \
+                    element_type == 'option':
+                        if clear:
+                            if value is not None:
+                                if element_value == value:
+                                    found = True
+                                else:
+                                    found_rejected = 'Element `%s` does not have `%s` as a possible value' % (name, value)
+                            else:
+                                found = True
+                        else:
+                            if element_value == value:
+                                found = True
+                            else:
+                                found_rejected = 'Element `%s` does not have `%s` as a possible value' % (name, value)
+                else:
+                    # assume it's a text field or similar, e.g. email in html5
+                    found = True
+            if found:
+                if element_type == 'checkbox':
+                    if clear:
+                        write_value = None
+                    else:
+                        write_value = True
+                    # multiple selection
+                    if name in self.chosen_values:
+                        self.chosen_values[name][value] = write_value
+                    else:
+                        self.chosen_values[name] = {value: write_value}
+                else:
+                    if clear:
+                        write_value = ''
+                    else:
+                        write_value = value
+                    # single selection
+                    self.chosen_values[name] = write_value
+                if value is not None or not clear:
+                    break
+        if not found:
+            if found_rejected:
+                raise ValueError(found_rejected)
             else:
-                self.chosen_values[name] = ''
+                raise ValueError('Did not find element with name %s' % name)
     
     def _find_element(self, name, value=None):
         candidates = []
