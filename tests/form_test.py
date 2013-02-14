@@ -209,7 +209,7 @@ class FormTest(webracer.WebTestCase):
         elements = form.elements
         self.assertEquals([['field', 'second']], utils.listit(elements.params.list))
     
-    def test_clear_checkbox_selection(self):
+    def test_clear_checkbox(self):
         self.get('/checkboxes')
         self.assert_status(200)
         
@@ -231,6 +231,22 @@ class FormTest(webracer.WebTestCase):
         # select the other checkbox
         elements.set_value('field', 'first')
         self.assertEquals([['field', 'first'], ['field', 'second']], utils.listit(elements.params.list))
+    
+    def test_set_and_clear_checkbox(self):
+        self.get('/checkboxes')
+        self.assert_status(200)
+        
+        form = self.response.form()
+        elements = form.elements.mutable
+        self.assertEquals([['field', 'second']], utils.listit(elements.params.list))
+        
+        # select the other checkbox
+        elements.set_value('field', 'first')
+        self.assertEquals([['field', 'first'], ['field', 'second']], utils.listit(elements.params.list))
+        
+        # clear the other checkbox
+        elements.clear('field', 'first')
+        self.assertEquals([['field', 'second']], utils.listit(elements.params.list))
     
     def test_empty_textarea(self):
         self.get('/empty_textarea')
