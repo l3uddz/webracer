@@ -933,6 +933,13 @@ class Session(object):
         if len(self.response.body) > 0:
             if self.config.save_dir is not None:
                 basename = 'response_%f_%d' % (_time.time(), threading.current_thread().ident)
+                # XXX use a higher level interface
+                if 'content-type' in self.response.header_dict and self.response.header_dict['content-type'].lower().startswith('text/html'):
+                    extension = 'html'
+                else:
+                    extension = None
+                if extension is not None:
+                    basename += '.' + extension
                 with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
                     f.write(self.response.body)
                 last_path = os.path.join(self.config.save_dir, 'last')
