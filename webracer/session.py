@@ -114,9 +114,20 @@ class Config(object):
     # (Config setting takes precedence over environment variable).
     http_client = None
     
+    KEYS = [
+        'host', 'port', 'protocol',
+        'user_agent',
+        'save_responses', 'save_failed_responses', 'save_dir',
+        'extra_500_message',
+        'use_cookie_jar',
+        'http_client',
+    ]
+    
+    KEYS_MAP = dict((key, True) for key in KEYS)
+    
     def __init__(self, **kwargs):
         for key in kwargs:
-            if hasattr(self, key):
+            if key in Config.KEYS_MAP:
                 setattr(self, key, kwargs[key])
             else:
                 raise ValueError('Unknown parameter: %s' % key)
