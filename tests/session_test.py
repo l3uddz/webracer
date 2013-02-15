@@ -89,3 +89,30 @@ class SessionConstructionTest(webracer.WebTestCase):
         s.assert_response_cookie('visited', value='yes')
         assert 'visited' in cookie_jar
         self.assertEqual('yes', cookie_jar['visited'].value)
+    
+    def test_copy_highlevel(self):
+        s = webracer.Session(**base_config)
+        s.get('/set_cookie_value', query=dict(v='start'))
+        s.assert_status(200)
+        s.assert_response_cookie('sink', value='start')
+        
+        a = s.copy()
+        b = s.copy()
+        
+        a.get('/read_cookie_value/sink')
+        a.assert_status(200)
+        self.assertEqual('start', a.response.body)
+        
+        a.get('/set_cookie_value', query=dict(v='avalue'))
+        a.assert_status(200)
+        a.assert_response_cookie('sink', value='avalue')
+        
+        a.get('/read_cookie_value/sink')
+        a.assert_status(200)
+        self.assertEqual('avalue', a.response.body)
+        
+        # b has original start value
+        
+        b.get('/read_cookie_value/sink')
+        b.assert_status(200)
+        self.assertEqual('start', b.response.body)

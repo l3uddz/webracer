@@ -879,6 +879,27 @@ class Session(object):
             self._cookie_jar = ocookie.CookieJar()
         self.__client = None
     
+    def copy(self):
+        '''Creates a copy of this session.
+        
+        The new session has the same configuration as the current sesssion
+        and the same cookie jar as the current session, if a cookie jar
+        is being used.
+        
+        The new session will use its own HTTP client instance to perform
+        requests.
+        
+        The new session does not share any state with the current session.
+        Current session's values are only used to initialize the new session.
+        
+        The intent of this method is to create sessions usable in other threads
+        that start with the current session's present state.
+        '''
+        
+        config = Config(self.config)
+        cookie_jar = ocookie.CookieJar(self._cookie_jar)
+        return Session(config=config, cookie_jar=cookie_jar)
+    
     def request(self, method, url, body=None, query=None, headers=None):
         url = self._absolutize_url(url)
         kwargs = {}
