@@ -9,6 +9,8 @@ import time as _time
 import xml.sax.saxutils
 import cidict
 import ocookie
+import threading
+import errno
 
 py3 = sys.version_info[0] == 3
 
@@ -930,13 +932,28 @@ class Session(object):
     def _save_response(self):
         if len(self.response.body) > 0:
             if self.config.save_dir is not None:
-                basename = 'response_%f' % _time.time()
+                basename = 'response_%f_%d' % (_time.time(), threading.current_thread().ident)
                 with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
                     f.write(self.response.body)
                 last_path = os.path.join(self.config.save_dir, 'last')
                 if os.path.exists(last_path):
-                    os.unlink(last_path)
-                os.symlink(basename, last_path)
+                    try:
+                        os.unlink(last_path)
+                    except OSError as e:
+                        if e.errno == errno.ENOENT:
+                            # race with someone else
+                            pass
+                        else:
+                            raise
+                try:
+                    os.symlink(basename, last_path)
+                except OSError as e:
+                    if e.errno == errno.EEXIST:
+                        # someone else is saving responses concurrently,
+                        # do not fight
+                        pass
+                    else:
+                        raise
             else:
                 raise ConfigurationError('Could not save response body - save_dir is None')
     
