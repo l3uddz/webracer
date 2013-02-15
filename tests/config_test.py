@@ -22,6 +22,17 @@ class ConfigTest(unittest.TestCase):
     @nose.tools.raises(ValueError)
     def test_bogus_constructor_keyword(self):
         config = webracer.Config(bogus='foo')
+    
+    def test_constructor_copy(self):
+        config = webracer.Config()
+        assert config.host is None
+        
+        config.host = 'testhost'
+        copy = webracer.Config(config)
+        self.assertEqual('testhost', copy.host)
+        
+        copy = webracer.Config(config, host='foobar')
+        self.assertEqual('foobar', copy.host)
 
 if __name__ == '__main__':
     import unittest

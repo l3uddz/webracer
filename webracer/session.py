@@ -125,7 +125,21 @@ class Config(object):
     
     KEYS_MAP = dict((key, True) for key in KEYS)
     
-    def __init__(self, **kwargs):
+    def __init__(self, config=None, **kwargs):
+        '''Creates a Config instance.
+        
+        Configuration parameters may be passed as keyword arguments.
+        
+        An existing configuration instance can be copied, if passed as
+        config argument.
+        
+        Parameters specified in keyword arguments will overwrite parameters
+        specified in Config instance being copied, if both are given.
+        '''
+        
+        if config is not None:
+            for key in Config.KEYS_MAP:
+                setattr(self, key, getattr(config, key))
         for key in kwargs:
             if key in Config.KEYS_MAP:
                 setattr(self, key, kwargs[key])
