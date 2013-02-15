@@ -858,11 +858,25 @@ def urlencode_utf8(params):
     return '&'.join(encoded)
 
 class Session(object):
-    def __init__(self, config=None, **kwargs):
+    def __init__(self, config=None, cookie_jar=None, **kwargs):
+        '''Creates a new session.
+        
+        Configuration options may be given as a Config instance in
+        config argument and in keyword arguments. Keyword arguments
+        override parameters in config.
+        
+        If cookie_jar is provided, it is used as the cookie jar.
+        Note that cookie jar will not be copied. Supplied cookie jar
+        will be mutated as requests are performed.
+        '''
+        
         if config is None:
             config = Config(**kwargs)
         self.config = config or Config()
-        self._cookie_jar = ocookie.CookieJar()
+        if cookie_jar is not None:
+            self._cookie_jar = cookie_jar
+        else:
+            self._cookie_jar = ocookie.CookieJar()
         self.__client = None
     
     def request(self, method, url, body=None, query=None, headers=None):

@@ -1,4 +1,5 @@
 import webracer
+import ocookie
 import nose.plugins.attrib
 from . import utils
 from .apps import kitchen_sink_app
@@ -56,7 +57,7 @@ class NoSessionTest(webracer.WebTestCase):
 base_config = dict(host='localhost', port=8052)
 
 @nose.plugins.attrib.attr('client')
-class SessionWithCustomConfigTest(webracer.WebTestCase):
+class SessionConstructionTest(webracer.WebTestCase):
     def test_get(self):
         s = webracer.Session(**base_config)
         s.get('/ok')
@@ -79,3 +80,12 @@ class SessionWithCustomConfigTest(webracer.WebTestCase):
         s.get('/get_user_agent', headers=headers)
         self.assertEqual(200, s.response.code)
         self.assertEqual('Barlicious/2.0', s.response.body)
+    
+    def test_specifying_cookie_jar(self):
+        cookie_jar = ocookie.CookieJar()
+        s = webracer.Session(cookie_jar=cookie_jar, **base_config)
+        s.get('/set_cookie')
+        s.assert_status(200)
+        s.assert_response_cookie('visited', value='yes')
+        assert 'visited' in cookie_jar
+        self.assertEqual('yes', cookie_jar['visited'].value)
