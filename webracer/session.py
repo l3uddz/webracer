@@ -11,6 +11,7 @@ import cidict
 import ocookie
 import threading
 import errno
+import types
 
 py3 = sys.version_info[0] == 3
 
@@ -98,6 +99,26 @@ class Config(object):
     # application.
     extra_500_message = None
     
+    # Retry failed requests automatically.
+    retry_failed = False
+    
+    # By default, failed requests are those with HTTP status codes between
+    # 500 and 599. Setting retry_condition to None returns to this behavior.
+    retry_condition = None
+    
+    # You can instead specify a sequence or iterable of HTTP
+    # status codes that should be considered failures:
+    # retry_condition = xrange(400, 599)
+    
+    # Or, specify a function taking a webracer Response object as the argument
+    # and returning a boolean indicating whether to retry the request:
+    # def retry_fn(response):
+    #     return response.code >= 400 and response.code <= 599
+    # retry_condition = retry_fn
+    
+    # How many times to retry (initial attempt is not included in retry count).
+    retry_count = 3
+    
     # Override session class to use. Allows defining additional helper methods
     # on session objects.
     session_class = None
@@ -119,6 +140,7 @@ class Config(object):
         'user_agent',
         'save_responses', 'save_failed_responses', 'save_dir',
         'extra_500_message',
+        'retry_failed', 'retry_condition', 'retry_count',
         'use_cookie_jar',
         'http_client',
     ]
@@ -857,6 +879,14 @@ def urlencode_utf8(params):
             encoded.append(pair[0] + '=' + _urlencode_value(pair[1]))
     return '&'.join(encoded)
 
+def default_retry_condition(response):
+    return response.code >= 500 and response.code <= 599
+
+def sequence_retry_condition_factory(sequence):
+    def retry_condition(response):
+        return response.code in sequence
+    return retry_condition
+
 class Session(object):
     def __init__(self, config=None, cookie_jar=None, **kwargs):
         '''Creates a new session.
@@ -934,9 +964,21 @@ class Session(object):
             # XXX handle url also having a query
             url += '?' + encoded_query
         
+        if self.config.retry_failed:
+            retry_check = self._determine_retry_check()
+        
         client = self._client()
-        response = client.request(method.upper(), url, body, computed_headers)
-        self.response = Response(url, response)
+        retries = 0
+        while True:
+            response = client.request(method.upper(), url, body, computed_headers)
+            response = Response(url, response)
+            if self.config.retry_failed:
+                if retry_check(response):
+                    if retries < self.config.retry_count:
+                        retries += 1
+                        continue
+            self.response = response
+            break
         if self.config.use_cookie_jar:
             for cookie in self.response.cookie_list:
                 self._cookie_jar.add(cookie)
@@ -988,6 +1030,15 @@ class Session(object):
                 except e:
                     msg += "\n" + str(e)
             assert False, msg
+    
+    def _determine_retry_check(self):
+        if self.config.retry_condition is None:
+            fn = default_retry_condition
+        elif type(self.config.retry_condition) == types.FunctionType:
+            fn = self.config.retry_condition
+        else:
+            fn = sequence_retry_condition_factory(self.config.retry_condition)
+        return fn
     
     def _save_response(self):
         if len(self.response.body) > 0:
