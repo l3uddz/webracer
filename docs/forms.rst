@@ -1,3 +1,6 @@
+Form Handling
+=============
+
 WebRacer recognizes the following form elements:
 
 - input type=text
