@@ -26,3 +26,9 @@ html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
+# XXX this does not report undocumented class methods
+doccov:
+	$(SPHINXBUILD) -b coverage $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	@echo
+	@echo "Coverage report is in $(BUILDDIR)/python.txt."
