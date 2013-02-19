@@ -1,5 +1,5 @@
 import unittest
-from .session import Config, Session
+from .agent import Config, Session
 
 # XXX bring into compliance with python 2.7 unittest api
 class AssertRaisesContextManager(object):

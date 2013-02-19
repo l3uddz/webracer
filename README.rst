@@ -5,11 +5,11 @@ WebRacer started as a high level web application testing library, similar
 to twill but with a more comprehensive API. With time the client portion
 became sufficiently useful standalone.
 
-Session module
+Agent module
 --------------
 
-The session module provides a browser level HTTP client. Besides the standard
-request/response functionality the session module notably offers an easy
+The agent module provides a browser level HTTP client. Besides the standard
+request/response functionality the agent module notably offers an easy
 to use form API.
 
 Test case module

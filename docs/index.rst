@@ -23,7 +23,7 @@ Reference:
 .. toctree::
    :maxdepth: 2
    
-   api/session
+   api/agent
    api/test_case
 
 Indices and tables
