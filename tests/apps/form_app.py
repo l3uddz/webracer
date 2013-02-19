@@ -223,3 +223,21 @@ def form_retrieval():
 @app.route('/dump_params', method='POST')
 def dump_params():
     return json.dumps(dict(bottle.request.forms))
+
+@app.route('/method_check_form')
+def method_check_form():
+    return '''
+<!doctype html>
+<html>
+<head></head>
+<body>
+    <form action='/method_check' method='post'>
+        <input type='submit' value='Go' />
+    </form>
+</body>
+</html>
+'''
+
+@app.route('/method_check')
+def method_check():
+    return bottle.request.method

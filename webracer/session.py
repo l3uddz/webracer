@@ -931,11 +931,15 @@ class Session(object):
         return Session(config=config, cookie_jar=cookie_jar)
     
     def request(self, method, url, body=None, query=None, headers=None):
+        if isinstance(url, Form):
+            url = url.computed_action
         url = self._absolutize_url(url)
         kwargs = {}
         computed_headers = self._build_initial_headers()
         self._merge_headers(computed_headers, headers)
         if body is not None:
+            if isinstance(body, FormElements):
+                body = body.params.list
             if is_container(body):
                 body = urlencode_utf8(body)
             if 'content-type' not in computed_headers:
