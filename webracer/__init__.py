@@ -1,2 +1,2 @@
 from .session import *
-from .case import *
+from .testcase import *

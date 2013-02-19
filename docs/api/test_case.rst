@@ -1,6 +1,6 @@
 TestCase Reference
 ==================
 
-.. automodule:: webracer.case
+.. automodule:: webracer.testcase
    :members:
    :undoc-members:

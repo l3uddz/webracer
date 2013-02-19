@@ -20,7 +20,7 @@ test:
 	WEBRACER_HTTP_CLIENT=pycurl nosetests -a 'client'
 
 clean:
-	-rm -rf $(BUILDDIR)/*
+	-rm -rf $(BUILDDIR)/* ./**/*.pyc
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
