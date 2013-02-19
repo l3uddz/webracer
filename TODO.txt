@@ -14,3 +14,4 @@
 - Expose curl objects somehow, to let applications tweak them
 - Remove session_class/agent_class?
 - Remove no_session?
+- Agent copying does not respect agent class
