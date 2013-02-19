@@ -12,3 +12,5 @@
 - Deal with multiple elements having the same name, e.g. foo[]
 - Form element selection via id/xpath/css
 - Expose curl objects somehow, to let applications tweak them
+- Remove session_class/agent_class?
+- Remove no_session?

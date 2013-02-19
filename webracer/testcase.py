@@ -1,5 +1,5 @@
 import unittest
-from .agent import Config, Session
+from .agent import Config, Agent
 
 # XXX bring into compliance with python 2.7 unittest api
 class AssertRaisesContextManager(object):
@@ -26,26 +26,26 @@ class WebTestCase(unittest.TestCase):
     
     def setUp(self):
         super(WebTestCase, self).setUp()
-        self._session = self._create_session()
+        self._agent = self._create_agent()
     
-    def _create_session(self):
+    def _create_agent(self):
         kwargs = {}
         kwargs['config'] = self.config
-        session_class = self.config.session_class or Session
-        return session_class(**kwargs)
+        agent_class = self.config.agent_class or Agent
+        return agent_class(**kwargs)
     
-    def session(self):
-        session = self._create_session()
-        return session
+    def agent(self):
+        agent = self._create_agent()
+        return agent
     
     @property
     def response(self):
-        return self._session.response
+        return self._agent.response
     
     def request(self, method, url, *args, **kwargs):
         if hasattr(self, '_no_session') and self._no_session:
-            self._session = self._create_session()
-        return self._session.request(method, url, *args, **kwargs)
+            self._agent = self._create_agent()
+        return self._agent.request(method, url, *args, **kwargs)
     
     def get(self, url, *args, **kwargs):
         return self.request('get', url, *args, **kwargs)
@@ -54,7 +54,7 @@ class WebTestCase(unittest.TestCase):
         return self.request('post', url, *args, **kwargs)
     
     def follow_redirect(self):
-        return self._session.follow_redirect()
+        return self._agent.follow_redirect()
     
     # XXX move to utu
     # XXX accept kwargs
@@ -65,34 +65,34 @@ class WebTestCase(unittest.TestCase):
             return AssertRaisesContextManager(expected)
     
     def assert_status(self, code):
-        self._session.assert_status(code)
+        self._agent.assert_status(code)
     
     def assert_redirected_to_uri(self, target):
-        self._session.assert_redirected_to_uri(target)
+        self._agent.assert_redirected_to_uri(target)
     
     def assert_response_cookie(self, name, **kwargs):
-        self._session.assert_response_cookie(name, **kwargs)
+        self._agent.assert_response_cookie(name, **kwargs)
     
     def assert_not_response_cookie(self, name):
-        self._session.assert_not_response_cookie(name)
+        self._agent.assert_not_response_cookie(name)
     
-    def assert_session_cookie(self, name, **kwargs):
-        self._session.assert_session_cookie(name, **kwargs)
+    def assert_cookie_jar_cookie(self, name, **kwargs):
+        self._agent.assert_cookie_jar_cookie(name, **kwargs)
     
-    def assert_not_session_cookie(self, name):
-        self._session.assert_not_session_cookie(name)
+    def assert_not_cookie_jar_cookie(self, name):
+        self._agent.assert_not_cookie_jar_cookie(name)
     
     @property
     def cookie_dict(self):
-        return self._session.cookie_dict
+        return self._agent.cookie_dict
     
     @property
     def header_list(self):
-        return self._session.header_list
+        return self._agent.header_list
     
     @property
     def header_dict(self):
-        return self._session.header_dict
+        return self._agent.header_dict
 
 def no_session(cls):
     '''Class decorator requesting that session management should not be

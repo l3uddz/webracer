@@ -1,4 +1,5 @@
 import unittest
+import webracer.agent
 import webracer.support
 
 class NetlocToHostPortTest(unittest.TestCase):
@@ -13,7 +14,7 @@ class NetlocToHostPortTest(unittest.TestCase):
         self._perform(netloc, expected)
     
     def _perform(self, netloc, expected):
-        session = webracer.Session()
+        agent = webracer.agent.Agent()
         actual = webracer.support.netloc_to_host_port(netloc)
         if isinstance(actual, list):
             actual = tuple(actual)

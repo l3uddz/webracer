@@ -91,7 +91,7 @@ class Config(object):
     save_failed_responses = False
     save_dir = None
     
-    # A function that will be invoked with a session argument to retrieve
+    # A function that will be invoked with an agent argument to retrieve
     # any additional diagnostics for the response, if response status is 500.
     # Mostly this is useful when the application being tested exists in
     # the same process as the test suite, and the test suite has the ability
@@ -119,9 +119,9 @@ class Config(object):
     # How many times to retry (initial attempt is not included in retry count).
     retry_count = 3
     
-    # Override session class to use. Allows defining additional helper methods
-    # on session objects.
-    session_class = None
+    # Override agent class to use. Allows defining additional helper methods
+    # on agent objects.
+    agent_class = None
     
     # Whether to use a cookie jar, allowing for session tracking.
     use_cookie_jar = True
@@ -887,9 +887,9 @@ def sequence_retry_condition_factory(sequence):
         return response.code in sequence
     return retry_condition
 
-class Session(object):
+class Agent(object):
     def __init__(self, config=None, cookie_jar=None, **kwargs):
-        '''Creates a new session.
+        '''Creates a new agent.
         
         Configuration options may be given as a Config instance in
         config argument and in keyword arguments. Keyword arguments
@@ -910,25 +910,25 @@ class Session(object):
         self.__client = None
     
     def copy(self):
-        '''Creates a copy of this session.
+        '''Creates a copy of this agent.
         
-        The new session has the same configuration as the current sesssion
-        and the same cookie jar as the current session, if a cookie jar
+        The new agent has the same configuration as the current agent
+        and the same cookie jar as the current agent, if a cookie jar
         is being used.
         
-        The new session will use its own HTTP client instance to perform
+        The new agent will use its own HTTP client instance to perform
         requests.
         
-        The new session does not share any state with the current session.
-        Current session's values are only used to initialize the new session.
+        The new agent does not share any state with the current agent.
+        Current agent's values are only used to initialize the new agent.
         
-        The intent of this method is to create sessions usable in other threads
-        that start with the current session's present state.
+        The intent of this method is to create agents usable in other threads
+        that start with the current agent's present state.
         '''
         
         config = Config(self.config)
         cookie_jar = ocookie.CookieJar(self._cookie_jar)
-        return Session(config=config, cookie_jar=cookie_jar)
+        return Agent(config=config, cookie_jar=cookie_jar)
     
     def request(self, method, url, body=None, query=None, headers=None):
         if isinstance(url, Form):
@@ -1087,7 +1087,7 @@ class Session(object):
         assert expected == actual, '%s expected but was %s' % (expected, actual)
     
     def assert_response_cookie(self, name, **kwargs):
-        '''Asserts that the response (as opposed to the session/cookie jar)
+        '''Asserts that the response (as opposed to the cookie jar)
         contains the specified cookie.'''
         
         assert name in self.response.cookie_dict
@@ -1102,10 +1102,10 @@ class Session(object):
         
         assert name not in self.response.cookie_dict
     
-    def assert_session_cookie(self, name, **kwargs):
+    def assert_cookie_jar_cookie(self, name, **kwargs):
         assert name in self._cookie_jar, 'Cookie expected but not present: %s' % name
     
-    def assert_not_session_cookie(self, name, **kwargs):
+    def assert_not_cookie_jar_cookie(self, name, **kwargs):
         assert name not in self._cookie_jar, 'Cookie not expected but present: %s' % name
     
     def __enter__(self):

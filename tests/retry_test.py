@@ -28,7 +28,7 @@ class RetryTest(webracer.WebTestCase):
     def test_with_retry_default(self):
         retry_app.status_codes = [200, 500, 404, 200]
         config = utils.add_dicts(base_config, dict(retry_failed=True, retry_count=5))
-        with webracer.Session(**config) as s:
+        with webracer.Agent(**config) as s:
             s.get('/')
             s.assert_status(200)
             s.get('/')
@@ -43,7 +43,7 @@ class RetryTest(webracer.WebTestCase):
         config = utils.add_dicts(base_config, dict(
             retry_failed=True, retry_count=5, retry_condition=xrange(400, 599),
         ))
-        with webracer.Session(**config) as s:
+        with webracer.Agent(**config) as s:
             s.get('/')
             s.assert_status(200)
             # 404 is now retried
@@ -59,7 +59,7 @@ class RetryTest(webracer.WebTestCase):
         config = utils.add_dicts(base_config, dict(
             retry_failed=True, retry_count=5, retry_condition=retry_fn,
         ))
-        with webracer.Session(**config) as s:
+        with webracer.Agent(**config) as s:
             s.get('/')
             s.assert_status(500)
             s.get('/')

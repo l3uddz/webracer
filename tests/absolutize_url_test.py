@@ -1,5 +1,5 @@
 import unittest
-import webracer
+import webracer.agent
 
 class AbsolutizeUrlTest(unittest.TestCase):
     def test_noop(self):
@@ -38,8 +38,8 @@ class AbsolutizeUrlTest(unittest.TestCase):
         self.assertRaises(ValueError, self._perform, config, url, expected)
     
     def _perform(self, config, url, expected):
-        session = webracer.Session(**config)
-        absolutized = session._absolutize_url(url)
+        agent = webracer.agent.Agent(**config)
+        absolutized = agent._absolutize_url(url)
         self.assertEqual(expected, absolutized)
 
 if __name__ == '__main__':
