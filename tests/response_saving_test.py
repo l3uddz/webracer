@@ -8,6 +8,7 @@ from .apps import kitchen_sink_app
 utils.app_runner_setup(__name__, kitchen_sink_app.app, 8060)
 
 save_dir = os.path.join(os.path.dirname(__file__), 'tmp')
+nonexistent_save_dir = '/tmp/nonexistent.dee11123e367b4a7506f856cc55898fabd4caeff'
 
 def list_save_dir():
     entries = os.listdir(save_dir)
@@ -40,3 +41,14 @@ class ResponseTest(webracer.WebTestCase):
         assert 'last' in entries
         entries.remove('last')
         assert entries[0].startswith('response')
+    
+    @webracer.config(save_responses=True, save_dir=nonexistent_save_dir)
+    def test_save_unsuccessful(self):
+        assert not os.path.exists(nonexistent_save_dir)
+        
+        with self.assert_raises(IOError) as cm:
+            self.get('/ok')
+        
+        assert nonexistent_save_dir in str(cm.exception)
+        
+        assert not os.path.exists(nonexistent_save_dir)
