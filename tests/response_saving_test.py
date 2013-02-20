@@ -5,9 +5,10 @@ import nose.plugins.attrib
 from . import utils
 from .apps import kitchen_sink_app
 
-if utils.py3:
+try:
+    # python 3.3?
     file_not_found_exception_class = FileNotFoundError
-else:
+except NameError:
     file_not_found_exception_class = IOError
 
 utils.app_runner_setup(__name__, kitchen_sink_app.app, 8060)
