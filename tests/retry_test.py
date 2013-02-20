@@ -3,6 +3,16 @@ import nose.plugins.attrib
 from . import utils
 from .apps import retry_app
 
+# py2/3 compatibility
+try:
+    import __builtin__
+except ImportError:
+    # py3
+    range_iter = range
+else:
+    # py2
+    range_iter = xrange
+
 utils.app_runner_setup(__name__, retry_app.app, 8058)
 
 base_config = dict(host='localhost', port=8058)
@@ -41,7 +51,7 @@ class RetryTest(webracer.WebTestCase):
     def test_with_retry_sequence(self):
         retry_app.status_codes = [200, 500, 404, 200]
         config = utils.add_dicts(base_config, dict(
-            retry_failed=True, retry_count=5, retry_condition=xrange(400, 599),
+            retry_failed=True, retry_count=5, retry_condition=range_iter(400, 599),
         ))
         with webracer.Agent(**config) as s:
             s.get('/')
