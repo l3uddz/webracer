@@ -5,6 +5,11 @@ import nose.plugins.attrib
 from . import utils
 from .apps import kitchen_sink_app
 
+if utils.py3:
+    file_not_found_exception_class = FileNotFoundError
+else:
+    file_not_found_exception_class = IOError
+
 utils.app_runner_setup(__name__, kitchen_sink_app.app, 8060)
 
 save_dir = os.environ.get('WEBRACER_TEST_TMP') or os.path.join(os.path.dirname(__file__), 'tmp')
@@ -46,7 +51,7 @@ class ResponseTest(webracer.WebTestCase):
     def test_save_to_nonexistent_dir(self):
         assert not os.path.exists(nonexistent_save_dir)
         
-        with self.assert_raises(IOError) as cm:
+        with self.assert_raises(file_not_found_exception_class) as cm:
             self.get('/ok')
         
         assert nonexistent_save_dir in str(cm.exception)

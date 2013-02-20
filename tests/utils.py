@@ -5,6 +5,8 @@ import time as _time
 import sys
 import nose.tools
 
+py3 = sys.version_info[0] == 3
+
 class Server(bottle.WSGIRefServer):
     def run(self, handler): # pragma: no cover
         from wsgiref.simple_server import make_server, WSGIRequestHandler
