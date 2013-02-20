@@ -7,7 +7,7 @@ from .apps import kitchen_sink_app
 
 utils.app_runner_setup(__name__, kitchen_sink_app.app, 8060)
 
-save_dir = os.path.join(os.path.dirname(__file__), 'tmp')
+save_dir = os.environ.get('WEBRACER_TEST_TMP') or os.path.join(os.path.dirname(__file__), 'tmp')
 nonexistent_save_dir = '/tmp/nonexistent.dee11123e367b4a7506f856cc55898fabd4caeff'
 
 def list_save_dir():
