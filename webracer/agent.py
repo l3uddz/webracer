@@ -1031,7 +1031,8 @@ class Agent(object):
             if self.config.save_failed_responses and not self.config.save_responses:
                 try:
                     self._save_response()
-                except e:
+                except:
+                    e = sys.exc_info()[1]
                     msg += "\n" + str(e)
             assert False, msg
     
