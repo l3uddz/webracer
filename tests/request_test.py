@@ -27,8 +27,15 @@ class DefaultHostUrlTest(webracer.WebTestCase):
 
 @nose.plugins.attrib.attr('client')
 @webracer.config(host='localhost', port=8054)
-class ConfigDecoratorTest(webracer.WebTestCase):
-    def test_simple(self):
+class ConfigClassDecoratorTest(webracer.WebTestCase):
+    def test_request(self):
+        self.get('/ok')
+        self.assert_status(200)
+
+@nose.plugins.attrib.attr('client')
+class ConfigMethodDecoratorTest(webracer.WebTestCase):
+    @webracer.config(host='localhost', port=8054)
+    def test_request(self):
         self.get('/ok')
         self.assert_status(200)
 

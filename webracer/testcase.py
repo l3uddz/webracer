@@ -1,3 +1,5 @@
+import types
+import functools
 import unittest
 from .agent import Config, Agent
 
@@ -103,12 +105,28 @@ def no_session(cls):
     return cls
 
 def config(**kwargs):
-    '''Class decorator for setting configuration on test cases.'''
+    '''Function and class decorator for setting configuration on test cases.'''
     
-    def decorator(cls):
-        config = getattr(cls, '_config', None) or Config()
-        for name in kwargs:
-            setattr(config, name, kwargs[name])
-        cls._config = config
-        return cls
+    def decorator(cls_or_fn):
+        if isinstance(cls_or_fn, types.FunctionType):
+            fn = cls_or_fn
+            @functools.wraps(fn)
+            def decorated(self):
+                saved = {}
+                for key in kwargs:
+                    saved[key] = getattr(self.config, key)
+                    setattr(self.config, key, kwargs[key])
+                try:
+                    fn(self)
+                finally:
+                    for key in kwargs:
+                        setattr(self.config, key, saved[key])
+            return decorated
+        else:
+            cls = cls_or_fn
+            config = getattr(cls, '_config', None) or Config()
+            for name in kwargs:
+                setattr(config, name, kwargs[name])
+            cls._config = config
+            return cls
     return decorator
