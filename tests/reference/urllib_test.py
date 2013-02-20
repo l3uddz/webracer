@@ -3,9 +3,7 @@ import unittest
 from .. import utils
 from ..apps import kitchen_sink_app
 
-py3 = sys.version_info[0] == 3
-
-if py3:
+if utils.py3:
     import urllib.request as urllib_request
     import http.cookiejar as cookielib
     

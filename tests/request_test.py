@@ -5,8 +5,6 @@ import nose.plugins.attrib
 from . import utils
 from .apps import kitchen_sink_app
 
-py3 = sys.version_info[0] == 3
-
 utils.app_runner_setup(__name__, kitchen_sink_app.app, 8054)
 
 @nose.plugins.attrib.attr('client')
@@ -47,7 +45,7 @@ def mock_http_connection_returning_200():
     mock_http_connection.return_value = mock_cls
     return mock_http_connection
 
-if py3:
+if utils.py3:
     http_connection_class = 'http.client.HTTPConnection'
 else:
     http_connection_class = 'httplib.HTTPConnection'

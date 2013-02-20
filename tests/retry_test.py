@@ -3,14 +3,9 @@ import nose.plugins.attrib
 from . import utils
 from .apps import retry_app
 
-# py2/3 compatibility
-try:
-    import __builtin__
-except ImportError:
-    # py3
+if utils.py3:
     range_iter = range
 else:
-    # py2
     range_iter = xrange
 
 utils.app_runner_setup(__name__, retry_app.app, 8058)
