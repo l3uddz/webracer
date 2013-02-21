@@ -988,6 +988,7 @@ class Agent(object):
                 self._cookie_jar.add(cookie)
         if self.config.save_responses:
             self._save_response()
+        return response
     
     def _client(self):
         if self.__client is None:

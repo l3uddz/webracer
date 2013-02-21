@@ -9,9 +9,31 @@ utils.app_runner_setup(__name__, kitchen_sink_app.app, 8054)
 
 @nose.plugins.attrib.attr('client')
 class FullUrlTest(webracer.WebTestCase):
-    def test_simple(self):
+    def test_request(self):
         self.get('http://127.0.0.1:8054/ok')
         self.assert_status(200)
+    
+    def test_response_return_from_get_on_agent(self):
+        with self.agent() as s:
+            response = s.get('http://127.0.0.1:8054/ok')
+        assert isinstance(response, webracer.Response)
+        self.assertEqual(200, response.code)
+    
+    def test_response_return_from_post(self):
+        with self.agent() as s:
+            response = s.post('http://127.0.0.1:8054/param')
+        assert isinstance(response, webracer.Response)
+        self.assertEqual(200, response.code)
+    
+    def test_response_return_from_get_on_testcase(self):
+        response = self.get('http://127.0.0.1:8054/ok')
+        assert isinstance(response, webracer.Response)
+        self.assertEqual(200, response.code)
+    
+    def test_response_return_from_post_on_testcase(self):
+        response = self.post('http://127.0.0.1:8054/param')
+        assert isinstance(response, webracer.Response)
+        self.assertEqual(200, response.code)
 
 @nose.plugins.attrib.attr('client')
 class DefaultHostUrlTest(webracer.WebTestCase):
