@@ -1,1 +1,6 @@
 http://www.wsgi.org/en/latest/testing.html
+
+WebTest seems to have very good form handling api:
+http://webtest.pythonpaste.org/en/latest/forms.html
+
+http://flask.pocoo.org/docs/testing/
