@@ -58,6 +58,11 @@ def app_runner_setup(*specs):
     
     The setup and teardown functions expect to be called with an argument
     on which server state will be stored.
+    
+    Example usage with nose:
+    
+    >>> setup_module, teardown_module = \
+        webracer.utils.runwsgi.app_runner_setup((app_module.app, 8050))
     '''
     
     def setup(self):
