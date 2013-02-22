@@ -85,8 +85,8 @@ class WebTestCase(unittest.TestCase):
         self._agent.assert_not_cookie_jar_cookie(name)
     
     @property
-    def cookie_dict(self):
-        return self._agent.cookie_dict
+    def cookies(self):
+        return self._agent.cookies
     
     @property
     def raw_headers(self):

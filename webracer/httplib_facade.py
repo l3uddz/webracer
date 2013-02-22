@@ -22,7 +22,7 @@ class Response(object):
         return self.httplib_response.read()
     
     @property
-    def cookie_list(self):
+    def raw_cookies(self):
         return ocookie.httplib_adapter.parse_response_cookies(
             self.httplib_response
         )

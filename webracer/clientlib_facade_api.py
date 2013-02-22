@@ -25,7 +25,7 @@ class Response(object):
         pass
     
     @property
-    def cookie_list(self):
+    def raw_cookies(self):
         '''Returns a list of cookies in the response.
         
         Return value should be a sequence of ocookie.Cookie objects.

@@ -258,16 +258,13 @@ class Response(object):
     
     @property
     @immutable
-    def cookie_list(self):
-        return self.cl_response.cookie_list
+    def raw_cookies(self):
+        return self.cl_response.raw_cookies
     
     @property
-    def cookie_dict(self):
-        try:
-            return self._cookie_dict
-        except AttributeError:
-            self._cookie_dict = ocookie.cookie_list_to_dict(self.cookie_list)
-            return self._cookie_dict
+    @immutable
+    def cookies(self):
+        return ocookie.cookie_list_to_dict(self.raw_cookies)
     
     @property
     @immutable
@@ -1000,7 +997,7 @@ class Agent(object):
             self.response = response
             break
         if self.config.use_cookie_jar:
-            for cookie in self.response.cookie_list:
+            for cookie in self.response.raw_cookies:
                 self._cookie_jar.add(cookie)
         if self.config.save_responses:
             self._save_response()
@@ -1111,9 +1108,9 @@ class Agent(object):
         '''Asserts that the response (as opposed to the cookie jar)
         contains the specified cookie.'''
         
-        assert name in self.response.cookie_dict
+        assert name in self.response.cookies
         if kwargs:
-            cookie = self.response.cookie_dict[name]
+            cookie = self.response.cookies[name]
             if 'value' in kwargs:
                 self.assert_equal(kwargs['value'], cookie.value)
     
@@ -1121,7 +1118,7 @@ class Agent(object):
         '''Asserts that a cookie with the specified name was not set
         in the response.'''
         
-        assert name not in self.response.cookie_dict
+        assert name not in self.response.cookies
     
     def assert_cookie_jar_cookie(self, name, **kwargs):
         assert name in self._cookie_jar, 'Cookie expected but not present: %s' % name

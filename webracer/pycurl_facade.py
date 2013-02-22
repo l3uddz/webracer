@@ -25,7 +25,7 @@ class Response(object):
         return self.buf.getvalue()
     
     @property
-    def cookie_list(self):
+    def raw_cookies(self):
         # Not delegating to ocookie because header storage is caller-dependent
         headers = [pair for pair in self.headers if pair[0].lower() in ['set-cookie', 'set-cookie2']]
         cookies = [ocookie.CookieParser.parse_set_cookie_value(value) for key, value in headers]
