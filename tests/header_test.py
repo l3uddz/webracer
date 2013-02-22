@@ -7,10 +7,11 @@ utils.app_runner_setup(__name__, kitchen_sink_app.app, 8051)
 
 @nose.plugins.attrib.attr('client')
 @webracer.config(host='localhost', port=8051)
-class KitchenSinkTest(webracer.WebTestCase):
+class HeaderTest(webracer.WebTestCase):
     def test_header_list(self):
         self.get('/ok')
         self.assert_status(200)
+        self.assertEqual('ok', self.response.body)
         
         actual = utils.listit(self.response.header_list)
         lowercased = [[key.lower(), value] for key, value in actual]
@@ -34,3 +35,5 @@ class KitchenSinkTest(webracer.WebTestCase):
         assert 'content-length' in actual
         assert 'Content-Length' in actual
         assert 'content-LENGTH' in actual
+        
+        self.assertEqual('2', actual['content-LENGTH'])
