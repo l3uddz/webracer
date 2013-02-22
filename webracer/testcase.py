@@ -89,12 +89,12 @@ class WebTestCase(unittest.TestCase):
         return self._agent.cookie_dict
     
     @property
-    def header_list(self):
-        return self._agent.header_list
+    def raw_headers(self):
+        return self._agent.raw_headers
     
     @property
-    def header_dict(self):
-        return self._agent.header_dict
+    def headers(self):
+        return self._agent.headers
 
 def no_session(cls):
     '''Class decorator requesting that session management should not be

@@ -28,7 +28,7 @@ class Response(object):
         )
     
     @property
-    def header_list(self):
+    def raw_headers(self):
         return self.httplib_response.getheaders()
 
 class Client(object):

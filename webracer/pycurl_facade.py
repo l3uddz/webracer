@@ -32,7 +32,7 @@ class Response(object):
         return cookies
     
     @property
-    def header_list(self):
+    def raw_headers(self):
         return self.headers
 
 class Client(object):

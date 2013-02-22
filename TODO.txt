@@ -2,7 +2,6 @@
 - Use setUpClass/tearDownClass for starting and stopping bottle servers
 - Multiple selection select support for form params
 - Add a case-insensitive api to header_list
-- Add tests for header_dict case insensitivity on keys (broken in py3)
 - Rename self.config to self.webracer_config - tests are likely to have
   their own configuration
 - Investigate response body decoding further; respect encoding declared
@@ -15,3 +14,4 @@
 - Remove session_class/agent_class?
 - Remove no_session?
 - Agent copying does not respect agent class
+- Investigate whether other libraries return copies of headers, etc.

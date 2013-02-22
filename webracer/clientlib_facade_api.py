@@ -33,7 +33,7 @@ class Response(object):
         pass
     
     @property
-    def header_list(self):
+    def raw_headers(self):
         '''Returns a list of headers in the response.
         
         Return value should be a sequence of (name, value) pairs.

@@ -221,7 +221,7 @@ class Response(object):
         is used (text/html content type) or XML (everything else).
         '''
         
-        if self.header_dict['content-type'].lower().find('text/html') >= 0:
+        if self.headers['content-type'].lower().find('text/html') >= 0:
             return self.lxml_etree_html
         else:
             return self.lxml_etree_xml
@@ -271,20 +271,20 @@ class Response(object):
     
     @property
     @immutable
-    def header_list(self):
-        return self.cl_response.header_list
+    def raw_headers(self):
+        return self.cl_response.raw_headers
     
     @property
-    def header_dict(self):
-        header_list = self.header_list
+    def headers(self):
+        raw_headers = self.raw_headers
         map = cidict.cidict()
-        for key, value in header_list:
+        for key, value in raw_headers:
             map[key] = value
         return map
     
     @property
     def location(self):
-        headers = self.header_dict
+        headers = self.headers
         if 'location' in headers:
             return headers['location']
         else:
@@ -1010,7 +1010,7 @@ class Agent(object):
         return self.request('post', url, *args, **kwargs)
     
     def follow_redirect(self):
-        assert 'location' in self.response.header_dict
+        assert 'location' in self.response.headers
         return self.get(self.response.location)
     
     def assert_status(self, code):
@@ -1020,8 +1020,8 @@ class Agent(object):
             ok = self.response.code == code
         if not ok:
             msg = 'Response status %s expected but was %s' % (code, self.response.code)
-            if 'location' in self.response.header_dict:
-                msg += ' (to %s)' % self.response.header_dict['location']
+            if 'location' in self.response.headers:
+                msg += ' (to %s)' % self.response.headers['location']
             if self.response.code == 500:
                 if self.config.extra_500_message:
                     extra = self.config.extra_500_message()
@@ -1051,7 +1051,7 @@ class Agent(object):
             if self.config.save_dir is not None:
                 basename = 'response_%f_%d' % (_time.time(), threading.current_thread().ident)
                 # XXX use a higher level interface
-                if 'content-type' in self.response.header_dict and self.response.header_dict['content-type'].lower().startswith('text/html'):
+                if 'content-type' in self.response.headers and self.response.headers['content-type'].lower().startswith('text/html'):
                     extension = 'html'
                 else:
                     extension = None
