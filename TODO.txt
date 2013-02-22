@@ -15,3 +15,4 @@
 - Remove no_session?
 - Agent copying does not respect agent class
 - Investigate whether other libraries return copies of headers, etc.
+- cookies/raw_cookies, analogously with headers
