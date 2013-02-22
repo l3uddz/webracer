@@ -48,7 +48,7 @@ class ServerThread(threading.Thread):
     def run(self):
         bottle.run(self.app, server=self.server, quiet=True)
 
-def app_runner_setup_multiple(*specs):
+def app_runner_setup(*specs):
     '''Returns setup and teardown methods for running a list of WSGI
     applications in a daemon thread.
     

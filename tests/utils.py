@@ -12,7 +12,7 @@ def app_runner_setup_multiple(module_name, specs):
     # requiring all tests to import sys
     module = sys.modules[module_name]
     
-    setup, teardown = webracer.utils.runwsgi.app_runner_setup_multiple(*specs)
+    setup, teardown = webracer.utils.runwsgi.app_runner_setup(*specs)
     
     assert not hasattr(module, 'setup_module')
     assert not hasattr(module, 'teardown_module')
