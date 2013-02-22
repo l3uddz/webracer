@@ -272,10 +272,26 @@ class Response(object):
     @property
     @immutable
     def raw_headers(self):
+        '''Returns response headers as a list, with duplicate headers
+        intact.
+        
+        Header names are exactly as they were sent by the server.
+        
+        For a case-insensitive dictionary view of the headers, see headers
+        method.
+        '''
+        
         return self.cl_response.raw_headers
     
     @property
     def headers(self):
+        '''Returns response headers as a case-insensitive dictionary.
+        
+        If multiple headers with the same name are present in the response,
+        the last header overwrites preceding ones. Use raw_headers to
+        retrieve headers as a list with duplicate headers preserved.
+        '''
+        
         raw_headers = self.raw_headers
         map = cidict.cidict()
         for key, value in raw_headers:
