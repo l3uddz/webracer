@@ -86,7 +86,7 @@ class WebTestCase(unittest.TestCase):
     
     @property
     def cookies(self):
-        return self._agent.cookies
+        return self._agent.response.cookies
     
     @property
     def raw_headers(self):

@@ -18,6 +18,3 @@
 - cookies/raw_cookies, analogously with headers
 - Pre-fill cookies into cookie jar
 - Extract cookies from cookie jar for future reuse, check that a copy is made
-- Test coverage for raw_cookies
-- Test coverage for Agent#cookies
-- Test coverage for WebTestCase#cookies
