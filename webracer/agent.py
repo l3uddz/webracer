@@ -259,11 +259,24 @@ class Response(object):
     @property
     @immutable
     def raw_cookies(self):
+        '''Returns a list of cookies as ocookie.LiveCookie objects.
+        
+        To access cookies as a dictionary, use cookies method.
+        '''
+        
         return self.cl_response.raw_cookies
     
     @property
     @immutable
     def cookies(self):
+        '''Returns a dictionary of cookies. Keys are cookie names,
+        values are ocookie.LiveCookie objects.
+        
+        If multiple cookies with the same name were sent by the server,
+        later ones overwrite earlier ones. Use raw_cookies to access
+        all cookies as a list.
+        '''
+        
         return ocookie.cookie_list_to_dict(self.raw_cookies)
     
     @property

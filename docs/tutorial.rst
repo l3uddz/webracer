@@ -16,6 +16,9 @@ Response objects have the expected assortment of useful methods::
 
     # case-insensitive header dictionary
     headers = response.headers
+    
+    # cookie dictionary (values are ocookie.LiveCookie objects)
+    cookies = response.cookies
 
 Test Case
 ---------

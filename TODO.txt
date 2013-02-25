@@ -17,3 +17,4 @@
 - Investigate whether other libraries return copies of headers, etc.
 - Pre-fill cookies into cookie jar
 - Extract cookies from cookie jar for future reuse, check that a copy is made
+- Check that cookies/raw_cookies return LiveCookie instances
