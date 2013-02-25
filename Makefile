@@ -23,7 +23,7 @@ clean:
 	-rm -rf $(BUILDDIR)/* ./**/*.pyc
 
 html:
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	PYTHONPATH=.:$$PYTHONPATH $(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
