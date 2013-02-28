@@ -58,6 +58,12 @@ def is_string(value):
     return isinstance(value, string_type)
 
 def immutable(func):
+    '''Decorator for marking a property immutable.
+    
+    The property's value will be computed once and stored in the instance's
+    cache.
+    '''
+    
     @functools.wraps(func)
     def decorated(self):
         # XXX consider caching in __dict__
@@ -169,18 +175,27 @@ class Config(object):
                 raise ValueError('Unknown parameter: %s' % key)
 
 class Response(object):
+    '''Encapsulates resposnse data.
+    
+    Responses provide a common API over various HTTP client libraries
+    that webracer supports.
+    '''
+    
     def __init__(self, request_url, cl_response):
         self.request_url = request_url
         self.cl_response = cl_response
     
     @property
     def code(self):
+        '''Integer response code (200, 404, etc.).
+        '''
+        
         return self.cl_response.code
     
     @property
     @immutable
     def raw_body(self):
-        '''Returns the raw response body.
+        '''The raw response body.
         
         In Python 3, this returns the bytes of the response.
         In Python 2, this is identical to body.
@@ -193,7 +208,7 @@ class Response(object):
     @property
     @immutable
     def body(self):
-        '''Returns the response body.
+        '''The response body.
         
         In Python 3, this returns the response decoded into a string.
         In Python 2, this is identical to raw_body.
@@ -206,7 +221,8 @@ class Response(object):
     
     @property
     def etree(self):
-        '''Returns an ElementTree built from response body.'''
+        '''An ElementTree built from response body.
+        '''
         
         import xml.etree.ElementTree
         
@@ -219,6 +235,9 @@ class Response(object):
         
         Depending on content type of the response, either HTML parsing
         is used (text/html content type) or XML (everything else).
+        
+        Requires lxml to be installed. If lxml is not installed,
+        an ImportError will be raised.
         '''
         
         if self.headers['content-type'].lower().find('text/html') >= 0:
@@ -230,7 +249,11 @@ class Response(object):
     @immutable
     def lxml_etree_xml(self):
         '''Returns an lxml.etree built from response body, treating
-        the latter as XML.'''
+        the latter as XML.
+        
+        Requires lxml to be installed. If lxml is not installed,
+        an ImportError will be raised.
+        '''
         
         import lxml.etree
         
@@ -241,7 +264,11 @@ class Response(object):
     @immutable
     def lxml_etree_html(self):
         '''Returns an lxml.etree built from response body, treating
-        the latter as HTML.'''
+        the latter as HTML.
+        
+        Requires lxml to be installed. If lxml is not installed,
+        an ImportError will be raised.
+        '''
         
         import lxml.etree
         
@@ -250,7 +277,8 @@ class Response(object):
     
     @property
     def json(self):
-        '''Returns response body parsed as JSON.'''
+        '''Returns response body parsed as JSON.
+        '''
         
         import json
         
@@ -310,6 +338,11 @@ class Response(object):
     
     @property
     def location(self):
+        '''The value of Location header, if one exists in the response.
+        
+        If the response has no Location header, ValueError is raised.
+        '''
+        
         headers = self.headers
         if 'location' in headers:
             return headers['location']
