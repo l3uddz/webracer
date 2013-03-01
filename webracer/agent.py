@@ -375,9 +375,29 @@ class Response(object):
     
     @property
     def form(self):
+        '''With no arguments, returns the form in the response. If the
+        response has no forms or more than one form, NoForms or MultipleForms,
+        respectively, is raised.
+        
+        With arguments, returns the form matching specified selection criteria.
+        Forms can be restricted by name or id attributes, XPath expression
+        or a CSS selector. Criteria are additive: specifying, for example,
+        an id and an XPath expression will return forms that have the
+        specified id and match the XPath expression. If no forms match,
+        NoForms is raised. If more than one form matches, MultipleForms
+        is raised.
+        '''
+        
         return FormProxy(self.forms)
     
     def urljoin(self, url):
+        '''Returns a url resulting from urljoin'ing the request url and
+        the specified url.
+        
+        This is simply a shortcut for
+        `urlparse.urljoin(response.request_url, url)`.
+        '''
+        
         return urlparse.urljoin(self.request_url, url)
 
 class FormElements(object):
