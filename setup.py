@@ -8,5 +8,5 @@ setup(name='webracer',
     author='Oleg Pudeyev',
     author_email='oleg@bsdpower.com',
     url='http://github.com/p/webracer',
-    packages=['webracer'],
+    packages=['webracer', 'webracer.utils'],
 )
