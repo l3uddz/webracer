@@ -1053,6 +1053,13 @@ class Agent(object):
         client = self._client()
         retries = 0
         while True:
+            # XXX maybe this should be done differently
+            if method.lower() == 'get' and body is not None and len(body) > 0:
+                if '?' in url:
+                    url += '&' + body
+                else:
+                    url += '?' + body
+                body = None
             response = client.request(method.upper(), url, body, computed_headers)
             response = Response(url, response)
             if self.config.retry_failed:
