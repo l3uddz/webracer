@@ -35,7 +35,11 @@ class Client(object):
     def request(self, method, url, body, headers):
         parsed_url, uri = support.parse_url(url)
         host, port = support.netloc_to_host_port(parsed_url.netloc)
-        connection = httplib.HTTPConnection(host, port)
+        if parsed_url.scheme == 'https':
+            connection_cls = httplib.HTTPSConnection
+        else:
+            connection_cls = httplib.HTTPConnection
+        connection = connection_cls(host, port)
         connection.request(method, uri, body, headers)
         response = Response(connection.getresponse())
         return response
