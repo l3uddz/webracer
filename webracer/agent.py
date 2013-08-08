@@ -105,6 +105,9 @@ class Config(object):
     # application.
     extra_500_message = None
     
+    # Automatically follow redirects
+    follow_redirects = False
+    
     # Retry failed requests automatically.
     retry_failed = False
     
@@ -146,6 +149,7 @@ class Config(object):
         'user_agent',
         'save_responses', 'save_failed_responses', 'save_dir',
         'extra_500_message',
+        'follow_redirects',
         'retry_failed', 'retry_condition', 'retry_count',
         'use_cookie_jar',
         'http_client',
@@ -1010,6 +1014,14 @@ class Agent(object):
         return Agent(config=config, cookie_jar=cookie_jar)
     
     def request(self, method, url, body=None, query=None, headers=None):
+        response = self.do_request(method, url, body, query, headers)
+        if self.config.follow_redirects:
+            for limit in range(10):
+                if response.code in [301, 302, 303] and 'location' in response.headers:
+                    response = self.do_request('get', response.headers['location'])
+        return response
+    
+    def do_request(self, method, url, body=None, query=None, headers=None):
         if isinstance(url, Form):
             url = url.computed_action
         url = self._absolutize_url(url)
