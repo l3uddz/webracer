@@ -20,4 +20,3 @@
 - Check that cookies/raw_cookies return LiveCookie instances
 - Evaluate ValueError usage in location property
 - Test coverage for https requests
-- Test coverage for following redirects
