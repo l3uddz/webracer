@@ -1112,8 +1112,25 @@ class Agent(object):
         return self.get(self.response.location)
     
     def assert_status(self, code):
+        '''Asserts that response code is either equal to the specified
+        value or contained in the specified iterable.
+        
+        Code can be:
+        - An integer, in which case an exact match is performed;
+        - A range, in which case response code must be within the range;
+        - An instance of xrange;
+        - An arbitrary tuple or list of integers, in which case the
+          response code must be included in the list;
+        - A special value 'redirect' which is equivalent to the tuple
+          (301, 302, 303); note that no other string values are accepted.
+        '''
+        
         if code == 'redirect':
-            ok = self.response.code in (301, 302, 303)
+            code = (301, 302, 303)
+        elif isinstance(code, string_type):
+            assert False, '%s is not a recognized status (response code was %d)' % (code, self.response.code)
+        if hasattr(code, '__getitem__'):
+            ok = self.response.code in code
         else:
             ok = self.response.code == code
         if not ok:
