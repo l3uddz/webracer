@@ -1200,8 +1200,25 @@ class Agent(object):
                 raise ConfigurationError('Could not save response body - save_dir is None')
     
     def assert_redirected_to_uri(self, target):
+        '''Asserts that response is a redirect and that the URI
+        (path, query string and fragment) is the specified target.
+        
+        Use assert_redirected_to_url to check complete url.
+        '''
+        
         self.assert_status('redirect')
         self.assert_equal(target, self.response.location_uri)
+    
+    def assert_redirected_to_url(self, target):
+        '''Asserts that response is a redirect and that the complete
+        URL being redirected to is the specified target.
+        
+        Use assert_redirected_to_uri to check the URI portion of the
+        URL only, ignoring protocol, host and port.
+        '''
+        
+        self.assert_status('redirect')
+        self.assert_equal(target, self.response.location)
     
     def assert_equal(self, expected, actual):
         assert expected == actual, '%s expected but was %s' % (expected, actual)
