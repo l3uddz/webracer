@@ -1203,6 +1203,10 @@ class Agent(object):
         self.assert_status('redirect')
         self.assert_equal(target, self.response.location_uri)
     
+    def assert_redirected_to_url(self, target):
+        self.assert_status('redirect')
+        self.assert_equal(target, self.response.location)
+    
     def assert_equal(self, expected, actual):
         assert expected == actual, '%s expected but was %s' % (expected, actual)
     

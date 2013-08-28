@@ -18,10 +18,6 @@ class ResponseTest(webracer.WebTestCase):
         self.assert_status(200)
         self.assertEqual({'a': 'b'}, self.response.json)
     
-    def test_redirect_assertion(self):
-        self.get('/redirect')
-        self.assert_redirected_to_uri('/found')
-    
     def test_follow_redirect(self):
         self.get('/redirect_to', query=dict(target='/ok'))
         self.assert_redirected_to_uri('/ok')

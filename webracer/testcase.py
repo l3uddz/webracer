@@ -72,6 +72,9 @@ class WebTestCase(unittest.TestCase):
     def assert_redirected_to_uri(self, target):
         self._agent.assert_redirected_to_uri(target)
     
+    def assert_redirected_to_url(self, target):
+        self._agent.assert_redirected_to_url(target)
+    
     def assert_response_cookie(self, name, **kwargs):
         self._agent.assert_response_cookie(name, **kwargs)
     
