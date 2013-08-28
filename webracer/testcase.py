@@ -98,6 +98,14 @@ class WebTestCase(unittest.TestCase):
     @property
     def headers(self):
         return self._agent.headers
+    
+    @property
+    def current_url(self):
+        '''Contains the full URL for the last request made.
+        None if no requests have been made.
+        '''
+        
+        return self._agent.current_url
 
 def no_session(cls):
     '''Class decorator requesting that session management should not be
