@@ -116,3 +116,30 @@ class AgentConstructionTest(webracer.WebTestCase):
         b.get('/read_cookie_value/sink')
         b.assert_status(200)
         self.assertEqual('start', b.response.body)
+
+@nose.plugins.attrib.attr('client')
+@webracer.config(host='localhost', port=8052)
+class AgentTest(webracer.WebTestCase):
+    def test_current_url_before_request(self):
+        s = webracer.Agent(**base_config)
+        assert s.current_url is None
+    
+    def test_current_url_after_single_request(self):
+        s = webracer.Agent(**base_config)
+        s.get('/redirect')
+        self.assertEqual('http://localhost:8052/redirect', s.current_url)
+    
+    def test_current_url_after_following_redirect(self):
+        s = webracer.Agent(webracer.Config(follow_redirects=True, **base_config))
+        s.get('/redirect')
+        self.assertEqual('http://localhost:8052/found', s.current_url)
+
+@nose.plugins.attrib.attr('client')
+@webracer.config(host='localhost', port=8052)
+class AgentViaSessionTest(webracer.WebTestCase):
+    def test_current_url_before_request(self):
+        assert self.current_url is None
+    
+    def test_current_url_after_single_request(self):
+        self.get('/redirect')
+        self.assertEqual('http://localhost:8052/redirect', self.current_url)

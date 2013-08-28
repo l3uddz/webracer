@@ -991,6 +991,7 @@ class Agent(object):
         else:
             self._cookie_jar = ocookie.CookieJar()
         self.__client = None
+        self.current_url = None
     
     def copy(self):
         '''Creates a copy of this agent.
@@ -1086,6 +1087,7 @@ class Agent(object):
                 self._cookie_jar.add(cookie)
         if self.config.save_responses:
             self._save_response()
+        self.current_url = url
         return response
     
     def _client(self):
