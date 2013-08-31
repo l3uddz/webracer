@@ -18,6 +18,12 @@ def unhandled_exception():
 def redirect():
     bottle.redirect('/found', 302)
 
+@app.route('/relative-redirect')
+def relative_redirect():
+    bottle.response.status = '303 see other'
+    bottle.response.headers['location'] = 'found'
+    return ''
+
 @app.route('/found')
 def found():
     return 'found'

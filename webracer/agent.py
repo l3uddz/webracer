@@ -341,7 +341,7 @@ class Response(object):
         return map
     
     @property
-    def location(self):
+    def raw_location(self):
         '''The value of Location header, if one exists in the response.
         
         If the response has no Location header, ValueError is raised.
@@ -352,6 +352,15 @@ class Response(object):
             return headers['location']
         else:
             raise ValueError('There is no location header in this response')
+    
+    @property
+    def location(self):
+        '''Absolutized URL from the Location header of the response.
+        
+        If the response has no Location header, ValueError is raised.
+        '''
+        
+        return self.urljoin(self.raw_location)
     
     @property
     def location_uri(self):
@@ -1019,7 +1028,7 @@ class Agent(object):
         if self.config.follow_redirects:
             for limit in range(10):
                 if response.code in [301, 302, 303] and 'location' in response.headers:
-                    response = self.do_request('get', response.headers['location'])
+                    response = self.do_request('get', response.location)
         return response
     
     def do_request(self, method, url, body=None, query=None, headers=None):
