@@ -82,3 +82,10 @@ class AssertionsTest(webracer.WebTestCase):
         self.get('/redirect')
         # full url including protocol and host
         self.assert_redirected_to_url('http://localhost:8062/found')
+    
+    def test_current_url_when_expecting_200_receiving_404(self):
+        self.get('/not-found')
+        try:
+            self.assert_status(200)
+        except AssertionError, e:
+            self.assertEqual('Response status 200 expected but was 404 (current url: http://localhost:8062/not-found)', str(e))

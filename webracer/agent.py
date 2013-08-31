@@ -1139,7 +1139,9 @@ class Agent(object):
             msg = 'Response status %s expected but was %s' % (code, self.response.code)
             if 'location' in self.response.headers:
                 msg += ' (to %s)' % self.response.headers['location']
-            if self.response.code == 500:
+            if self.response.code == 404:
+                msg += ' (current url: %s)' % self.current_url
+            elif self.response.code == 500:
                 if self.config.extra_500_message:
                     extra = self.config.extra_500_message()
                 else:
