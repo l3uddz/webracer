@@ -18,6 +18,15 @@ class ResponseTest(webracer.WebTestCase):
         self.assert_status(200)
         self.assertEqual({'a': 'b'}, self.response.json)
     
+    def test_raw_location(self):
+        self.get('/relative-redirect')
+        self.assertEqual('found', self.response.raw_location)
+    
+    def test_location_on_relative_redirect(self):
+        # should return a full url
+        self.get('/relative-redirect')
+        self.assertEqual('http://localhost:8041/found', self.response.location)
+    
     def test_follow_redirect(self):
         self.get('/redirect_to', query=dict(target='/ok'))
         self.assert_redirected_to_uri('/ok')
