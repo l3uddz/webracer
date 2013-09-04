@@ -43,10 +43,13 @@ class ResponseTest(webracer.WebTestCase):
         
         entries = list_save_dir()
         # response + last symlink
-        self.assertEqual(2, len(entries))
-        assert 'last' in entries
-        entries.remove('last')
-        assert entries[0].startswith('response')
+        self.assertEqual(4, len(entries))
+        assert 'last.html' in entries, 'last.html not in entries: %s' % repr(entries)
+        entries.remove('last.html')
+        entries.sort()
+        assert entries[0].endswith('.html')
+        assert entries[1].endswith('.request.headers')
+        assert entries[2].endswith('.response.headers')
     
     @webracer.config(save_responses=True, save_dir=nonexistent_save_dir)
     def test_save_to_nonexistent_dir(self):
@@ -74,10 +77,13 @@ class ResponseTest(webracer.WebTestCase):
         
         entries = list_save_dir()
         # response + last symlink
-        self.assertEqual(2, len(entries))
-        assert 'last' in entries
-        entries.remove('last')
-        assert entries[0].startswith('response')
+        self.assertEqual(4, len(entries))
+        assert 'last.html' in entries
+        entries.remove('last.html')
+        entries.sort()
+        assert entries[0].endswith('.html')
+        assert entries[1].endswith('.request.headers')
+        assert entries[2].endswith('.response.headers')
     
     @webracer.config(save_responses=False, save_failed_responses=True,
         save_dir=nonexistent_save_dir)

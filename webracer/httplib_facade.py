@@ -32,14 +32,14 @@ class Response(object):
         return self.httplib_response.getheaders()
 
 class Client(object):
-    def request(self, method, url, body, headers):
-        parsed_url, uri = support.parse_url(url)
+    def request(self, req):
+        parsed_url, uri = support.parse_url(req.url)
         host, port = support.netloc_to_host_port(parsed_url.netloc)
         if parsed_url.scheme == 'https':
             connection_cls = httplib.HTTPSConnection
         else:
             connection_cls = httplib.HTTPConnection
         connection = connection_cls(host, port)
-        connection.request(method, uri, body, headers)
+        connection.request(req.method, uri, req.body, req.headers)
         response = Response(connection.getresponse())
         return response

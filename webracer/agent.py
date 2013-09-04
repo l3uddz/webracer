@@ -178,6 +178,16 @@ class Config(object):
             else:
                 raise ValueError('Unknown parameter: %s' % key)
 
+class Request(object):
+    '''Encapsulates request data.
+    '''
+    
+    def __init__(self, method, url, body, headers):
+        self.method = method
+        self.url = url
+        self.body = body
+        self.headers = headers
+
 class Response(object):
     '''Encapsulates resposnse data.
     
@@ -1082,7 +1092,8 @@ class Agent(object):
                 else:
                     url += '?' + body
                 body = None
-            response = client.request(method.upper(), url, body, computed_headers)
+            self.last_request = Request(method.upper(), url, body, computed_headers)
+            response = client.request(self.last_request)
             response = Response(url, response)
             if self.config.retry_failed:
                 if retry_check(response):
@@ -1175,42 +1186,63 @@ class Agent(object):
         return fn
     
     def _save_response(self):
+        if self.config.save_dir is None:
+            raise ConfigurationError('Could not save response body - save_dir is None')
+        
+        import mimetypes
+        
+        id = '%f_%d' % (_time.time(), threading.current_thread().ident)
+        
+        basename = '%s.request.headers' % id
+        with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
+            for header in self.last_request.headers:
+                f.write("%s: %s\n" % (header, self.last_request.headers[header]))
+        
+        basename = '%s.response.headers' % id
+        with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
+            for header in self.response.headers:
+                f.write("%s: %s\n" % (header, self.response.headers[header]))
+        
         if len(self.response.body) > 0:
-            if self.config.save_dir is not None:
-                basename = 'response_%f_%d' % (_time.time(), threading.current_thread().ident)
-                # XXX use a higher level interface
-                if 'content-type' in self.response.headers and self.response.headers['content-type'].lower().startswith('text/html'):
-                    extension = 'html'
-                else:
-                    extension = None
-                if extension is not None:
-                    basename += '.' + extension
-                encoded_body = self.response.body
-                if py3:
-                    encoded_body = bytes(encoded_body, 'utf-8')
-                with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
-                    f.write(encoded_body)
-                last_path = os.path.join(self.config.save_dir, 'last')
-                if os.path.exists(last_path):
-                    try:
-                        os.unlink(last_path)
-                    except OSError as e:
-                        if e.errno == errno.ENOENT:
-                            # race with someone else
-                            pass
-                        else:
-                            raise
+            basename = '%s.body' % id
+            if 'content-type' in self.response.headers:
+                content_type = self.response.headers['content-type']
+                # content type might have a charset etc which
+                # confuses mimetypes; delete
+                if ';' in content_type:
+                    content_type = content_type[:content_type.index(';')]
+                # includes leading dot, or None
+                extension = mimetypes.guess_extension(content_type)
+            else:
+                extension = None
+            if extension is not None:
+                basename += extension
+            encoded_body = self.response.body
+            if py3:
+                encoded_body = bytes(encoded_body, 'utf-8')
+            with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
+                f.write(encoded_body)
+            last_path = os.path.join(self.config.save_dir, 'last')
+            if extension is not None:
+                last_path += extension
+            if os.path.exists(last_path):
                 try:
-                    os.symlink(basename, last_path)
+                    os.unlink(last_path)
                 except OSError as e:
-                    if e.errno == errno.EEXIST:
-                        # someone else is saving responses concurrently,
-                        # do not fight
+                    if e.errno == errno.ENOENT:
+                        # race with someone else
                         pass
                     else:
                         raise
-            else:
-                raise ConfigurationError('Could not save response body - save_dir is None')
+            try:
+                os.symlink(basename, last_path)
+            except OSError as e:
+                if e.errno == errno.EEXIST:
+                    # someone else is saving responses concurrently,
+                    # do not fight
+                    pass
+                else:
+                    raise
     
     def assert_redirected_to_uri(self, target):
         '''Asserts that response is a redirect and that the URI
