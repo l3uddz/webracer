@@ -36,30 +36,30 @@ class Response(object):
         return self.headers
 
 class Client(object):
-    def request(self, method, url, body, headers):
+    def request(self, req):
         curl = pycurl.Curl()
-        curl.setopt(curl.URL, url)
+        curl.setopt(curl.URL, req.url)
         
-        if method != 'GET':
-            if method == 'POST':
+        if req.method != 'GET':
+            if req.method == 'POST':
                 # CUSTOMREQUEST does not work here
                 curl.setopt(curl.POST, True)
             else:
-                curl.setopt(curl.CUSTOMREQUEST, method)
+                curl.setopt(curl.CUSTOMREQUEST, req.method)
         
         buf = StringIO()
         curl.setopt(curl.WRITEFUNCTION, buf.write)
         
-        if body is not None:
-            curl.setopt(curl.POSTFIELDS, body)
+        if req.body is not None:
+            curl.setopt(curl.POSTFIELDS, req.body)
         
-        if headers is not None:
+        if req.headers is not None:
             header_list = []
-            for key in headers:
+            for key in req.headers:
                 if ':' in key:
                     raise ValueError('Colon is not allowed in header name: %s' % key)
                 # XXX assumes headers is a dict
-                value = headers[key]
+                value = req.headers[key]
                 # XXX very crude
                 header = '%s: %s' % (key, value)
                 header_list.append(header)
