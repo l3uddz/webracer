@@ -45,7 +45,7 @@ class Client(object):
                 # CUSTOMREQUEST does not work here
                 curl.setopt(curl.POST, True)
             else:
-                curl.setopt(curl.CUSTOMREQUEST, 'method')
+                curl.setopt(curl.CUSTOMREQUEST, method)
         
         buf = StringIO()
         curl.setopt(curl.WRITEFUNCTION, buf.write)
