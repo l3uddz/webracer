@@ -1198,13 +1198,21 @@ class Agent(object):
             for header in self.last_request.headers:
                 f.write("%s: %s\n" % (header, self.last_request.headers[header]))
         
+        if self.last_request.body is not None and len(self.last_request.body) > 0:
+            basename = '%s.request.body' % id
+            encoded_body = self.last_request.body
+            if py3:
+                encoded_body = bytes(encoded_body, 'utf-8')
+            with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
+                f.write(encoded_body)
+        
         basename = '%s.response.headers' % id
         with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
             for header in self.response.headers:
                 f.write("%s: %s\n" % (header, self.response.headers[header]))
         
         if len(self.response.body) > 0:
-            basename = '%s.body' % id
+            basename = '%s.response.body' % id
             if 'content-type' in self.response.headers:
                 content_type = self.response.headers['content-type']
                 # content type might have a charset etc which

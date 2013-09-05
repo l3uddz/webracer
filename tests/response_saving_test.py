@@ -47,8 +47,8 @@ class ResponseTest(webracer.WebTestCase):
         assert 'last.html' in entries, 'last.html not in entries: %s' % repr(entries)
         entries.remove('last.html')
         entries.sort()
-        assert entries[0].endswith('.html')
-        assert entries[1].endswith('.request.headers')
+        assert entries[0].endswith('.request.headers')
+        assert entries[1].endswith('.response.body.html')
         assert entries[2].endswith('.response.headers')
     
     @webracer.config(save_responses=True, save_dir=nonexistent_save_dir)
@@ -81,8 +81,8 @@ class ResponseTest(webracer.WebTestCase):
         assert 'last.html' in entries
         entries.remove('last.html')
         entries.sort()
-        assert entries[0].endswith('.html')
-        assert entries[1].endswith('.request.headers')
+        assert entries[0].endswith('.request.headers')
+        assert entries[1].endswith('.response.body.html')
         assert entries[2].endswith('.response.headers')
     
     @webracer.config(save_responses=False, save_failed_responses=True,
