@@ -10,7 +10,7 @@ def one_form():
 <html>
 <head></head>
 <body>
-    <form action='/there' method='post' id='formid' name='formname'>
+    <form action='/dump_params' method='post' id='formid' name='formname'>
         <input type='text' name='textf' value='textv' />
         <input type='submit' value='Go' />
         <button name='foo' />

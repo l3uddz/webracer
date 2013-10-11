@@ -25,8 +25,8 @@ class FormSingularAttributesTest(webracer.WebTestCase):
         self._check(form)
     
     def _check(self, form):
-        self.assertEqual('/there', form.action)
-        self.assertEqual('http://localhost:8050/there', form.computed_action)
+        self.assertEqual('/dump_params', form.action)
+        self.assertEqual('http://localhost:8050/dump_params', form.computed_action)
         self.assertEqual('post', form.method)
         self.assertEqual('POST', form.computed_method)
         self.assertEqual('formname', form.name)

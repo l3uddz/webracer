@@ -15,9 +15,9 @@ class FormTest(webracer.WebTestCase):
         self.assert_status(200)
         
         form = self.response.form()
-        self.assertEqual('/there', form.action)
+        self.assertEqual('/dump_params', form.action)
         # always a full url
-        self.assertEqual('http://localhost:8043/there', form.computed_action)
+        self.assertEqual('http://localhost:8043/dump_params', form.computed_action)
         self.assertEqual('post', form.method)
         self.assertEqual('POST', form.computed_method)
     
@@ -263,3 +263,22 @@ class FormTest(webracer.WebTestCase):
         form = self.response.form()
         elements = form.elements
         self.assertEquals([['field', 'hello world']], utils.listit(elements.params.list))
+    
+    def test_submit_form(self):
+        self.get('/one_form')
+        self.assert_status(200)
+        
+        form = self.response.form()
+        self.submit_form(form)
+        self.assertEquals({'textf': 'textv'}, self.response.json)
+    
+    def test_submit_form_with_elements(self):
+        self.get('/one_form')
+        self.assert_status(200)
+        
+        form = self.response.form()
+        elements = form.elements.mutable
+        elements.set_value('textf', 'modvalue')
+        
+        self.submit_form(form, elements)
+        self.assertEquals({'textf': 'modvalue'}, self.response.json)

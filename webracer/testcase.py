@@ -58,6 +58,9 @@ class WebTestCase(unittest.TestCase):
     def follow_redirect(self):
         return self._agent.follow_redirect()
     
+    def submit_form(self, form, elements=None):
+        return self._agent.submit_form(form, elements)
+    
     # XXX move to utu
     # XXX accept kwargs
     def assert_raises(self, expected, *args):

@@ -1133,6 +1133,11 @@ class Agent(object):
         assert 'location' in self.response.headers
         return self.get(self.response.location)
     
+    def submit_form(self, form, elements=None):
+        if elements is None:
+            elements = form.elements
+        self.request(form.computed_method, form.computed_action, body=elements.params.dict)
+    
     def assert_status(self, code):
         '''Asserts that response code is either equal to the specified
         value or contained in the specified iterable.
