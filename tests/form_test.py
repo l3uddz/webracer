@@ -106,6 +106,16 @@ class FormTest(webracer.WebTestCase):
         self.assert_status(200)
         self.assertEquals({'submit-second': 'second'}, self.response.json)
     
+    def test_nameless_default_submit_with_multiple_submits(self):
+        self.get('/form_with_nameless_and_named_submits')
+        self.assert_status(200)
+        
+        form = self.response.form()
+        self.submit_form(form)
+        
+        self.assert_status(200)
+        self.assertEquals({}, self.response.json)
+    
     def test_set_value(self):
         self.get('/one_form')
         self.assert_status(200)
