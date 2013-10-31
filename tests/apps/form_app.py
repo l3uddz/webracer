@@ -122,6 +122,21 @@ def form_with_two_submits():
 </html>
 '''
 
+@app.route('/form_with_nameless_and_named_submits')
+def form_with_nameless_and_named_submits():
+    return '''
+<!doctype html>
+<html>
+<head></head>
+<body>
+    <form action='/dump_params', method='post'>
+        <input type='submit' value='first' />
+        <input type='submit' name='submit-second' value='second' />
+    </form>
+</body>
+</html>
+'''
+
 @app.route('/first_radio_selected')
 def first_radio_selected():
     return '''

@@ -461,7 +461,7 @@ class FormElements(object):
         processed_selects = {}
         submit_found = False
         for element_type, element_name, element_value, element_selected in self.elements:
-            if element_name is None or element_type == 'reset':
+            if (element_type != 'submit' and element_name is None) or element_type == 'reset':
                 continue
             # second pass: actually build the parameter list
             if element_type == 'option':
@@ -482,7 +482,7 @@ class FormElements(object):
                         else:
                             found = True
                         if found:
-                            if element_value is not None:
+                            if element_name is not None and element_value is not None:
                                 params.append((element_name, element_value))
                             submit_found = True
                 elif element_name in self.chosen_values:
