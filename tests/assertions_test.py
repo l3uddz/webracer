@@ -87,5 +87,5 @@ class AssertionsTest(webracer.WebTestCase):
         self.get('/not-found')
         try:
             self.assert_status(200)
-        except AssertionError, e:
+        except AssertionError as e:
             self.assertEqual('Response status 200 expected but was 404 (current url: http://localhost:8062/not-found)', str(e))
