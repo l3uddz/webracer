@@ -40,7 +40,7 @@ class ResponseTest(webracer.WebTestCase):
     
     def test_non_ascii_body(self):
         self.get('/utf16_body')
-        self.assertEqual(u'hello world', self.response.body)
+        self.assertEqual(utils.u('hello world'), self.response.body)
 
     def test_charset_missing(self):
         self.get('/no_charset')

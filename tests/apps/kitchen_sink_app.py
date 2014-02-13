@@ -1,4 +1,5 @@
 import bottle
+from .. import utils
 
 app = bottle.Bottle()
 
@@ -83,7 +84,7 @@ def get_json_empty():
 @app.route('/utf16_body')
 def get_utf16_body():
     bottle.response.headers['content-type'] = 'text/plain; charset=utf-16'
-    return u'hello world'.encode('utf-16')
+    return utils.u('hello world').encode('utf-16')
 
 @app.route('/no_charset')
 def get_no_charset():
