@@ -189,7 +189,7 @@ class Request(object):
         self.headers = headers
 
 class Response(object):
-    '''Encapsulates resposnse data.
+    '''Encapsulates response data.
     
     Responses provide a common API over various HTTP client libraries
     that webracer supports.
