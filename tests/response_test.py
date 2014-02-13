@@ -33,3 +33,19 @@ class ResponseTest(webracer.WebTestCase):
         self.follow_redirect()
         self.assert_status(200)
         self.assertEqual('ok', self.response.body)
+    
+    def test_body(self):
+        self.get('/ok')
+        self.assertEqual('ok', self.response.body)
+    
+    def test_non_ascii_body(self):
+        self.get('/utf16_body')
+        self.assertEqual(utils.u('hello world'), self.response.body)
+
+    def test_charset_missing(self):
+        self.get('/no_charset')
+        self.assertTrue(self.response.charset is None)
+    
+    def test_charset(self):
+        self.get('/utf16_body')
+        self.assertEqual('utf-16', self.response.charset.lower())
