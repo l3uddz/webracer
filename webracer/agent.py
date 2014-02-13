@@ -209,10 +209,7 @@ class Response(object):
     @property
     @immutable
     def raw_body(self):
-        '''The raw response body.
-        
-        In Python 3, this returns the bytes of the response.
-        In Python 2, this is identical to body.
+        '''The raw response body, as a byte string.
         '''
         
         # read() can only be called once, immutable decorator achieves this
@@ -222,16 +219,32 @@ class Response(object):
     @property
     @immutable
     def body(self):
-        '''The response body.
+        '''The response body, decoded into Unicode.
         
-        In Python 3, this returns the response decoded into a string.
-        In Python 2, this is identical to raw_body.
+        Encoding is obtained from charset part of Content-Type response header.
+        If there is no charset specified, HTTP default of iso-8859-1 is used.
         '''
         
-        if py3:
-            return self.raw_body.decode('utf8')
-        else:
-            return self.raw_body
+        charset = self.charset or 'iso-8859-1'
+        return self.raw_body.decode(charset)
+    
+    @property
+    @immutable
+    def charset(self):
+        '''Charset part of Content-Type response header, or None if
+        Content-Type header is not present or does not include a charset.
+        '''
+        
+        content_type = self.headers.get('content-type')
+        if content_type is None:
+            return None
+        
+        parts = [part.strip() for part in content_type.split(';')[1:]]
+        for part in parts:
+            if part.lower().startswith('charset='):
+                return part[8:].strip()
+        
+        return None
     
     @property
     def etree(self):

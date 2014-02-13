@@ -79,3 +79,13 @@ def get_json_empty():
 @app.route('/json/hash')
 def get_json_empty():
     return '{"a": "b"}'
+
+@app.route('/utf16_body')
+def get_utf16_body():
+    bottle.response.headers['content-type'] = 'text/plain; charset=utf-16'
+    return u'hello world'.encode('utf-16')
+
+@app.route('/no_charset')
+def get_no_charset():
+    bottle.response.headers['content-type'] = 'text/plain'
+    return 'hello world'.encode('us-ascii')
