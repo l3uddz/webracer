@@ -1253,9 +1253,7 @@ class Agent(object):
                 extension = None
             if extension is not None:
                 basename += extension
-            encoded_body = self.response.body
-            if py3:
-                encoded_body = bytes(encoded_body, 'utf-8')
+            encoded_body = self.response.raw_body
             with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
                 f.write(encoded_body)
             last_path = os.path.join(self.config.save_dir, 'last')
