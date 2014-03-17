@@ -1217,6 +1217,7 @@ class Agent(object):
         
         basename = '%s.request.headers' % id
         with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
+            f.write("%s %s HTTP/1.x\n\n" % (self.last_request.method, self.last_request.url))
             for header in self.last_request.headers:
                 f.write("%s: %s\n" % (header, self.last_request.headers[header]))
         
