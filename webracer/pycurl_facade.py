@@ -74,6 +74,8 @@ class Client(object):
         phase = [0]
         
         def header_function(header_line):
+            # this encoding applies to both http status line and headers
+            header_line = header_line.decode('iso-8859-1')
             if header_line == "\r\n":
                 phase[0] = 2
             if phase[0] == 1:
