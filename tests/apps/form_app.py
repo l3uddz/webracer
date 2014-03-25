@@ -185,6 +185,21 @@ def checkboxes():
 </html>
 '''
 
+@app.route('/unvalued_checkbox')
+def unvalued_checkbox():
+    return '''
+<!doctype html>
+<html>
+<head></head>
+<body>
+    <form action='/dump_params'>
+        <input type='checkbox' name='field' />
+        <input type='submit' />
+    </form>
+</body>
+</html>
+'''
+
 @app.route('/empty_textarea')
 def empty_textarea():
     return '''

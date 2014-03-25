@@ -509,6 +509,11 @@ class FormElements(object):
                         if element_value is not None and \
                             element_value in self.chosen_values[element_name]:
                                 include = self.chosen_values[element_name][element_value] is not None
+                        elif element_value is None and self.chosen_values[element_name][True]:
+                            include = True
+                            # browsers send "on" as checkbox value if no value
+                            # is specified in the form
+                            element_value = 'on'
                         elif element_selected:
                             include = True
                         if include:
@@ -615,8 +620,9 @@ class MutableFormElements(FormElements):
                             else:
                                 found = True
                         else:
-                            if element_value == value:
-                                found = True
+                            if element_value == value or \
+                                value is True and element_type == 'checkbox':
+                                    found = True
                             else:
                                 found_rejected = 'Element `%s` does not have `%s` as a possible value' % (name, value)
                 else:

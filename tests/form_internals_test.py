@@ -100,6 +100,17 @@ class FormInternalsTest(webracer.WebTestCase):
         self.assertEquals(['checkbox', 'field', 'first', False], utils.listit(elements[0]))
         self.assertEquals(['checkbox', 'field', 'second', True], utils.listit(elements[1]))
     
+    def test_elements_unvaued_checkbox(self):
+        self.get('/unvalued_checkbox')
+        self.assert_status(200)
+        forms = self.response.forms
+        self.assertEquals(1, len(forms))
+        
+        form = forms[0]
+        elements = form.elements.elements
+        self.assertEqual(2, len(elements))
+        self.assertEquals(['checkbox', 'field', None, False], utils.listit(elements[0]))
+    
     def test_empty_textarea(self):
         self.get('/empty_textarea')
         self.assert_status(200)
