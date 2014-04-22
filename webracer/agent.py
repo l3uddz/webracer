@@ -1213,8 +1213,6 @@ class Agent(object):
         if self.config.save_dir is None:
             raise ConfigurationError('Could not save response body - save_dir is None')
         
-        import mimetypes
-        
         id = '%f_%d' % (_time.time(), threading.current_thread().ident)
         
         basename = '%s.request.headers' % id
@@ -1243,8 +1241,14 @@ class Agent(object):
                 # confuses mimetypes; delete
                 if ';' in content_type:
                     content_type = content_type[:content_type.index(';')]
-                # includes leading dot, or None
-                extension = mimetypes.guess_extension(content_type)
+                # mimetypes maps text/plain to .ksh which is just dumb:
+                # http://bugs.python.org/issue1043134
+                if content_type == 'text/plain':
+                    extension = '.txt'
+                else:
+                    import mimetypes
+                    # includes leading dot, or None
+                    extension = mimetypes.guess_extension(content_type)
             else:
                 extension = None
             if extension is not None:
