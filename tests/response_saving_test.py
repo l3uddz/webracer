@@ -69,6 +69,27 @@ class ResponseTest(webracer.WebTestCase):
         assert entries[1].endswith('.response.body.txt')
         assert entries[2].endswith('.response.headers')
     
+    @webracer.config(save_responses=True, save_dir=save_dir)
+    def test_save_encoded(self):
+        self.assertEqual(0, len(list_save_dir()))
+        
+        self.get('/utf16_body')
+        self.assert_status(200)
+        self.assertEqual('hello world', self.response.body)
+        
+        entries = list_save_dir()
+        # response + last symlink
+        self.assertEqual(4, len(entries))
+        assert 'last.txt' in entries, 'last.txt not in entries: %s' % repr(entries)
+        entries.remove('last.txt')
+        entries.sort()
+        assert entries[0].endswith('.request.headers')
+        assert entries[1].endswith('.response.body.txt')
+        with open(os.path.join(save_dir, entries[1]), 'rb') as f:
+            contents = f.read()
+            self.assertEqual(utils.u('hello world').encode('utf-16'), contents)
+        assert entries[2].endswith('.response.headers')
+    
     @webracer.config(save_responses=True, save_dir=nonexistent_save_dir)
     def test_save_to_nonexistent_dir(self):
         assert not os.path.exists(nonexistent_save_dir)
