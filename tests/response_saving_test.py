@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import os.path
 import webracer
@@ -88,6 +90,27 @@ class ResponseTest(webracer.WebTestCase):
         with open(os.path.join(save_dir, entries[1]), 'rb') as f:
             contents = f.read()
             self.assertEqual(utils.u('hello world').encode('utf-16'), contents)
+        assert entries[2].endswith('.response.headers')
+    
+    @webracer.config(save_responses=True, save_dir=save_dir)
+    def test_save_unicode(self):
+        self.assertEqual(0, len(list_save_dir()))
+        
+        self.get('/unicode_body')
+        self.assert_status(200)
+        self.assertEqual(utils.u('Столица'), self.response.body)
+        
+        entries = list_save_dir()
+        # response + last symlink
+        self.assertEqual(4, len(entries))
+        assert 'last.html' in entries, 'last.html not in entries: %s' % repr(entries)
+        entries.remove('last.html')
+        entries.sort()
+        assert entries[0].endswith('.request.headers')
+        assert entries[1].endswith('.response.body.html')
+        with open(os.path.join(save_dir, entries[1]), 'rb') as f:
+            contents = f.read()
+            self.assertEqual(utils.u('Столица').encode('utf-8'), contents)
         assert entries[2].endswith('.response.headers')
     
     @webracer.config(save_responses=True, save_dir=nonexistent_save_dir)
