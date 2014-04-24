@@ -7,6 +7,11 @@ app = bottle.Bottle()
 def ok():
     return 'ok'
 
+@app.route('/ok_plain')
+def ok_plain():
+    bottle.response.headers['content-type'] = 'text/plain'
+    return 'ok'
+
 @app.route('/internal_server_error')
 def internal_error():
     bottle.abort(500, 'internal server error')
