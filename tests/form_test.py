@@ -242,6 +242,15 @@ class FormTest(webracer.WebTestCase):
         elements.set_value('field', 'first')
         self.assertEquals([['field', 'first'], ['field', 'second']], utils.listit(elements.params.list))
     
+    def test_unvalued_checkbox_value(self):
+        self.get('/unvalued_checkbox')
+        self.assert_status(200)
+        
+        form = self.response.form()
+        elements = form.elements.mutable
+        elements.set_value('field', True)
+        self.assertEquals([['field', 'on']], utils.listit(elements.params.list))
+    
     def test_set_and_clear_checkbox(self):
         self.get('/checkboxes')
         self.assert_status(200)
