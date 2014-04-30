@@ -3,12 +3,12 @@ import ocookie
 import re
 
 try:
-    from cStringIO import StringIO
+    from cStringIO import StringIO as BytesIO
 except ImportError:
     try:
-        from StringIO import StringIO
+        from StringIO import StringIO as BytesIO
     except ImportError:
-        from io import StringIO
+        from io import BytesIO
 
 class Response(object):
     def __init__(self, curl, buf, headers):
@@ -22,6 +22,11 @@ class Response(object):
     
     @property
     def raw_body(self):
+        '''Returns response body in whichever content encoding
+        it was received.
+        
+        Returns a binary string.
+        '''
         return self.buf.getvalue()
     
     @property
@@ -51,7 +56,7 @@ class Client(object):
                 # which would need to be encoded for earlier pycurls
                 curl.setopt(curl.CUSTOMREQUEST, req.method.encode('iso-8859-1'))
         
-        buf = StringIO()
+        buf = BytesIO()
         curl.setopt(curl.WRITEFUNCTION, buf.write)
         
         if req.body is not None:
