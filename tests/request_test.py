@@ -13,6 +13,10 @@ class FullUrlTest(webracer.WebTestCase):
         self.get('http://127.0.0.1:8054/ok')
         self.assert_status(200)
     
+    def test_request_unicode_url(self):
+        self.get(utils.u('http://127.0.0.1:8054/ok'))
+        self.assert_status(200)
+    
     def test_response_return_from_get_on_agent(self):
         with self.agent() as s:
             response = s.get('http://127.0.0.1:8054/ok')

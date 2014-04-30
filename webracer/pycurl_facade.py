@@ -38,14 +38,18 @@ class Response(object):
 class Client(object):
     def request(self, req):
         curl = pycurl.Curl()
-        curl.setopt(curl.URL, req.url)
+        # url might be a unicode string,
+        # which would need to be encoded for earlier pycurls
+        curl.setopt(curl.URL, req.url.encode('iso-8859-1'))
         
         if req.method != 'GET':
             if req.method == 'POST':
                 # CUSTOMREQUEST does not work here
                 curl.setopt(curl.POST, True)
             else:
-                curl.setopt(curl.CUSTOMREQUEST, req.method)
+                # method might be a unicode string,
+                # which would need to be encoded for earlier pycurls
+                curl.setopt(curl.CUSTOMREQUEST, req.method.encode('iso-8859-1'))
         
         buf = StringIO()
         curl.setopt(curl.WRITEFUNCTION, buf.write)
