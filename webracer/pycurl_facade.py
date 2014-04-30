@@ -62,7 +62,7 @@ class Client(object):
                 value = req.headers[key]
                 # XXX very crude
                 header = '%s: %s' % (key, value)
-                header_list.append(header)
+                header_list.append(header.encode('iso-8859-1'))
             curl.setopt(curl.HTTPHEADER, header_list)
         
         self.setup_header_parsing(curl)
