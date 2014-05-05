@@ -3,12 +3,12 @@ import ocookie
 import re
 
 try:
-    from cStringIO import StringIO
+    from cStringIO import StringIO as BytesIO
 except ImportError:
     try:
-        from StringIO import StringIO
+        from StringIO import StringIO as BytesIO
     except ImportError:
-        from io import StringIO
+        from io import BytesIO
 
 class Response(object):
     def __init__(self, curl, buf, headers):
@@ -22,6 +22,11 @@ class Response(object):
     
     @property
     def raw_body(self):
+        '''Returns response body in whichever content encoding
+        it was received.
+        
+        Returns a binary string.
+        '''
         return self.buf.getvalue()
     
     @property
@@ -38,16 +43,20 @@ class Response(object):
 class Client(object):
     def request(self, req):
         curl = pycurl.Curl()
-        curl.setopt(curl.URL, req.url)
+        # url might be a unicode string,
+        # which would need to be encoded for earlier pycurls
+        curl.setopt(curl.URL, req.url.encode('iso-8859-1'))
         
         if req.method != 'GET':
             if req.method == 'POST':
                 # CUSTOMREQUEST does not work here
                 curl.setopt(curl.POST, True)
             else:
-                curl.setopt(curl.CUSTOMREQUEST, req.method)
+                # method might be a unicode string,
+                # which would need to be encoded for earlier pycurls
+                curl.setopt(curl.CUSTOMREQUEST, req.method.encode('iso-8859-1'))
         
-        buf = StringIO()
+        buf = BytesIO()
         curl.setopt(curl.WRITEFUNCTION, buf.write)
         
         if req.body is not None:
@@ -62,7 +71,7 @@ class Client(object):
                 value = req.headers[key]
                 # XXX very crude
                 header = '%s: %s' % (key, value)
-                header_list.append(header)
+                header_list.append(header.encode('iso-8859-1'))
             curl.setopt(curl.HTTPHEADER, header_list)
         
         self.setup_header_parsing(curl)
@@ -74,6 +83,8 @@ class Client(object):
         phase = [0]
         
         def header_function(header_line):
+            # this encoding applies to both http status line and headers
+            header_line = header_line.decode('iso-8859-1')
             if header_line == "\r\n":
                 phase[0] = 2
             if phase[0] == 1:
