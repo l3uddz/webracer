@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import bottle
 from .. import utils
 
@@ -11,6 +13,10 @@ def ok():
 def ok_plain():
     bottle.response.headers['content-type'] = 'text/plain'
     return 'ok'
+
+@app.route('/unicode_body')
+def unicode_body():
+    return utils.u('Столица')
 
 @app.route('/internal_server_error')
 def internal_error():
