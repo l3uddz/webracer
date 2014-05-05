@@ -1217,8 +1217,11 @@ class Agent(object):
         
         basename = '%s.request.headers' % id
         with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
+            request_line = "%s %s HTTP/1.x\n\n" % (self.last_request.method, self.last_request.url)
+            f.write(request_line.encode('iso-8859-1'))
             for header in self.last_request.headers:
-                f.write("%s: %s\n" % (header, self.last_request.headers[header]))
+                header_line = "%s: %s\n" % (header, self.last_request.headers[header])
+                f.write(header_line.encode('iso-8859-1'))
         
         if self.last_request.body is not None and len(self.last_request.body) > 0:
             basename = '%s.request.body' % id
@@ -1231,7 +1234,8 @@ class Agent(object):
         basename = '%s.response.headers' % id
         with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
             for header in self.response.headers:
-                f.write("%s: %s\n" % (header, self.response.headers[header]))
+                header_line = "%s: %s\n" % (header, self.response.headers[header])
+                f.write(header_line.encode('iso-8859-1'))
         
         if len(self.response.body) > 0:
             basename = '%s.response.body' % id
