@@ -93,6 +93,8 @@ class Config(object):
     # in a directory specified by save_dir.
     # If follow_redirects is True, redirect responses that webracer follows
     # are saved.
+    # If retry_failed is True, responses that are automatically retried by
+    # webracer are saved as well.
     save_responses = False
     # If True, responses whose statuses are unexpected will be saved
     # in a directory specified by save_dir.
@@ -1117,6 +1119,8 @@ class Agent(object):
             self.last_request = Request(method.upper(), url, body, computed_headers)
             response = client.request(self.last_request)
             response = Response(url, response)
+            if self.config.save_responses:
+                self._save_response(response)
             if self.config.retry_failed:
                 if retry_check(response):
                     if retries < self.config.retry_count:
@@ -1127,8 +1131,6 @@ class Agent(object):
         if self.config.use_cookie_jar:
             for cookie in self.response.raw_cookies:
                 self._cookie_jar.add(cookie)
-        if self.config.save_responses:
-            self._save_response()
         self.current_url = url
         return response
     
@@ -1212,7 +1214,7 @@ class Agent(object):
             fn = sequence_retry_condition_factory(self.config.retry_condition)
         return fn
     
-    def _save_response(self):
+    def _save_response(self, response=None):
         if self.config.save_dir is None:
             raise ConfigurationError('Could not save response body - save_dir is None')
         
@@ -1234,16 +1236,19 @@ class Agent(object):
             with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
                 f.write(encoded_body)
         
+        if response is None:
+            response = self.response
+        
         basename = '%s.response.headers' % id
         with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
-            for header in self.response.headers:
-                header_line = "%s: %s\n" % (header, self.response.headers[header])
+            for header in response.headers:
+                header_line = "%s: %s\n" % (header, response.headers[header])
                 f.write(header_line.encode('iso-8859-1'))
         
-        if len(self.response.body) > 0:
+        if len(response.body) > 0:
             basename = '%s.response.body' % id
-            if 'content-type' in self.response.headers:
-                content_type = self.response.headers['content-type']
+            if 'content-type' in response.headers:
+                content_type = response.headers['content-type']
                 # content type might have a charset etc which
                 # confuses mimetypes; delete
                 if ';' in content_type:
@@ -1260,7 +1265,7 @@ class Agent(object):
                 extension = None
             if extension is not None:
                 basename += extension
-            encoded_body = self.response.raw_body
+            encoded_body = response.raw_body
             with open(os.path.join(self.config.save_dir, basename), 'wb') as f:
                 f.write(encoded_body)
             last_path = os.path.join(self.config.save_dir, 'last')

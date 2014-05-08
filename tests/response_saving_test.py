@@ -5,7 +5,7 @@ import os.path
 import webracer
 import nose.plugins.attrib
 from . import utils
-from .apps import kitchen_sink_app
+from .apps import kitchen_sink_app, retry_app
 
 try:
     # python 3.3?
@@ -13,7 +13,10 @@ try:
 except NameError:
     file_not_found_exception_class = IOError
 
-utils.app_runner_setup(__name__, kitchen_sink_app.app, 8060)
+utils.app_runner_setup_multiple(__name__, [
+    (kitchen_sink_app.app, 8060),
+    (retry_app.app, 8063),
+])
 
 save_dir = os.environ.get('WEBRACER_TEST_TMP') or os.path.join(os.path.dirname(__file__), 'tmp')
 nonexistent_save_dir = '/tmp/nonexistent.dee11123e367b4a7506f856cc55898fabd4caeff'
@@ -189,3 +192,15 @@ class ResponseSavingTest(webracer.WebTestCase):
         entries = list_save_dir()
         # two responses + last symlink
         self.assertEqual(6, len(entries))
+    
+    @webracer.config(save_responses=True, save_dir=save_dir,
+        retry_failed=True, retry_count=2, retry_condition=[404], port=8063)
+    def test_save_retried_request(self):
+        retry_app.status_codes = [404, 200]
+        
+        self.get('/')
+        self.assert_status(200)
+        
+        entries = list_save_dir()
+        # two responses + last symlink
+        self.assertEqual(7, len(entries))
