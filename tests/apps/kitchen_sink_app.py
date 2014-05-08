@@ -26,7 +26,7 @@ def internal_error():
 def unhandled_exception():
     raise ValueError('This is an unhandled exception')
 
-@app.route('/redirect')
+@app.route('/redirect', method=('GET', 'POST'))
 def redirect():
     bottle.redirect('/found', 302)
 

@@ -88,8 +88,11 @@ class Config(object):
     
     user_agent = None
     
-    # If True, all responses will be saved in a directory specified by
-    # save_dir.
+    # If True, request lines, headers and bodies for all requests and
+    # responses sent and received by webracer will be written to files
+    # in a directory specified by save_dir.
+    # If follow_redirects is True, redirect responses that webracer follows
+    # are saved.
     save_responses = False
     # If True, responses whose statuses are unexpected will be saved
     # in a directory specified by save_dir.

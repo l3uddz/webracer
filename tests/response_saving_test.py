@@ -165,3 +165,27 @@ class ResponseSavingTest(webracer.WebTestCase):
         assert nonexistent_save_dir in str(cm.exception)
         
         assert not os.path.exists(nonexistent_save_dir)
+    
+    @webracer.config(save_responses=True, save_dir=save_dir,
+        follow_redirects=True)
+    def test_save_followed_redirect_from_get(self):
+        self.get('/redirect')
+        
+        self.assert_status(200)
+        self.assertEqual('found', self.response.body)
+        
+        entries = list_save_dir()
+        # two responses + last symlink
+        self.assertEqual(6, len(entries))
+    
+    @webracer.config(save_responses=True, save_dir=save_dir,
+        follow_redirects=True)
+    def test_save_followed_redirect_from_post(self):
+        self.post('/redirect')
+        
+        self.assert_status(200)
+        self.assertEqual('found', self.response.body)
+        
+        entries = list_save_dir()
+        # two responses + last symlink
+        self.assertEqual(6, len(entries))
