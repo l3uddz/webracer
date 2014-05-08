@@ -25,9 +25,9 @@ def list_save_dir():
 
 @nose.plugins.attrib.attr('client')
 @webracer.config(host='localhost', port=8060)
-class ResponseTest(webracer.WebTestCase):
+class ResponseSavingTest(webracer.WebTestCase):
     def setUp(self, *args, **kwargs):
-        super(ResponseTest, self).setUp(*args, **kwargs)
+        super(ResponseSavingTest, self).setUp(*args, **kwargs)
         
         if not os.path.exists(save_dir):
             os.mkdir(save_dir)
